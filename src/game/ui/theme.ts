@@ -9,7 +9,7 @@ export const FONT = '"M PLUS Rounded 1c", "Hiragino Maru Gothic ProN", "Hiragino
 
 export const COLOR = {
   text: PAL.uiText,
-  dim: PAL.uiTextDim,
+  dim: "#beb4a2", // secondary text — bright enough to stay readable at small sizes
   accent: PAL.uiAccent,
   good: PAL.uiGood,
   bad: PAL.uiBad,

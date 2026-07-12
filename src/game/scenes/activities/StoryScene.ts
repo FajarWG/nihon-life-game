@@ -1,6 +1,7 @@
 import type { StoryEvent } from "@/core/types";
 import { markStoryPlayed, storeStory, unplayedStory } from "@/core/db";
 import { G } from "@/game/state/gameState";
+import { M } from "@/game/i18n";
 import { COLOR, style } from "@/game/ui/theme";
 import { PixelButton } from "@/game/ui/widgets";
 import { ActivityBase, AW, PY, PH } from "./ActivityBase";
@@ -73,7 +74,7 @@ export class StoryScene extends ActivityBase {
         add(this.add.text(AW / 2, PY + 90, line.speaker === "narrator" ? "" : `— ${line.speaker} —`, style(11, COLOR.dim)).setOrigin(0.5));
         add(this.add.text(AW / 2, PY + 150, line.jp, style(18, COLOR.text, { wordWrap: { width: 620 }, align: "center", lineSpacing: 6 })).setOrigin(0.5));
         add(this.add.text(AW / 2, PY + 210, line.kana ?? "", style(11, COLOR.kana, { wordWrap: { width: 620 }, align: "center" })).setOrigin(0.5));
-        add(this.add.text(AW / 2, PY + 250, line.en, style(11, COLOR.dim, { wordWrap: { width: 620 }, align: "center", fontStyle: "italic" })).setOrigin(0.5));
+        add(this.add.text(AW / 2, PY + 250, M(line), style(11, COLOR.dim, { wordWrap: { width: 620 }, align: "center", fontStyle: "italic" })).setOrigin(0.5));
       }, "▼");
     }
 

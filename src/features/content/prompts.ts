@@ -23,6 +23,7 @@ const SHAPES: Record<ContentType, string> = {
   "kana": "みず",
   "romaji": "mizu",
   "en": "water",
+  "idn": "air",                // Indonesian gloss
   "category": "school" | "food" | "shopping" | "train" | "work" | "daily" | "time" | "place"
 }`,
   grammar: `{
@@ -30,8 +31,9 @@ const SHAPES: Record<ContentType, string> = {
   "level": "N5" | "N4" | "N3",
   "title": "〜たいです",
   "meaning": "want to do",
+  "meaningIdn": "ingin melakukan",
   "explanation": "1-3 friendly english sentences",
-  "examples": [ { "jp": "...", "kana": "...", "en": "..." } ],   // 2 examples
+  "examples": [ { "jp": "...", "kana": "...", "en": "...", "idn": "..." } ],   // 2 examples
   "exercises": [                                                  // 2-3 exercises
     { "kind": "order", "prompt": "english meaning", "tiles": ["私","は","学生","です"], "translation": "私は学生です。" },
     { "kind": "fill", "prompt": "instruction", "sentence": "田中さんは先生___。", "options": ["です","ます","だます"], "answer": "です", "translation": "..." }
@@ -51,7 +53,7 @@ const SHAPES: Record<ContentType, string> = {
   "nameJp": "味噌汁", "kana": "みそしる", "nameEn": "Miso Soup",
   "level": "N5" | "N4" | "N3",
   "ingredients": ["tofu", "miso"],          // existing item ids
-  "steps": [ { "jp": "...", "kana": "...", "en": "..." } ],  // 4-6 ordered steps
+  "steps": [ { "jp": "...", "kana": "...", "en": "...", "idn": "..." } ],  // 4-6 ordered steps
   "result": "meal-xxx"                       // item id of the cooked meal (add it via an items pack!)
 }`,
   stations: `{
@@ -73,14 +75,14 @@ const SHAPES: Record<ContentType, string> = {
   "bio": "one line",
   "favoriteItems": ["melonpan"],             // existing item ids
   "schedule": [ { "from": 8, "to": 17, "location": "school", "x": 7, "y": 2 } ],
-  "dialogues": [ { "id": "<id>-0", "minFriendship": 0, "lines": [ { "speaker": "<id>", "jp": "...", "kana": "...", "en": "..." } ] } ],
+  "dialogues": [ { "id": "<id>-0", "minFriendship": 0, "lines": [ { "speaker": "<id>", "jp": "...", "kana": "...", "en": "...", "idn": "..." } ] } ],
   "questId": "optional-quest-id"             // starts at friendship >= 3
 }`,
   quests: `{
   "id": "kebab-id",
   "type": "main" | "daily" | "side" | "school" | "work" | "cooking" | "relationship" | "festival",
   "title": "English Title", "titleJp": "日本語タイトル",
-  "desc": "what to do",
+  "desc": "what to do", "descIdn": "deskripsi bahasa Indonesia",
   "objectives": [ { "id": "o1", "desc": "...", "event": "talk|gift|buy|cook|eat|activity|visit", "target": "optional-id", "count": 1 } ],
   "reward": { "money": 300, "xp": { "reading": 5 } },
   "prereq": ["optional-quest-ids"], "next": "optional-next-main-quest"
@@ -90,7 +92,7 @@ const SHAPES: Record<ContentType, string> = {
   "kind": "bug-css" | "bug-js" | "ui-label" | "git-order" | "code-review" | "meeting" | "docs",
   "level": "N5" | "N4" | "N3",
   "title": "日本語のチケット名", "titleEn": "english",
-  "body": [ { "jp": "...", "en": "..." } ],
+  "body": [ { "jp": "...", "en": "...", "idn": "..." } ],
   "question": "what the player must decide",
   "options": ["a","b","c"], "answer": "a",   // for choice kinds
   "tiles": ["step1","step2"],                // for git-order instead of options
@@ -101,7 +103,7 @@ const SHAPES: Record<ContentType, string> = {
   "id": "read-n5-x",
   "level": "N5" | "N4" | "N3",
   "title": "私の一日",
-  "text": [ { "jp": "...", "kana": "...", "en": "..." } ],   // 3-4 short lines
+  "text": [ { "jp": "...", "kana": "...", "en": "...", "idn": "..." } ],   // 3-4 short lines
   "question": "english comprehension question",
   "options": ["a","b","c"], "answer": "a"
 }`,
@@ -148,6 +150,7 @@ Rules:
 - Target JLPT level: ${level}. Japanese must be level-appropriate (short simple sentences for N5).
 - Every Japanese string needs correct kana readings where the shape includes them.
 - Warm, everyday, culturally authentic content. No violence or romance.
+- Fill every "idn" field with a natural Bahasa Indonesia translation (the game shows meanings in Indonesian).
 - ids must be unique and MUST NOT collide with these existing ids:
 ${existing.join(", ") || "(none yet)"}
 ${EXTRA_NOTES[type] ? "- " + EXTRA_NOTES[type] : ""}

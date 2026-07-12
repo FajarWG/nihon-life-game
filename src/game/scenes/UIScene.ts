@@ -6,6 +6,7 @@ import { sfx } from "@/game/audio/sfx";
 import { adjustFriendship, questDef } from "@/game/systems/quests";
 import { NPC_MAP } from "@/data/npcs";
 import { G, gameStore, MAX_ENERGY } from "@/game/state/gameState";
+import { getUiLang, L, M, meaning } from "@/game/i18n";
 import { COLOR, style } from "@/game/ui/theme";
 import { Bar, panel, PixelButton, Typewriter } from "@/game/ui/widgets";
 
@@ -95,7 +96,11 @@ export class UIScene extends Phaser.Scene {
       padding: { x: 8, y: 5 },
     }));
 
-    this.add.text(W - 10, H - 8, "[E] interact · [I] bag · [Q] quests · [ESC] menu", style(10, "#d8d2c4", {
+    // control hints: single language only (JA when UI is set to Japanese, else meaning language)
+    const hint = getUiLang() === "ja"
+      ? "[E] 調べる · [I] かばん · [Q] クエスト · [ESC] メニュー"
+      : meaning("[E] interact · [I] bag · [Q] quests · [ESC] menu", "[E] interaksi · [I] tas · [Q] misi · [ESC] menu");
+    this.add.text(W - 10, H - 8, hint, style(10, "#d8d2c4", {
       backgroundColor: "#201a2ecc",
       padding: { x: 8, y: 4 },
     })).setOrigin(1);
@@ -181,7 +186,7 @@ export class UIScene extends Phaser.Scene {
     this.dlgMore.setVisible(false);
     this.typer.play(line.jp, 40, () => {
       this.dlgKana.setText(line.kana ?? "");
-      this.dlgEn.setText(line.en);
+      this.dlgEn.setText(M(line));
       this.dlgMore.setVisible(true);
     });
   }
@@ -194,7 +199,7 @@ export class UIScene extends Phaser.Scene {
     if (!this.typer.done) {
       this.typer.finish(line.jp);
       this.dlgKana.setText(line.kana ?? "");
-      this.dlgEn.setText(line.en);
+      this.dlgEn.setText(M(line));
       this.dlgMore.setVisible(true);
       return;
     }
@@ -256,10 +261,10 @@ export class UIScene extends Phaser.Scene {
     const choices = !rec.giftedToday && giftables.length
       ? [
           ...giftables.map(id => ({
-            text: `Give ${ITEM_MAP[id].nameJp}（${ITEM_MAP[id].nameEn}）`,
+            text: L(`${ITEM_MAP[id].nameJp}をあげる`, `Give ${ITEM_MAP[id].nameEn}`, `Beri ${ITEM_MAP[id].nameEn}`),
             cb: () => this.giveGift(npc, id),
           })),
-          { text: "またね (See you)", cb: () => {} },
+          { text: L("またね", "See you", "Sampai nanti"), cb: () => {} },
         ]
       : undefined;
 

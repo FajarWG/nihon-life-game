@@ -50,7 +50,7 @@ export default function TitlePage() {
         className="text-center"
       >
         <div className="text-sm tracking-[0.4em] text-[#9ad0f0] mb-3">にほんライフ</div>
-        <h1 className="font-pixel text-4xl md:text-6xl font-bold text-[var(--accent)] drop-shadow-[3px_3px_0_#000]">
+        <h1 className="text-4xl md:text-6xl font-bold text-[var(--accent)] drop-shadow-[3px_3px_0_#000]">
           Nihon Life
         </h1>
         <p className="mt-2 text-lg text-[#a89e8c]">Live · Learn · Work</p>

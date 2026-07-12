@@ -7,7 +7,7 @@ import type { GrammarPoint } from "@/core/types";
 export const GRAMMAR: GrammarPoint[] = [
   // ═══ N5 ═══════════════════════════════════════════════════════════════
   {
-    id: "g5-desu", level: "N5", title: "〜です", meaning: "to be (polite)",
+    id: "g5-desu", level: "N5", title: "〜です", meaning: "to be (polite)", meaningIdn: "adalah (bentuk sopan)",
     explanation: "です politely states what something is. Put it after a noun or na-adjective. The negative is じゃありません.",
     examples: [
       { jp: "私は学生です。", kana: "わたしはがくせいです。", en: "I am a student." },
@@ -20,7 +20,7 @@ export const GRAMMAR: GrammarPoint[] = [
     ],
   },
   {
-    id: "g5-masu", level: "N5", title: "〜ます", meaning: "polite verb ending",
+    id: "g5-masu", level: "N5", title: "〜ます", meaning: "polite verb ending", meaningIdn: "akhiran kata kerja sopan",
     explanation: "ます makes verbs polite: 食べる→食べます. Negative is ません, past is ました.",
     examples: [
       { jp: "毎朝パンを食べます。", kana: "まいあさパンをたべます。", en: "I eat bread every morning." },
@@ -33,7 +33,7 @@ export const GRAMMAR: GrammarPoint[] = [
     ],
   },
   {
-    id: "g5-wa-ga", level: "N5", title: "は・が", meaning: "topic and subject particles",
+    id: "g5-wa-ga", level: "N5", title: "は・が", meaning: "topic and subject particles", meaningIdn: "partikel topik dan subjek",
     explanation: "は marks the topic (what we're talking about). が marks the subject, often for new information or emphasis: 私は学生です / 猫がいます.",
     examples: [
       { jp: "私は留学生です。", kana: "わたしはりゅうがくせいです。", en: "I am an international student." },
@@ -45,7 +45,7 @@ export const GRAMMAR: GrammarPoint[] = [
     ],
   },
   {
-    id: "g5-o", level: "N5", title: "〜を", meaning: "direct object particle",
+    id: "g5-o", level: "N5", title: "〜を", meaning: "direct object particle", meaningIdn: "partikel objek",
     explanation: "を marks what the action is done to: パンを食べます (I eat bread).",
     examples: [
       { jp: "卵を買います。", kana: "たまごをかいます。", en: "I buy eggs." },
@@ -57,7 +57,7 @@ export const GRAMMAR: GrammarPoint[] = [
     ],
   },
   {
-    id: "g5-ni-de", level: "N5", title: "〜に・〜で", meaning: "place and destination particles",
+    id: "g5-ni-de", level: "N5", title: "〜に・〜で", meaning: "place and destination particles", meaningIdn: "partikel tempat & tujuan",
     explanation: "に marks destination or location of existence (学校に行く、家にいる). で marks where an action happens (図書館で勉強する).",
     examples: [
       { jp: "駅に行きます。", kana: "えきにいきます。", en: "I go to the station." },
@@ -69,7 +69,7 @@ export const GRAMMAR: GrammarPoint[] = [
     ],
   },
   {
-    id: "g5-tai", level: "N5", title: "〜たい", meaning: "want to do",
+    id: "g5-tai", level: "N5", title: "〜たい", meaning: "want to do", meaningIdn: "ingin melakukan",
     explanation: "Attach たい to the verb stem to say you want to do something: 食べたい (want to eat). It conjugates like an i-adjective.",
     examples: [
       { jp: "日本で働きたいです。", kana: "にほんではたらきたいです。", en: "I want to work in Japan." },
@@ -81,7 +81,7 @@ export const GRAMMAR: GrammarPoint[] = [
     ],
   },
   {
-    id: "g5-tekudasai", level: "N5", title: "〜てください", meaning: "please do…",
+    id: "g5-tekudasai", level: "N5", title: "〜てください", meaning: "please do…", meaningIdn: "tolong lakukan…",
     explanation: "Te-form + ください politely asks someone to do something: 見てください (please look).",
     examples: [
       { jp: "ここに名前を書いてください。", kana: "ここになまえをかいてください。", en: "Please write your name here." },
@@ -93,7 +93,7 @@ export const GRAMMAR: GrammarPoint[] = [
     ],
   },
   {
-    id: "g5-arimasu", level: "N5", title: "あります・います", meaning: "existence (things / living)",
+    id: "g5-arimasu", level: "N5", title: "あります・います", meaning: "existence (things / living)", meaningIdn: "keberadaan (benda / makhluk hidup)",
     explanation: "あります = inanimate things exist. います = people and animals exist. 机があります / 猫がいます.",
     examples: [
       { jp: "コンビニに卵があります。", kana: "コンビニにたまごがあります。", en: "There are eggs at the convenience store." },
@@ -105,7 +105,7 @@ export const GRAMMAR: GrammarPoint[] = [
     ],
   },
   {
-    id: "g5-mashita", level: "N5", title: "〜ました", meaning: "polite past tense",
+    id: "g5-mashita", level: "N5", title: "〜ました", meaning: "polite past tense", meaningIdn: "bentuk lampau sopan",
     explanation: "ました is the past of ます: 食べました (ate). Negative past is ませんでした.",
     examples: [
       { jp: "昨日、勉強しました。", kana: "きのう、べんきょうしました。", en: "I studied yesterday." },
@@ -117,7 +117,7 @@ export const GRAMMAR: GrammarPoint[] = [
     ],
   },
   {
-    id: "g5-adj", level: "N5", title: "い形容詞・な形容詞", meaning: "i- and na-adjectives",
+    id: "g5-adj", level: "N5", title: "い形容詞・な形容詞", meaning: "i- and na-adjectives", meaningIdn: "kata sifat -i dan -na",
     explanation: "i-adjectives end in い and connect directly (安い店). na-adjectives need な before a noun (元気な人).",
     examples: [
       { jp: "この店は安いです。", kana: "このみせはやすいです。", en: "This shop is cheap." },
@@ -131,7 +131,7 @@ export const GRAMMAR: GrammarPoint[] = [
 
   // ═══ N4 ═══════════════════════════════════════════════════════════════
   {
-    id: "g4-potential", level: "N4", title: "可能形 〜られる/〜える", meaning: "potential form (can do)",
+    id: "g4-potential", level: "N4", title: "可能形 〜られる/〜える", meaning: "potential form (can do)", meaningIdn: "bentuk potensial (bisa)",
     explanation: "Ru-verbs: 食べる→食べられる. U-verbs: 書く→書ける. する→できる. The object often takes が: 日本語が話せます.",
     examples: [
       { jp: "漢字が読めますか。", kana: "かんじがよめますか。", en: "Can you read kanji?" },
@@ -143,7 +143,7 @@ export const GRAMMAR: GrammarPoint[] = [
     ],
   },
   {
-    id: "g4-volitional", level: "N4", title: "意向形 〜よう", meaning: "volitional (let's / shall we)",
+    id: "g4-volitional", level: "N4", title: "意向形 〜よう", meaning: "volitional (let's / shall we)", meaningIdn: "bentuk ajakan (ayo)",
     explanation: "The casual 'let's': 行こう (let's go), 食べよう (let's eat). Polite version is ましょう.",
     examples: [
       { jp: "一緒に帰ろう。", kana: "いっしょにかえろう。", en: "Let's go home together." },
@@ -155,7 +155,7 @@ export const GRAMMAR: GrammarPoint[] = [
     ],
   },
   {
-    id: "g4-teiru", level: "N4", title: "〜ている", meaning: "ongoing state / continuous",
+    id: "g4-teiru", level: "N4", title: "〜ている", meaning: "ongoing state / continuous", meaningIdn: "sedang berlangsung / keadaan",
     explanation: "Te-form + いる: an action in progress (食べている = is eating) or a continuing state (結婚している = is married, 知っている = know).",
     examples: [
       { jp: "今、レポートを書いています。", kana: "いま、レポートをかいています。", en: "I am writing a report now." },
@@ -167,7 +167,7 @@ export const GRAMMAR: GrammarPoint[] = [
     ],
   },
   {
-    id: "g4-temoii", level: "N4", title: "〜てもいい・〜てはいけない", meaning: "permission and prohibition",
+    id: "g4-temoii", level: "N4", title: "〜てもいい・〜てはいけない", meaning: "permission and prohibition", meaningIdn: "izin dan larangan",
     explanation: "てもいい = it's okay to do. てはいけない = you must not. Essential for offices and trains!",
     examples: [
       { jp: "ここで写真を撮ってもいいですか。", kana: "ここでしゃしんをとってもいいですか。", en: "May I take photos here?" },
@@ -179,7 +179,7 @@ export const GRAMMAR: GrammarPoint[] = [
     ],
   },
   {
-    id: "g4-nakereba", level: "N4", title: "〜なければならない", meaning: "must / have to",
+    id: "g4-nakereba", level: "N4", title: "〜なければならない", meaning: "must / have to", meaningIdn: "harus / wajib",
     explanation: "Negative stem + なければならない: 行かなければならない (must go). Casual speech shortens it to なきゃ.",
     examples: [
       { jp: "明日までに宿題を出さなければなりません。", kana: "あしたまでにしゅくだいをださなければなりません。", en: "I must hand in the homework by tomorrow." },
@@ -191,7 +191,7 @@ export const GRAMMAR: GrammarPoint[] = [
     ],
   },
   {
-    id: "g4-hikaku", level: "N4", title: "〜より・〜のほうが", meaning: "comparisons",
+    id: "g4-hikaku", level: "N4", title: "〜より・〜のほうが", meaning: "comparisons", meaningIdn: "perbandingan",
     explanation: "AよりBのほうが〜 = B is more ~ than A. 電車のほうがバスより速いです.",
     examples: [
       { jp: "急行のほうが普通より速いです。", kana: "きゅうこうのほうがふつうよりはやいです。", en: "The express is faster than the local." },
@@ -203,7 +203,7 @@ export const GRAMMAR: GrammarPoint[] = [
     ],
   },
   {
-    id: "g4-sou", level: "N4", title: "〜そうです", meaning: "looks like / I heard",
+    id: "g4-sou", level: "N4", title: "〜そうです", meaning: "looks like / I heard", meaningIdn: "kelihatannya / katanya",
     explanation: "Stem + そう = looks like (おいしそう = looks tasty). Plain form + そう = I heard (雨が降るそうです = I heard it will rain).",
     examples: [
       { jp: "このケーキはおいしそうですね。", kana: "このケーキはおいしそうですね。", en: "This cake looks delicious." },
@@ -215,7 +215,7 @@ export const GRAMMAR: GrammarPoint[] = [
     ],
   },
   {
-    id: "g4-tara", level: "N4", title: "〜たら", meaning: "if / when",
+    id: "g4-tara", level: "N4", title: "〜たら", meaning: "if / when", meaningIdn: "kalau / ketika",
     explanation: "Past form + ら: conditional. 安かったら買います (if it's cheap, I'll buy it). Also 'when': 家に帰ったら電話します.",
     examples: [
       { jp: "仕事が終わったら、買い物に行きます。", kana: "しごとがおわったら、かいものにいきます。", en: "When work is over, I'll go shopping." },
@@ -227,7 +227,7 @@ export const GRAMMAR: GrammarPoint[] = [
     ],
   },
   {
-    id: "g4-nagara", level: "N4", title: "〜ながら", meaning: "while doing",
+    id: "g4-nagara", level: "N4", title: "〜ながら", meaning: "while doing", meaningIdn: "sambil",
     explanation: "Verb stem + ながら = doing two things at once: 音楽を聞きながら勉強します.",
     examples: [
       { jp: "音楽を聞きながら走ります。", kana: "おんがくをききながらはしります。", en: "I run while listening to music." },
@@ -239,7 +239,7 @@ export const GRAMMAR: GrammarPoint[] = [
     ],
   },
   {
-    id: "g4-agekure", level: "N4", title: "あげる・くれる・もらう", meaning: "giving and receiving",
+    id: "g4-agekure", level: "N4", title: "あげる・くれる・もらう", meaning: "giving and receiving", meaningIdn: "memberi dan menerima",
     explanation: "あげる = I give to others. くれる = someone gives to me. もらう = I receive. The direction matters!",
     examples: [
       { jp: "先生が辞書をくれました。", kana: "せんせいがじしょをくれました。", en: "The teacher gave me a dictionary." },
@@ -253,7 +253,7 @@ export const GRAMMAR: GrammarPoint[] = [
 
   // ═══ N3 ═══════════════════════════════════════════════════════════════
   {
-    id: "g3-passive", level: "N3", title: "受身形 〜られる", meaning: "passive voice",
+    id: "g3-passive", level: "N3", title: "受身形 〜られる", meaning: "passive voice", meaningIdn: "bentuk pasif",
     explanation: "食べられる (is eaten), 言われる (is told). Also used for the 'suffering passive': 雨に降られた (I got rained on).",
     examples: [
       { jp: "このアプリは多くの人に使われています。", kana: "このアプリはおおくのひとにつかわれています。", en: "This app is used by many people." },
@@ -265,7 +265,7 @@ export const GRAMMAR: GrammarPoint[] = [
     ],
   },
   {
-    id: "g3-causative", level: "N3", title: "使役形 〜させる", meaning: "causative (make / let someone do)",
+    id: "g3-causative", level: "N3", title: "使役形 〜させる", meaning: "causative (make / let someone do)", meaningIdn: "kausatif (menyuruh / membiarkan)",
     explanation: "食べさせる = make/let someone eat. In offices you'll hear 確認させてください (please let me confirm).",
     examples: [
       { jp: "少し考えさせてください。", kana: "すこしかんがえさせてください。", en: "Please let me think a little." },
@@ -277,7 +277,7 @@ export const GRAMMAR: GrammarPoint[] = [
     ],
   },
   {
-    id: "g3-causpass", level: "N3", title: "使役受身 〜させられる", meaning: "causative-passive (be made to do)",
+    id: "g3-causpass", level: "N3", title: "使役受身 〜させられる", meaning: "causative-passive (be made to do)", meaningIdn: "kausatif-pasif (dipaksa melakukan)",
     explanation: "The 'I was forced to' form: 残業させられた (I was made to work overtime). Expresses reluctance.",
     examples: [
       { jp: "昨日、残業させられました。", kana: "きのう、ざんぎょうさせられました。", en: "Yesterday I was made to work overtime." },
@@ -288,7 +288,7 @@ export const GRAMMAR: GrammarPoint[] = [
     ],
   },
   {
-    id: "g3-younaru", level: "N3", title: "〜ようになる", meaning: "come to be able / start doing",
+    id: "g3-younaru", level: "N3", title: "〜ようになる", meaning: "come to be able / start doing", meaningIdn: "menjadi bisa / mulai terbiasa",
     explanation: "Describes a change over time: 日本語が話せるようになりました (I've become able to speak Japanese).",
     examples: [
       { jp: "漢字が読めるようになりました。", kana: "かんじがよめるようになりました。", en: "I've become able to read kanji." },
@@ -300,7 +300,7 @@ export const GRAMMAR: GrammarPoint[] = [
     ],
   },
   {
-    id: "g3-kotonisuru", level: "N3", title: "〜ことにする・〜ことになる", meaning: "decide to / it was decided",
+    id: "g3-kotonisuru", level: "N3", title: "〜ことにする・〜ことになる", meaning: "decide to / it was decided", meaningIdn: "memutuskan / diputuskan",
     explanation: "ことにする = my decision (毎日勉強することにした). ことになる = it was decided by circumstances (東京で働くことになりました).",
     examples: [
       { jp: "来月から東京の会社で働くことになりました。", kana: "らいげつからとうきょうのかいしゃではたらくことになりました。", en: "It's been decided I'll work at a Tokyo company from next month." },
@@ -312,7 +312,7 @@ export const GRAMMAR: GrammarPoint[] = [
     ],
   },
   {
-    id: "g3-keigo", level: "N3", title: "敬語の基本", meaning: "basic honorific & humble speech",
+    id: "g3-keigo", level: "N3", title: "敬語の基本", meaning: "basic honorific & humble speech", meaningIdn: "dasar bahasa hormat",
     explanation: "尊敬語 raises others (いらっしゃる、おっしゃる). 謙譲語 lowers yourself (参る、申す、いたす). Crucial for the office!",
     examples: [
       { jp: "部長はもういらっしゃいますか。", kana: "ぶちょうはもういらっしゃいますか。", en: "Is the manager already here? (honorific)" },
@@ -324,7 +324,7 @@ export const GRAMMAR: GrammarPoint[] = [
     ],
   },
   {
-    id: "g3-ba", level: "N3", title: "〜ば", meaning: "ba-conditional",
+    id: "g3-ba", level: "N3", title: "〜ば", meaning: "ba-conditional", meaningIdn: "pengandaian bentuk ~ba",
     explanation: "行けば、食べれば、安ければ… A neutral 'if': 練習すれば上手になります (if you practice, you'll improve).",
     examples: [
       { jp: "毎日練習すれば、上手になりますよ。", kana: "まいにちれんしゅうすれば、じょうずになりますよ。", en: "If you practice daily, you'll get good." },
@@ -336,7 +336,7 @@ export const GRAMMAR: GrammarPoint[] = [
     ],
   },
   {
-    id: "g3-hazu-beki", level: "N3", title: "〜はず・〜べき", meaning: "should (expectation / duty)",
+    id: "g3-hazu-beki", level: "N3", title: "〜はず・〜べき", meaning: "should (expectation / duty)", meaningIdn: "seharusnya (dugaan / kewajiban)",
     explanation: "はず = logical expectation (来るはずです = he should come). べき = moral duty (謝るべきだ = you ought to apologize).",
     examples: [
       { jp: "会議は3時に終わるはずです。", kana: "かいぎはさんじにおわるはずです。", en: "The meeting should end at 3." },
@@ -348,7 +348,7 @@ export const GRAMMAR: GrammarPoint[] = [
     ],
   },
   {
-    id: "g3-bakari", level: "N3", title: "〜ばかり", meaning: "just did / nothing but",
+    id: "g3-bakari", level: "N3", title: "〜ばかり", meaning: "just did / nothing but", meaningIdn: "baru saja / melulu",
     explanation: "たばかり = just did (来たばかり = just arrived). てばかり = doing nothing but (遊んでばかりいる).",
     examples: [
       { jp: "日本に来たばかりです。", kana: "にほんにきたばかりです。", en: "I just came to Japan." },
@@ -359,7 +359,7 @@ export const GRAMMAR: GrammarPoint[] = [
     ],
   },
   {
-    id: "g3-uchini", level: "N3", title: "〜うちに", meaning: "while / before it changes",
+    id: "g3-uchini", level: "N3", title: "〜うちに", meaning: "while / before it changes", meaningIdn: "selagi / sebelum berubah",
     explanation: "Do something while a state lasts: 熱いうちに食べてください (eat it while it's hot), 忘れないうちにメモする.",
     examples: [
       { jp: "温かいうちに食べてください。", kana: "あたたかいうちにたべてください。", en: "Please eat it while it's warm." },

@@ -3,6 +3,7 @@ import { ITEM_MAP, SHOP_STOCK } from "@/data/items";
 import { Bus } from "@/game/events";
 import { sfx } from "@/game/audio/sfx";
 import { G } from "@/game/state/gameState";
+import { L, meaning } from "@/game/i18n";
 import { COLOR, style } from "@/game/ui/theme";
 import { panel, PixelButton } from "@/game/ui/widgets";
 import { ActivityBase, PX, PY, PW, PH } from "./ActivityBase";
@@ -61,7 +62,7 @@ export class ShopScene extends ActivityBase {
     this.moneyText = this.add.text(PX + PW - 150, PY + 18, "", style(13, COLOR.accent));
     if (this.listItems.length) {
       panel(this, PX + 16, PY + 44, 240, 96, true);
-      this.add.text(PX + 28, PY + 52, "買い物リスト (Shopping list)", style(10, COLOR.dim));
+      this.add.text(PX + 28, PY + 52, L("買い物リスト", "Shopping list", "Daftar belanja"), style(10, COLOR.dim));
       this.listText = this.add.text(PX + 28, PY + 72, "", style(12));
     }
 
@@ -74,7 +75,7 @@ export class ShopScene extends ActivityBase {
     this.pageText = this.add.text(PX + 280 + (PW - 280 - 36) / 2, PY + PH - 37, "", style(11, COLOR.dim)).setOrigin(0.5);
     if (pages <= 1) { this.prevBtn.setVisible(false); this.nextBtn.setVisible(false); this.pageText.setVisible(false); }
 
-    new PixelButton(this, PX + 20, PY + PH - 56, "会計する (Check out)", () => this.checkout(), { w: 200 });
+    new PixelButton(this, PX + 20, PY + PH - 56, L("会計する", "Check out", "Bayar"), () => this.checkout(), { w: 200 });
 
     this.renderShelf();
     this.refresh();
@@ -94,10 +95,10 @@ export class ShopScene extends ActivityBase {
         const col = i % COLS, row = Math.floor(i / COLS);
         const x = PX + 280 + col * 112, y = PY + 48 + row * 106;
         this.shelf.add(panel(this, x, y, 102, 96, true));
-        this.shelf.add(this.add.image(x + 51, y + 22, "icons", def.icon).setScale(2));
-        this.shelf.add(this.add.text(x + 51, y + 46, def.nameJp, style(11)).setOrigin(0.5));
-        this.shelf.add(this.add.text(x + 51, y + 60, def.kana, style(8, COLOR.kana)).setOrigin(0.5));
-        const buyBtn: PixelButton = new PixelButton(this, x + 12, y + 70, `¥${def.price}`, () => this.buy(id, buyBtn), { w: 78, h: 20, size: 10 });
+        this.shelf.add(this.add.image(x + 51, y + 20, "icons", def.icon).setScale(2));
+        this.shelf.add(this.add.text(x + 51, y + 42, def.nameJp, style(12)).setOrigin(0.5));
+        this.shelf.add(this.add.text(x + 51, y + 57, def.kana, style(9, COLOR.kana)).setOrigin(0.5));
+        const buyBtn: PixelButton = new PixelButton(this, x + 10, y + 66, `¥${def.price}`, () => this.buy(id, buyBtn), { w: 82, h: 24, size: 11 });
         this.shelf.add(buyBtn);
       });
 
@@ -112,7 +113,7 @@ export class ShopScene extends ActivityBase {
     if (!g.spendMoney(def.price)) {
       sfx("fail");
       btn.flash(false);
-      Bus.emit("toast", "お金が足りません… (Not enough money)", "warn");
+      Bus.emit("toast", `お金が足りません… (${meaning("Not enough money", "Uangnya kurang")})`, "warn");
       return;
     }
     sfx("coin");

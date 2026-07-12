@@ -24,6 +24,8 @@ export interface JpText {
   kana?: string;
   romaji?: string;
   en: string;
+  /** Indonesian translation (meaning-language "idn"); falls back to `en` */
+  idn?: string;
 }
 
 export interface VocabEntry {
@@ -33,6 +35,7 @@ export interface VocabEntry {
   kana: string;
   romaji: string;
   en: string;
+  idn?: string;            // Indonesian gloss
   category: "school" | "food" | "shopping" | "train" | "work" | "daily" | "time" | "place";
 }
 
@@ -52,7 +55,9 @@ export interface GrammarPoint {
   level: JlptLevel;
   title: string;           // e.g. "〜たいです"
   meaning: string;         // short english gloss
+  meaningIdn?: string;     // Indonesian gloss
   explanation: string;     // friendly 1-3 sentence explanation
+  explanationIdn?: string;
   examples: JpText[];
   exercises: GrammarExercise[];
 }
@@ -109,6 +114,7 @@ export interface DialogueLine {
   jp: string;
   kana?: string;
   en: string;
+  idn?: string;            // Indonesian translation
 }
 
 /** A short predefined conversation. Higher tiers unlock with friendship. */
@@ -215,6 +221,7 @@ export interface QuestDef {
   title: string;
   titleJp?: string;
   desc: string;
+  descIdn?: string;        // Indonesian description
   giver?: string;          // npc id
   level?: JlptLevel;       // minimum JLPT level to receive it
   prereq?: string[];       // quest ids that must be completed first

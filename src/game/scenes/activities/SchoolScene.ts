@@ -2,6 +2,7 @@ import * as Phaser from "phaser";
 import { LISTENINGS, READINGS } from "@/data/drills";
 import { vocabByLevel } from "@/data/vocabulary";
 import { speakJapanese } from "@/game/audio/speech";
+import { M } from "@/game/i18n";
 import { G, gameStore } from "@/game/state/gameState";
 import { COLOR, style } from "@/game/ui/theme";
 import { PixelButton } from "@/game/ui/widgets";
@@ -29,7 +30,7 @@ export class SchoolScene extends ActivityBase {
       this.setTitle("語彙 — Vocabulary");
       vocabMistakes = await this.pairs(
         "先生：「今日の言葉です。意味を合わせてください。」(Match today's words.)",
-        todays.map(v => [`${v.jp}（${v.kana}）`, v.en] as [string, string]),
+        todays.map(v => [`${v.jp}（${v.kana}）`, M(v)] as [string, string]),
       );
       // record these words as learned
       gameStore.setState(st => ({

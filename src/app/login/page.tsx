@@ -42,7 +42,7 @@ export default function LoginPage() {
     <main className="min-h-screen flex flex-col items-center justify-center gap-8 p-6">
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="text-center">
         <div className="text-sm tracking-[0.4em] text-[#9ad0f0] mb-2">ログイン</div>
-        <h1 className="font-pixel text-4xl text-[var(--accent)] drop-shadow-[3px_3px_0_#000]">Nihon Life</h1>
+        <h1 className="text-4xl text-[var(--accent)] drop-shadow-[3px_3px_0_#000]">Nihon Life</h1>
       </motion.div>
 
       <form

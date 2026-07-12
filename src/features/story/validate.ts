@@ -35,6 +35,7 @@ export function validateStoryEvent(raw: string, ctx: StoryContext): StoryEvent {
       jp: str(lo.jp, `lines[${i}].jp`),
       kana: typeof lo.kana === "string" ? lo.kana : undefined,
       en: str(lo.en, `lines[${i}].en`),
+      idn: typeof lo.idn === "string" ? lo.idn : undefined,
     };
   });
 

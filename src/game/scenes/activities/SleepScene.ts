@@ -4,6 +4,7 @@ import { Bus } from "@/game/events";
 import { autoSave } from "@/game/systems/save";
 import { rollDailyQuest } from "@/game/systems/quests";
 import { G } from "@/game/state/gameState";
+import { meaning } from "@/game/i18n";
 import { COLOR, style } from "@/game/ui/theme";
 import { panel, PixelButton } from "@/game/ui/widgets";
 
@@ -43,7 +44,7 @@ export class SleepScene extends Phaser.Scene {
       `今日のXP (XP today): ${xpGained}`,
       `所持金 (Money): ¥${s.money.toLocaleString()}`,
       `JLPT: ${s.jlpt} · Total XP: ${s.totalXp()}`,
-      forced ? "You collapsed into bed — low energy this morning." : "You slept well. Energy restored!",
+      forced ? meaning("You collapsed into bed — low energy this morning.", "Kamu ambruk ke kasur — energi pagi ini rendah.") : meaning("You slept well. Energy restored!", "Tidurmu nyenyak. Energi pulih!"),
       s.weather === "rain" ? "☔ It's raining today." : s.weather === "snow" ? "❄ It's snowing today." : s.weather === "cloudy" ? "☁ Cloudy skies today." : "☀ A beautiful morning.",
     ];
     lines.forEach((l, i) => this.add.text(W / 2, H / 2 - 70 + i * 30, l, style(12)).setOrigin(0.5));

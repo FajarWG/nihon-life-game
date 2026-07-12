@@ -6,8 +6,8 @@ export const WORK_TASKS: WorkTask[] = [
     id: "w-css-color", kind: "bug-css", level: "N5",
     title: "ボタンの色が違います", titleEn: "The button color is wrong",
     body: [
-      { jp: "ログインボタンの色が赤になっています。", en: "The login button has turned red." },
-      { jp: "青にしてください。", en: "Please make it blue." },
+      { jp: "ログインボタンの色が赤になっています。", en: "The login button has turned red.", idn: "Tombol login berubah jadi merah." },
+      { jp: "青にしてください。", en: "Please make it blue.", idn: "Tolong ubah jadi biru." },
     ],
     question: "Which CSS fixes the ticket?",
     options: [
@@ -22,8 +22,8 @@ export const WORK_TASKS: WorkTask[] = [
     id: "w-css-size", kind: "bug-css", level: "N4",
     title: "文字が小さすぎます", titleEn: "The text is too small",
     body: [
-      { jp: "画面のタイトルの文字が小さすぎて、読めません。", en: "The screen title text is too small to read." },
-      { jp: "24ピクセルに直してください。", en: "Please fix it to 24 pixels." },
+      { jp: "画面のタイトルの文字が小さすぎて、読めません。", en: "The screen title text is too small to read.", idn: "Teks judul layar terlalu kecil sampai tidak terbaca." },
+      { jp: "24ピクセルに直してください。", en: "Please fix it to 24 pixels.", idn: "Tolong perbaiki menjadi 24 piksel." },
     ],
     question: "Which CSS fixes the ticket?",
     options: [
@@ -37,7 +37,7 @@ export const WORK_TASKS: WorkTask[] = [
   {
     id: "w-label-1", kind: "ui-label", level: "N5",
     title: "画面のラベルを確認してください", titleEn: "Please check the screen labels",
-    body: [{ jp: "新しい画面のボタンのラベルです。意味を確認してください。", en: "These are the new screen's button labels. Please confirm their meanings." }],
+    body: [{ jp: "新しい画面のボタンのラベルです。意味を確認してください。", en: "These are the new screen's button labels. Please confirm their meanings.", idn: "Ini label tombol layar baru. Tolong pastikan artinya." }],
     question: "Match each Japanese UI label to its meaning.",
     pairs: [
       ["ログイン", "Log in"],
@@ -50,7 +50,7 @@ export const WORK_TASKS: WorkTask[] = [
   {
     id: "w-git-1", kind: "git-order", level: "N4",
     title: "作業の手順を覚えましょう", titleEn: "Learn the workflow steps",
-    body: [{ jp: "山田さん：「うちのチームのGitの流れです。順番に並べてみてください。」", en: "Yamada: \"This is our team's Git flow. Try putting it in order.\"" }],
+    body: [{ jp: "山田さん：「うちのチームのGitの流れです。順番に並べてみてください。」", en: "Yamada: \"This is our team's Git flow. Try putting it in order.\"", idn: "Yamada: \"Ini alur Git tim kita. Coba urutkan.\"" }],
     question: "Arrange the Git workflow in order.",
     tiles: ["git pull", "git checkout -b fix/button", "コードを直す", "git commit", "git push", "プルリクエストを出す"],
     pay: 900,
@@ -59,9 +59,9 @@ export const WORK_TASKS: WorkTask[] = [
     id: "w-meeting-1", kind: "meeting", level: "N4",
     title: "会議の連絡", titleEn: "Meeting notice",
     body: [
-      { jp: "お疲れ様です。", en: "Good work, everyone." },
-      { jp: "明日のデザインレビューは木曜日の15時からです。", en: "Tomorrow's design review is Thursday from 3 PM." },
-      { jp: "会議室Bに集まってください。", en: "Please gather in meeting room B." },
+      { jp: "お疲れ様です。", en: "Good work, everyone.", idn: "Terima kasih kerja kerasnya, semuanya." },
+      { jp: "明日のデザインレビューは木曜日の15時からです。", en: "Tomorrow's design review is Thursday from 3 PM.", idn: "Design review besok hari Kamis mulai pukul 15.00." },
+      { jp: "会議室Bに集まってください。", en: "Please gather in meeting room B.", idn: "Silakan berkumpul di ruang rapat B." },
     ],
     question: "When and where is the design review?",
     options: ["Thursday 15:00, Room B", "Tuesday 15:00, Room B", "Thursday 5:00, Room D"],

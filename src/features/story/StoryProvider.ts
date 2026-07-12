@@ -42,7 +42,7 @@ Return ONLY a JSON object (no markdown, no commentary) with EXACTLY this shape:
   "level": "${ctx.level}",
   "setting": "one english sentence describing the scene",
   "lines": [
-    { "speaker": "narrator|player|<character name>", "jp": "japanese line", "kana": "full-kana reading", "en": "english translation" }
+    { "speaker": "narrator|player|<character name>", "jp": "japanese line", "kana": "full-kana reading", "en": "english translation", "idn": "terjemahan bahasa Indonesia" }
   ],
   "vocabulary": [ { "jp": "word", "en": "meaning" } ],
   "grammarFocus": "one grammar point used, e.g. ~てもいい",
@@ -52,7 +52,7 @@ Return ONLY a JSON object (no markdown, no commentary) with EXACTLY this shape:
 
 Rules:
 - 6 to 9 lines. Japanese strictly appropriate for JLPT ${ctx.level} (short sentences for N5).
-- Every line MUST include jp, kana and en.
+- Every line MUST include jp, kana, en AND idn (Indonesian translation).
 - 3-5 vocabulary items actually used in the lines.
 - Warm, cozy Stardew-Valley-like tone. No violence, no romance beyond friendship.
 - reward.money between 0 and 300; xp values between 2 and 8.`;

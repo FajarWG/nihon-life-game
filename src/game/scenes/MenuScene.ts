@@ -5,6 +5,7 @@ import { Bus } from "@/game/events";
 import { manualSave } from "@/game/systems/save";
 import { activeQuests, questDef } from "@/game/systems/quests";
 import { G } from "@/game/state/gameState";
+import { getMeaningLang, getUiLang, L, meaning, setMeaningLang, setUiLang } from "@/game/i18n";
 import { COLOR, style } from "@/game/ui/theme";
 import { dim, panel, PixelButton } from "@/game/ui/widgets";
 
@@ -13,7 +14,7 @@ const MX = 160, MY = 60, MW = 640, MH = 420;
 
 type Tab = "menu" | "inventory" | "quests";
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 8; // 2 cols × 4 taller, readable rows
 
 export class MenuScene extends Phaser.Scene {
   private tab: Tab = "menu";
@@ -29,9 +30,9 @@ export class MenuScene extends Phaser.Scene {
     panel(this, MX, MY, MW, MH);
     this.content = this.add.container(0, 0);
 
-    const tabs: [Tab, string][] = [["menu", "メニュー"], ["inventory", "かばん (Bag)"], ["quests", "クエスト"]];
+    const tabs: [Tab, string][] = [["menu", L("メニュー", "Menu", "Menu")], ["inventory", L("かばん", "Bag", "Tas")], ["quests", L("クエスト", "Quests", "Misi")]];
     tabs.forEach(([t, label], i) => {
-      new PixelButton(this, MX + 16 + i * 150, MY + 12, label, () => { this.tab = t; this.render(); }, { w: 140, h: 30, size: 11 });
+      new PixelButton(this, MX + 16 + i * 150, MY + 12, label, () => { this.tab = t; this.render(); }, { w: 140, h: 34, size: 13 });
     });
     new PixelButton(this, MX + MW - 46, MY + 12, "✕", () => this.close(), { w: 32, h: 30, size: 12 });
 
@@ -55,32 +56,43 @@ export class MenuScene extends Phaser.Scene {
   private renderMenu() {
     const s = G();
     const add = (go: Phaser.GameObjects.GameObject) => this.content.add(go);
-    add(this.add.text(W / 2, MY + 70, `${s.playerName} · Day ${s.day} · JLPT ${s.jlpt}`, style(14, COLOR.accent)).setOrigin(0.5));
+    add(this.add.text(W / 2, MY + 70, `${s.playerName} · Day ${s.day} · JLPT ${s.jlpt}`, style(16, COLOR.accent)).setOrigin(0.5));
 
     const skills = Object.entries(s.skills);
     skills.forEach(([skill, xp], i) => {
-      add(this.add.text(MX + 90 + (i % 3) * 170, MY + 110 + Math.floor(i / 3) * 26, `${skill}: ${xp}`, style(11, COLOR.dim)));
+      add(this.add.text(MX + 90 + (i % 3) * 170, MY + 108 + Math.floor(i / 3) * 28, `${skill}: ${xp}`, style(13, COLOR.dim)));
     });
 
+    const uiLangName = { "ja-en": "日本語+Arti", ja: "日本語", en: "Arti saja" }[getUiLang()];
+    const meaningName = getMeaningLang() === "idn" ? "Indonesia" : "English";
     const buttons: [string, () => void][] = [
-      ["つづける (Resume)", () => this.close()],
-      ["セーブ (Save game)", async () => { await manualSave(); }],
-      [isMuted() ? "🔇 音を出す (Unmute)" : "🔊 ミュート (Mute)", () => { setMuted(!isMuted()); this.render(); }],
-      ["タイトルへ (Quit to title)", () => { window.location.href = "/"; }],
+      [L("つづける", "Resume", "Lanjut"), () => this.close()],
+      [L("セーブ", "Save game", "Simpan"), async () => { await manualSave(); }],
+      [isMuted() ? L("音を出す", "Unmute", "Bunyikan") : L("ミュート", "Mute", "Bisukan"), () => { setMuted(!isMuted()); this.render(); }],
+      [`UI: ${uiLangName}`, () => {
+        const order = ["ja-en", "ja", "en"] as const;
+        setUiLang(order[(order.indexOf(getUiLang()) + 1) % order.length]);
+        this.render();
+      }],
+      [`${meaning("Meaning", "Arti")}: ${meaningName}`, () => {
+        setMeaningLang(getMeaningLang() === "idn" ? "en" : "idn");
+        this.render();
+      }],
+      [L("タイトルへ", "Quit to title", "Keluar ke judul"), () => { window.location.href = "/"; }],
     ];
     buttons.forEach(([label, cb], i) => {
-      this.content.add(new PixelButton(this, W / 2 - 130, MY + 180 + i * 52, label, cb, { w: 260 }));
+      this.content.add(new PixelButton(this, W / 2 - 130, MY + 156 + i * 44, label, cb, { w: 260, h: 38 }));
     });
   }
 
   private renderInventory() {
     const s = G();
     const add = (go: Phaser.GameObjects.GameObject) => this.content.add(go);
-    add(this.add.text(MX + 24, MY + 60, `¥${s.money.toLocaleString()}`, style(14, COLOR.accent)));
+    add(this.add.text(MX + 24, MY + 58, `¥${s.money.toLocaleString()}`, style(16, COLOR.accent)));
 
     const entries = Object.entries(s.inventory);
     if (!entries.length) {
-      add(this.add.text(W / 2, H / 2, "かばんは空です。(Your bag is empty.)", style(12, COLOR.dim)).setOrigin(0.5));
+      add(this.add.text(W / 2, H / 2, `かばんは空です。(${meaning("Your bag is empty.", "Tasmu kosong.")})`, style(14, COLOR.dim)).setOrigin(0.5));
       return;
     }
     const pages = Math.ceil(entries.length / PAGE_SIZE);
@@ -94,19 +106,19 @@ export class MenuScene extends Phaser.Scene {
       const def = ITEM_MAP[id];
       if (!def) return;
       const col = i % 2, row = Math.floor(i / 2);
-      const x = MX + 24 + col * 300, y = MY + 92 + row * 52;
-      add(panel(this, x, y, 288, 46, true));
-      add(this.add.image(x + 24, y + 23, "icons", def.icon).setScale(2));
-      add(this.add.text(x + 46, y + 8, `${def.nameJp} ×${qty}`, style(11)));
-      add(this.add.text(x + 46, y + 26, def.nameEn, style(8, COLOR.dim)));
+      const x = MX + 24 + col * 300, y = MY + 92 + row * 64;
+      add(panel(this, x, y, 288, 58, true));
+      add(this.add.image(x + 26, y + 29, "icons", def.icon).setScale(2.4));
+      add(this.add.text(x + 50, y + 10, `${def.nameJp} ×${qty}`, style(14)));
+      add(this.add.text(x + 50, y + 33, def.nameEn, style(11, COLOR.dim)));
       if (def.energy) {
-        this.content.add(new PixelButton(this, x + 208, y + 8, `食べる +${def.energy}`, () => {
+        this.content.add(new PixelButton(this, x + 190, y + 11, `食べる +${def.energy}`, () => {
           if (G().eatItem(id)) {
             sfx("confirm");
             Bus.emit("toast", `${def.nameJp}を食べました (+${def.energy} energy)`, "success");
             this.render();
           }
-        }, { w: 72, h: 28, size: 8 }));
+        }, { w: 92, h: 36, size: 11 }));
       }
     });
   }
@@ -115,20 +127,20 @@ export class MenuScene extends Phaser.Scene {
     const add = (go: Phaser.GameObjects.GameObject) => this.content.add(go);
     const quests = activeQuests();
     let y = MY + 62;
-    if (!quests.length) add(this.add.text(W / 2, H / 2, "No active quests.", style(12, COLOR.dim)).setOrigin(0.5));
-    for (const q of quests.slice(0, 5)) {
-      add(this.add.text(MX + 24, y, `【${q.def.type}】${q.def.title}${q.def.titleJp ? `（${q.def.titleJp}）` : ""}`, style(12, COLOR.accent)));
-      y += 22;
-      add(this.add.text(MX + 36, y, q.def.desc, style(10, COLOR.dim, { wordWrap: { width: MW - 80 } })));
-      y += 20;
+    if (!quests.length) add(this.add.text(W / 2, H / 2, meaning("No active quests.", "Belum ada misi aktif."), style(14, COLOR.dim)).setOrigin(0.5));
+    for (const q of quests.slice(0, 4)) {
+      add(this.add.text(MX + 24, y, `【${q.def.type}】${q.def.title}${q.def.titleJp ? `（${q.def.titleJp}）` : ""}`, style(14, COLOR.accent)));
+      y += 26;
+      add(this.add.text(MX + 36, y, meaning(q.def.desc, q.def.descIdn), style(12, COLOR.dim, { wordWrap: { width: MW - 80 } })));
+      y += 24;
       for (const obj of q.def.objectives) {
         const done = (q.progress[obj.id] ?? 0) >= obj.count;
-        add(this.add.text(MX + 36, y, `${done ? "☑" : "☐"} ${obj.desc} (${q.progress[obj.id] ?? 0}/${obj.count})`, style(10, done ? COLOR.good : COLOR.text)));
-        y += 18;
+        add(this.add.text(MX + 36, y, `${done ? "☑" : "☐"} ${obj.desc} (${q.progress[obj.id] ?? 0}/${obj.count})`, style(12, done ? COLOR.good : COLOR.text)));
+        y += 22;
       }
-      y += 12;
+      y += 14;
     }
     const completed = G().quests.completed.length;
-    add(this.add.text(MX + 24, MY + MH - 34, `Completed quests: ${completed}`, style(10, COLOR.dim)));
+    add(this.add.text(MX + 24, MY + MH - 36, `${meaning("Completed quests", "Misi selesai")}: ${completed}`, style(12, COLOR.dim)));
   }
 }

@@ -6,6 +6,7 @@ import { Bus } from "@/game/events";
 import { CHAR_FRAMES, TILE } from "@/game/gfx/textures";
 import { getMap, SOLID_TILES, type CompiledMap } from "@/game/maps/maps";
 import { DAY_END, G } from "@/game/state/gameState";
+import { L } from "@/game/i18n";
 import { style } from "@/game/ui/theme";
 import type { UIScene } from "./UIScene";
 
@@ -20,10 +21,32 @@ const SEASON_TINT: Record<Season, { color: number; alpha: number }> = {
 
 /** Rotating notices on the office board — light reading practice. */
 const BOARD_NOTICES = [
-  { jp: "金曜日の15時からデザインレビューがあります。", kana: "きんようびのじゅうごじからでざいんれびゅーがあります。", en: "There's a design review Friday from 3 PM." },
-  { jp: "来週、新しいメンバーが入ります。よろしくお願いします。", kana: "らいしゅう、あたらしいめんばーがはいります。よろしくおねがいします。", en: "A new member joins next week. Please welcome them." },
-  { jp: "エアコンの温度は26度にしてください。", kana: "えあこんのおんどはにじゅうろくどにしてください。", en: "Please keep the AC at 26 degrees." },
+  { jp: "金曜日の15時からデザインレビューがあります。", kana: "きんようびのじゅうごじからでざいんれびゅーがあります。", en: "There's a design review Friday from 3 PM.", idn: "Ada design review hari Jumat mulai pukul 15.00." },
+  { jp: "来週、新しいメンバーが入ります。よろしくお願いします。", kana: "らいしゅう、あたらしいめんばーがはいります。よろしくおねがいします。", en: "A new member joins next week. Please welcome them.", idn: "Minggu depan ada anggota baru. Mohon sambutannya." },
+  { jp: "エアコンの温度は26度にしてください。", kana: "えあこんのおんどはにじゅうろくどにしてください。", en: "Please keep the AC at 26 degrees.", idn: "Tolong atur suhu AC di 26 derajat." },
 ];
+
+/** Interact-prompt labels per kind, honoring the language settings. */
+function interactLabel(kind: string, fallback: string): string {
+  switch (kind) {
+    case "sleep": return L("寝る", "Sleep", "Tidur");
+    case "study": return L("文法の勉強", "Study grammar", "Belajar tata bahasa");
+    case "cook": return L("料理する", "Cook", "Masak");
+    case "fridge": return L("何か食べる", "Eat something", "Makan sesuatu");
+    case "story": return L("ものがたり", "Story time", "Waktu cerita");
+    case "lesson": return L("授業に出る", "Join the lesson", "Ikut pelajaran");
+    case "shop-konbini":
+    case "shop-super": return L("買い物", "Shop", "Belanja");
+    case "shop-restaurant": return L("注文する", "Order food", "Pesan makanan");
+    case "vending": return L("飲み物を買う", "Buy a drink", "Beli minuman");
+    case "train": return L("電車に乗る", "Take the train", "Naik kereta");
+    case "work": return L("仕事を始める", "Start your shift", "Mulai kerja");
+    case "read": return L("読書の練習", "Reading practice", "Latihan membaca");
+    case "exam": return L("JLPT試験", "JLPT exam", "Ujian JLPT");
+    case "meeting-board": return L("掲示板", "Notice board", "Papan pengumuman");
+    default: return fallback;
+  }
+}
 
 interface SpawnData { mapId: LocationId; spawnX: number; spawnY: number }
 
@@ -85,16 +108,14 @@ export class MapScene extends Phaser.Scene {
     this.layer = tilemap.createLayer(0, tileset, 0, 0)!;
     this.layer.setCollision([...SOLID_TILES]);
 
-    // building name signs above every door (outdoor maps only)
+    // building name signs above every door — Japanese only (outdoor maps)
     if (this.map.def.outdoor) {
       for (const door of this.map.doors) {
         const name = LOCATION_NAMES[door.to];
         if (!name) continue;
-        this.add.text(door.x * TILE + 8, door.y * TILE - 3, `${name.jp}\n${name.en}`, style(6, "#fff7e0", {
-          align: "center",
+        this.add.text(door.x * TILE + 8, door.y * TILE - 3, name.jp, style(7, "#fff7e0", {
           backgroundColor: "#201a2ecc",
-          padding: { x: 4, y: 2 },
-          lineSpacing: 1,
+          padding: { x: 5, y: 2 },
         })).setOrigin(0.5, 1).setDepth(25);
       }
     }
@@ -266,10 +287,10 @@ export class MapScene extends Phaser.Scene {
       const nx = Math.floor(n.sprite.x / TILE), ny = Math.floor(n.sprite.y / TILE);
       return (nx === fx && ny === fy) || (Math.abs(n.sprite.x - this.player.x) < 20 && Math.abs(n.sprite.y - this.player.y) < 20);
     });
-    if (npc) return { npc: npc.def, label: `Talk to ${npc.def.name}` };
+    if (npc) return { npc: npc.def, label: L(`${npc.def.nameJp}と話す`, `Talk to ${npc.def.name}`, `Bicara dengan ${npc.def.name}`) };
     const it = this.map.interacts.find(i =>
       (i.x === fx && i.y === fy) || (Math.abs(i.x - px) + Math.abs(i.y - py) <= 1));
-    if (it) return { interact: it, label: it.label };
+    if (it) return { interact: it, label: interactLabel(it.kind, it.label) };
     return null;
   }
 
@@ -294,12 +315,12 @@ export class MapScene extends Phaser.Scene {
     switch (kind) {
       case "sleep":
         ui.startDialogue(
-          [{ speaker: "narrator", jp: "もう寝ますか。", kana: "もうねますか。", en: "Sleep and end the day?" }],
+          [{ speaker: "narrator", jp: "もう寝ますか。", kana: "もうねますか。", en: "Sleep and end the day?", idn: "Tidur dan akhiri hari ini?" }],
           {
             name: "ベッド",
             choices: [
-              { text: "寝る (Sleep)", cb: () => this.launchActivity("Sleep", { forced: false }) },
-              { text: "まだ起きてる (Not yet)", cb: () => {} },
+              { text: L("寝る", "Sleep", "Tidur"), cb: () => this.launchActivity("Sleep", { forced: false }) },
+              { text: L("まだ起きてる", "Not yet", "Nanti dulu"), cb: () => {} },
             ],
           },
         );

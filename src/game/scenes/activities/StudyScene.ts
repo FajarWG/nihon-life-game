@@ -1,5 +1,6 @@
 import { GRAMMAR, grammarByLevel } from "@/data/grammar";
 import { G } from "@/game/state/gameState";
+import { L, M, meaning } from "@/game/i18n";
 import { COLOR, style } from "@/game/ui/theme";
 import { ActivityBase, AW, PY } from "./ActivityBase";
 
@@ -26,14 +27,14 @@ export class StudyScene extends ActivityBase {
     // 1. lesson card
     await this.card(add => {
       add(this.add.text(AW / 2, PY + 60, g.title, style(26, COLOR.accent)).setOrigin(0.5));
-      add(this.add.text(AW / 2, PY + 98, g.meaning, style(13, COLOR.kana)).setOrigin(0.5));
-      add(this.add.text(AW / 2, PY + 140, g.explanation, style(12, COLOR.text, { wordWrap: { width: 620 }, align: "center", lineSpacing: 6 })).setOrigin(0.5, 0));
+      add(this.add.text(AW / 2, PY + 98, meaning(g.meaning, g.meaningIdn), style(14, COLOR.kana)).setOrigin(0.5));
+      add(this.add.text(AW / 2, PY + 140, meaning(g.explanation, g.explanationIdn), style(13, COLOR.text, { wordWrap: { width: 620 }, align: "center", lineSpacing: 6 })).setOrigin(0.5, 0));
       g.examples.forEach((ex, i) => {
         const y = PY + 215 + i * 62;
         add(this.add.text(AW / 2, y, ex.jp, style(16)).setOrigin(0.5));
-        add(this.add.text(AW / 2, y + 22, `${ex.kana ?? ""}  —  ${ex.en}`, style(10, COLOR.dim)).setOrigin(0.5));
+        add(this.add.text(AW / 2, y + 22, `${ex.kana ?? ""}  —  ${M(ex)}`, style(11, COLOR.dim)).setOrigin(0.5));
       });
-    }, "練習する (Practice)");
+    }, L("練習する", "Practice", "Latihan"));
 
     // 2. exercises
     let score = 0;
@@ -57,7 +58,7 @@ export class StudyScene extends ActivityBase {
       energyCost: 10,
       xp: { grammar: xp },
       summary: [
-        `Learned: ${g.title} — ${g.meaning}`,
+        `${meaning("Learned", "Dipelajari")}: ${g.title} — ${meaning(g.meaning, g.meaningIdn)}`,
         `Exercises: ${score}/${total} perfect`,
       ],
     });

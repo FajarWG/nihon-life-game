@@ -21,7 +21,10 @@ export function createGame(parent: HTMLElement): Phaser.Game {
     parent,
     width: 960,
     height: 540,
-    pixelArt: true,
+    // NOT pixelArt:true — that forces nearest-neighbor on text too, making it
+    // unreadable when the canvas upscales. Sprites/tiles opt into NEAREST
+    // individually in gfx/textures.ts; text stays smooth.
+    roundPixels: true,
     backgroundColor: "#181420",
     physics: { default: "arcade", arcade: { debug: false } },
     scale: {

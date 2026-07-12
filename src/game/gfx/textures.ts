@@ -1,5 +1,14 @@
-import type * as Phaser from "phaser";
+import * as Phaser from "phaser";
 import { PAL } from "./palette";
+
+/**
+ * Pixel-art textures opt into NEAREST filtering individually (the game does
+ * NOT use pixelArt:true, so text stays smooth when the canvas upscales).
+ */
+function crisp(tex: Phaser.Textures.CanvasTexture | Phaser.Textures.Texture | null) {
+  tex?.setFilter(Phaser.Textures.FilterMode.NEAREST);
+  return tex;
+}
 
 export const TILE = 16;
 
@@ -294,7 +303,7 @@ export function generateTileset(scene: Phaser.Scene) {
   for (let i = 0; i < TILE_COUNT; i++) {
     paintTile(ctx, i as T, (i % COLS) * TILE, Math.floor(i / COLS) * TILE);
   }
-  scene.textures.addCanvas("tiles", canvas);
+  crisp(scene.textures.addCanvas("tiles", canvas));
 }
 
 /** 4 dirs × 4 frames; frame index = dir * 4 + frame. */
@@ -308,7 +317,7 @@ export function generateCharSheet(scene: Phaser.Scene, key: string, colors: Char
       paintChar(ctx, (dir * CHAR_FRAMES + f) * CHAR_W, dir, f, colors);
     }
   }
-  const tex = scene.textures.addCanvas(key, canvas);
+  const tex = crisp(scene.textures.addCanvas(key, canvas)) as Phaser.Textures.CanvasTexture | null;
   if (!tex) return;
   for (let i = 0; i < total; i++) tex.add(i, 0, i * CHAR_W, 0, CHAR_W, CHAR_H);
 }
@@ -317,7 +326,7 @@ export function generateIcons(scene: Phaser.Scene, iconKeys: string[]) {
   const keys = [...new Set([...iconKeys, "default"])];
   const [canvas, ctx] = makeCanvas(ICON_SIZE * keys.length, ICON_SIZE);
   keys.forEach((k, i) => paintIcon(ctx, i * ICON_SIZE, k));
-  const tex = scene.textures.addCanvas("icons", canvas);
+  const tex = crisp(scene.textures.addCanvas("icons", canvas)) as Phaser.Textures.CanvasTexture | null;
   if (!tex) return;
   keys.forEach((k, i) => tex!.add(k, 0, i * ICON_SIZE, 0, ICON_SIZE, ICON_SIZE));
 }
@@ -334,7 +343,7 @@ export function generateUiTextures(scene: Phaser.Scene) {
     // corner accents
     p(0, 0, 2, 2, PAL.uiBorderLight); p(22, 0, 2, 2, PAL.uiBorderLight);
     p(0, 22, 2, 2, PAL.uiBorderLight); p(22, 22, 2, 2, PAL.uiBorderLight);
-    scene.textures.addCanvas("panel", canvas);
+    crisp(scene.textures.addCanvas("panel", canvas));
   }
   // lighter inner panel
   {
@@ -342,30 +351,30 @@ export function generateUiTextures(scene: Phaser.Scene) {
     const p = (x: number, y: number, w: number, h: number, c: string) => { ctx.fillStyle = c; ctx.fillRect(x, y, w, h); };
     p(0, 0, 24, 24, "#544a68");
     p(1, 1, 22, 22, PAL.uiBgLight);
-    scene.textures.addCanvas("panel-light", canvas);
+    crisp(scene.textures.addCanvas("panel-light", canvas));
   }
   // small particles
   {
     const [canvas, ctx] = makeCanvas(6, 6);
     ctx.fillStyle = "#9ac8e8"; ctx.fillRect(2, 0, 1, 5); ctx.fillRect(3, 2, 1, 3);
-    scene.textures.addCanvas("rain", canvas);
+    crisp(scene.textures.addCanvas("rain", canvas));
   }
   {
     const [canvas, ctx] = makeCanvas(4, 4);
     ctx.fillStyle = "#ffffff"; ctx.fillRect(1, 0, 2, 4); ctx.fillRect(0, 1, 4, 2);
-    scene.textures.addCanvas("snow", canvas);
+    crisp(scene.textures.addCanvas("snow", canvas));
   }
   {
     const [canvas, ctx] = makeCanvas(8, 4);
     ctx.fillStyle = "rgba(20,16,28,0.35)";
     ctx.fillRect(1, 0, 6, 4); ctx.fillRect(0, 1, 8, 2);
-    scene.textures.addCanvas("shadow", canvas);
+    crisp(scene.textures.addCanvas("shadow", canvas));
   }
   // weather icons (14x14)
   const wx = (key: string, draw: (p: (x: number, y: number, w: number, h: number, c: string) => void) => void) => {
     const [canvas, ctx] = makeCanvas(14, 14);
     draw((x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(x, y, w, h); });
-    scene.textures.addCanvas(key, canvas);
+    crisp(scene.textures.addCanvas(key, canvas));
   };
   wx("wx-sunny", p => {
     p(4, 4, 6, 6, "#f0c040"); p(5, 3, 4, 8, "#f0c040"); p(3, 5, 8, 4, "#f0c040");

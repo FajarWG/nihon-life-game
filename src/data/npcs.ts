@@ -14,15 +14,15 @@ export const NPCS: NpcDef[] = [
       {
         id: "tanaka-0", minFriendship: 0,
         lines: [
-          { speaker: "tanaka", jp: "おはようございます。今日も頑張りましょう。", kana: "おはようございます。きょうもがんばりましょう。", en: "Good morning. Let's do our best today too." },
-          { speaker: "tanaka", jp: "毎日少しずつ勉強してくださいね。", kana: "まいにちすこしずつべんきょうしてくださいね。", en: "Please study a little bit every day." },
+          { speaker: "tanaka", jp: "おはようございます。今日も頑張りましょう。", kana: "おはようございます。きょうもがんばりましょう。", en: "Good morning. Let's do our best today too.", idn: "Selamat pagi. Hari ini juga mari semangat." },
+          { speaker: "tanaka", jp: "毎日少しずつ勉強してくださいね。", kana: "まいにちすこしずつべんきょうしてくださいね。", en: "Please study a little bit every day.", idn: "Belajarlah sedikit demi sedikit setiap hari ya." },
         ],
       },
       {
         id: "tanaka-3", minFriendship: 3,
         lines: [
-          { speaker: "tanaka", jp: "最近、日本語が上手になりましたね。", kana: "さいきん、にほんごがじょうずになりましたね。", en: "Your Japanese has gotten really good lately." },
-          { speaker: "tanaka", jp: "エンジニアの夢、応援していますよ。", kana: "えんじにあのゆめ、おうえんしていますよ。", en: "I'm rooting for your engineer dream." },
+          { speaker: "tanaka", jp: "最近、日本語が上手になりましたね。", kana: "さいきん、にほんごがじょうずになりましたね。", en: "Your Japanese has gotten really good lately.", idn: "Akhir-akhir ini bahasa Jepangmu makin bagus ya." },
+          { speaker: "tanaka", jp: "エンジニアの夢、応援していますよ。", kana: "えんじにあのゆめ、おうえんしていますよ。", en: "I'm rooting for your engineer dream.", idn: "Aku mendukung cita-citamu jadi engineer lho." },
         ],
       },
     ],
@@ -40,15 +40,15 @@ export const NPCS: NpcDef[] = [
       {
         id: "yuki-0", minFriendship: 0,
         lines: [
-          { speaker: "yuki", jp: "あ、おはよう！宿題やった？", kana: "あ、おはよう！しゅくだいやった？", en: "Oh, morning! Did you do the homework?" },
-          { speaker: "yuki", jp: "私はまだ…一緒にやらない？", kana: "わたしはまだ…いっしょにやらない？", en: "I haven't yet... wanna do it together?" },
+          { speaker: "yuki", jp: "あ、おはよう！宿題やった？", kana: "あ、おはよう！しゅくだいやった？", en: "Oh, morning! Did you do the homework?", idn: "Oh, pagi! Sudah kerjakan PR?" },
+          { speaker: "yuki", jp: "私はまだ…一緒にやらない？", kana: "わたしはまだ…いっしょにやらない？", en: "I haven't yet... wanna do it together?", idn: "Aku belum… mau kerjakan bareng?" },
         ],
       },
       {
         id: "yuki-3", minFriendship: 3,
         lines: [
-          { speaker: "yuki", jp: "ねえ、週末に公園でお花見しない？", kana: "ねえ、しゅうまつにこうえんでおはなみしない？", en: "Hey, wanna do hanami in the park this weekend?" },
-          { speaker: "yuki", jp: "おにぎり作ってきてよ！", kana: "おにぎりつくってきてよ！", en: "Make some onigiri and bring them!" },
+          { speaker: "yuki", jp: "ねえ、週末に公園でお花見しない？", kana: "ねえ、しゅうまつにこうえんでおはなみしない？", en: "Hey, wanna do hanami in the park this weekend?", idn: "Eh, akhir pekan mau hanami di taman nggak?" },
+          { speaker: "yuki", jp: "おにぎり作ってきてよ！", kana: "おにぎりつくってきてよ！", en: "Make some onigiri and bring them!", idn: "Buatkan onigiri dan bawa ya!" },
         ],
       },
     ],
@@ -64,15 +64,15 @@ export const NPCS: NpcDef[] = [
       {
         id: "yamada-0", minFriendship: 0,
         lines: [
-          { speaker: "yamada", jp: "お疲れ様です。今日のタスク、確認しましたか。", kana: "おつかれさまです。きょうのたすく、かくにんしましたか。", en: "Good work. Did you check today's tasks?" },
-          { speaker: "yamada", jp: "分からなかったら、いつでも聞いてください。", kana: "わからなかったら、いつでもきいてください。", en: "If you don't understand, ask me anytime." },
+          { speaker: "yamada", jp: "お疲れ様です。今日のタスク、確認しましたか。", kana: "おつかれさまです。きょうのたすく、かくにんしましたか。", en: "Good work. Did you check today's tasks?", idn: "Terima kasih kerja kerasnya. Sudah cek tugas hari ini?" },
+          { speaker: "yamada", jp: "分からなかったら、いつでも聞いてください。", kana: "わからなかったら、いつでもきいてください。", en: "If you don't understand, ask me anytime.", idn: "Kalau ada yang tidak paham, tanya saja kapan pun." },
         ],
       },
       {
         id: "yamada-3", minFriendship: 3,
         lines: [
-          { speaker: "yamada", jp: "君のコード、きれいになってきたね。", kana: "きみのこーど、きれいになってきたね。", en: "Your code is getting cleaner." },
-          { speaker: "yamada", jp: "この調子なら、正社員も夢じゃないよ。", kana: "このちょうしなら、せいしゃいんもゆめじゃないよ。", en: "At this rate, a full-time position isn't just a dream." },
+          { speaker: "yamada", jp: "君のコード、きれいになってきたね。", kana: "きみのこーど、きれいになってきたね。", en: "Your code is getting cleaner.", idn: "Kode-mu makin rapi ya." },
+          { speaker: "yamada", jp: "この調子なら、正社員も夢じゃないよ。", kana: "このちょうしなら、せいしゃいんもゆめじゃないよ。", en: "At this rate, a full-time position isn't just a dream.", idn: "Kalau begini terus, jadi karyawan tetap bukan cuma mimpi." },
         ],
       },
     ],
@@ -88,8 +88,8 @@ export const NPCS: NpcDef[] = [
       {
         id: "sato-0", minFriendship: 0,
         lines: [
-          { speaker: "sato", jp: "いらっしゃいませ！", kana: "いらっしゃいませ！", en: "Welcome!" },
-          { speaker: "sato", jp: "新しいおにぎり、入りましたよ。", kana: "あたらしいおにぎり、はいりましたよ。", en: "We got new onigiri in stock." },
+          { speaker: "sato", jp: "いらっしゃいませ！", kana: "いらっしゃいませ！", en: "Welcome!", idn: "Selamat datang!" },
+          { speaker: "sato", jp: "新しいおにぎり、入りましたよ。", kana: "あたらしいおにぎり、はいりましたよ。", en: "We got new onigiri in stock.", idn: "Onigiri baru sudah masuk lho." },
         ],
       },
     ],

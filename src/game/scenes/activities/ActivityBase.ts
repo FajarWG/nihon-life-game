@@ -2,6 +2,7 @@ import * as Phaser from "phaser";
 import type { SkillId } from "@/core/types";
 import { sfx } from "@/game/audio/sfx";
 import { G } from "@/game/state/gameState";
+import { L, meaning } from "@/game/i18n";
 import { COLOR, style } from "@/game/ui/theme";
 import { dim, panel, PixelButton } from "@/game/ui/widgets";
 
@@ -67,7 +68,7 @@ export abstract class ActivityBase extends Phaser.Scene {
 
     this.clearContent();
     const cy = PY + 90;
-    this.content.add(this.add.text(AW / 2, cy, opts.title ?? "おつかれさま！ (Good work!)", style(20, COLOR.good)).setOrigin(0.5));
+    this.content.add(this.add.text(AW / 2, cy, opts.title ?? `おつかれさま！ (${meaning("Good work!", "Kerja bagus!")})`, style(20, COLOR.good)).setOrigin(0.5));
     opts.summary.forEach((line, i) => {
       this.content.add(this.add.text(AW / 2, cy + 50 + i * 26, line, style(13)).setOrigin(0.5));
     });
@@ -78,7 +79,7 @@ export abstract class ActivityBase extends Phaser.Scene {
       this.content.add(this.add.text(AW / 2, cy + 60 + opts.summary.length * 26, rewards.join("   "), style(13, COLOR.accent)).setOrigin(0.5));
     }
     sfx("success");
-    this.content.add(new PixelButton(this, AW / 2 - 90, PY + PH - 70, "つづける (Continue)", () => this.close(), { w: 180 }));
+    this.content.add(new PixelButton(this, AW / 2 - 90, PY + PH - 70, L("つづける", "Continue", "Lanjut"), () => this.close(), { w: 180 }));
   }
 
   /* ── awaitable widgets ───────────────────────────────────────────────── */
@@ -207,11 +208,11 @@ export abstract class ActivityBase extends Phaser.Scene {
   }
 
   /** Info card with a continue button. */
-  protected card(build: (add: (go: Phaser.GameObjects.GameObject) => void) => void, buttonLabel = "つぎへ (Next)"): Promise<void> {
+  protected card(build: (add: (go: Phaser.GameObjects.GameObject) => void) => void, buttonLabel?: string): Promise<void> {
     return new Promise(resolve => {
       this.clearContent();
       build(go => this.content.add(go));
-      this.content.add(new PixelButton(this, AW / 2 - 90, PY + PH - 70, buttonLabel, () => resolve(), { w: 180 }));
+      this.content.add(new PixelButton(this, AW / 2 - 90, PY + PH - 70, buttonLabel ?? L("つぎへ", "Next", "Berikutnya"), () => resolve(), { w: 180 }));
     });
   }
 }

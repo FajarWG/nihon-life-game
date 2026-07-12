@@ -86,7 +86,7 @@ export default function AdminPage() {
     <main className="min-h-screen p-6 md:p-10 max-w-5xl mx-auto">
       <header className="mb-8 flex items-end justify-between flex-wrap gap-3">
         <div>
-          <h1 className="font-pixel text-3xl text-[var(--accent)]">Content Workshop</h1>
+          <h1 className="text-3xl text-[var(--accent)]">Content Workshop</h1>
           <p className="text-sm text-[#a89e8c] mt-1">
             Generate game content with any AI: copy a prompt → paste the JSON back → save.
             The game merges packs at launch (and caches them for offline play).

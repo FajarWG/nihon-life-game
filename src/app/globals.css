@@ -15,10 +15,7 @@ html, body {
   font-family: "M PLUS Rounded 1c", "Hiragino Maru Gothic ProN", "Hiragino Sans", "Yu Gothic UI", system-ui, sans-serif;
 }
 
-/* pixel display font for titles/logos only */
-.font-pixel {
-  font-family: "DotGothic16", "Hiragino Maru Gothic ProN", monospace;
-}
+
 
 /* pixel-art panel used on the website pages (title screen etc.) */
 .pixel-panel {
@@ -26,7 +23,6 @@ html, body {
   border: 3px solid var(--border);
   outline: 2px solid var(--border-light);
   outline-offset: -6px;
-  image-rendering: pixelated;
 }
 
 .pixel-btn {
@@ -42,4 +38,6 @@ html, body {
 .pixel-btn:hover { transform: translateY(-2px); border-color: var(--border-light); color: var(--accent); }
 .pixel-btn:disabled { opacity: 0.4; cursor: default; transform: none; }
 
-canvas { image-rendering: pixelated; }
+/* NOTE: no global `image-rendering: pixelated` on canvas — it would make all
+   in-game TEXT crunchy on large screens. Pixel-art textures get NEAREST
+   filtering inside Phaser instead (see gfx/textures.ts). */
