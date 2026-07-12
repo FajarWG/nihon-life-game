@@ -10,10 +10,11 @@ export enum T {
   FLOOR_WOOD, TATAMI, FLOOR_TILE, CARPET, WALL_IN, COUNTER, SHELF, TABLE,
   CHAIR, BED, DESK, STOVE, FRIDGE, BOOKSHELF, BLACKBOARD, PC_DESK,
   VENDING, GATE, PLATFORM, RAIL, FENCE, SIGN, CROSSWALK, DARK,
+  BENCH, LAMP, BUSH, PLAZA,
 }
 
 const COLS = 8;
-export const TILE_COUNT = 40;
+export const TILE_COUNT = 44;
 
 type Ctx = CanvasRenderingContext2D;
 
@@ -150,6 +151,23 @@ function paintTile(ctx: Ctx, id: T, ox: number, oy: number) {
       fillNoise(ctx, ox, oy, PAL.road, "#64646f", 4, 5);
       p(1, 0, 3, 16, PAL.roadLine); p(6, 0, 3, 16, PAL.roadLine); p(11, 0, 3, 16, PAL.roadLine); break;
     case T.DARK: p(0, 0, 16, 16, "#181420"); break;
+    case T.BENCH:
+      fillNoise(ctx, ox, oy, PAL.grass, PAL.grassDark, 5, 23);
+      p(1, 5, 14, 4, "#a06a3c"); p(1, 5, 14, 1, "#c08a52");
+      p(2, 9, 2, 5, "#7a4e2a"); p(12, 9, 2, 5, "#7a4e2a");
+      p(1, 2, 14, 2, "#c08a52"); break; // backrest
+    case T.LAMP:
+      fillNoise(ctx, ox, oy, PAL.grass, PAL.grassDark, 5, 29);
+      p(7, 4, 2, 11, "#3a3040");
+      p(5, 1, 6, 4, "#f0e0a0"); p(6, 0, 4, 1, "#3a3040"); p(6, 5, 4, 1, "#3a3040"); break;
+    case T.BUSH:
+      fillNoise(ctx, ox, oy, PAL.grass, PAL.grassDark, 5, 31);
+      p(2, 4, 12, 10, PAL.leaf); p(1, 6, 14, 6, PAL.leaf);
+      p(3, 5, 4, 3, PAL.leafLight); p(9, 8, 4, 2, PAL.leafLight); break;
+    case T.PLAZA:
+      p(0, 0, 16, 16, "#cfc8ba"); p(0, 0, 16, 1, "#b8b0a0"); p(0, 8, 16, 1, "#b8b0a0");
+      p(0, 0, 1, 8, "#b8b0a0"); p(8, 8, 1, 8, "#b8b0a0");
+      p(4, 4, 2, 2, "#dcd6c8"); p(11, 11, 2, 2, "#dcd6c8"); break;
   }
 }
 
@@ -160,7 +178,12 @@ export interface CharColors { hair: string; shirt: string; pants: string; skin?:
 export const CHAR_W = 16;
 export const CHAR_H = 20;
 
-/** dir: 0 down, 1 left, 2 right, 3 up. frame: 0 idle, 1/2 walk. */
+/**
+ * dir: 0 down, 1 left, 2 right, 3 up.
+ * frame: 0 idle · 1 stride A · 2 passing (body lifts 1px) · 3 stride B.
+ * Legs alternate a 2px stride, arms counter-swing, body bobs on the pass —
+ * played as [1,2,3,2] the cycle reads as a natural gait.
+ */
 function paintChar(ctx: Ctx, ox: number, dir: number, frame: number, c: CharColors) {
   const skin = c.skin ?? PAL.skin;
   const p = (x: number, y: number, w: number, h: number, col: string) => { ctx.fillStyle = col; ctx.fillRect(ox + x, y, w, h); };
@@ -168,33 +191,50 @@ function paintChar(ctx: Ctx, ox: number, dir: number, frame: number, c: CharColo
   const mx = (x: number, w: number) => (mirror ? CHAR_W - x - w : x);
   const pm = (x: number, y: number, w: number, h: number, col: string) => p(mx(x, w), y, w, h, col);
 
-  // legs (walk animation: alternate)
-  const legL = frame === 1 ? 1 : 0;
-  const legR = frame === 2 ? 1 : 0;
-  pm(4, 15 - legL, 3, 4 + legL, c.pants);
-  pm(9, 15 - legR, 3, 4 + legR, c.pants);
-  pm(4, 18 - legL + legL, 3, 1, "#3a3040"); // shoes
-  pm(9, 18, 3, 1, "#3a3040");
+  const dy = frame === 2 ? -1 : 0;          // body bob on the passing frame
+  const shoe = "#3a3040";
 
   if (dir === 0 || dir === 3) {
+    // ── front / back view ──
+    // legs: extended leg reaches the ground, the other lifts its foot
+    const lLift = frame === 1 ? 2 : frame === 2 ? 1 : 0;
+    const rLift = frame === 3 ? 2 : frame === 2 ? 1 : 0;
+    p(4, 14 + dy, 3, 5 - lLift, c.pants);
+    p(9, 14 + dy, 3, 5 - rLift, c.pants);
+    p(4, 18 - lLift, 3, 1, shoe);
+    p(9, 18 - rLift, 3, 1, shoe);
     // body
-    p(3, 9, 10, 6, c.shirt);
-    p(2, 9, 1, 4, skin); p(13, 9, 1, 4, skin); // arms
+    p(3, 8 + dy, 10, 7, c.shirt);
+    // arms counter-swing (down 3px range)
+    const lArm = frame === 3 ? 5 : frame === 1 ? 2 : 4;
+    const rArm = frame === 1 ? 5 : frame === 3 ? 2 : 4;
+    p(2, 9 + dy, 1, lArm, skin);
+    p(13, 9 + dy, 1, rArm, skin);
     // head
-    p(4, 1, 8, 8, skin);
+    p(4, 1 + dy, 8, 8, skin);
     if (dir === 0) {
-      p(3, 0, 10, 4, c.hair); p(3, 3, 2, 3, c.hair); p(11, 3, 2, 3, c.hair);
-      p(6, 5, 1, 2, "#3a3040"); p(9, 5, 1, 2, "#3a3040"); // eyes
+      p(3, 0 + dy, 10, 4, c.hair); p(3, 3 + dy, 2, 3, c.hair); p(11, 3 + dy, 2, 3, c.hair);
+      p(6, 5 + dy, 1, 2, "#3a3040"); p(9, 5 + dy, 1, 2, "#3a3040");
     } else {
-      p(3, 0, 10, 6, c.hair); p(3, 5, 10, 2, c.hair);
+      p(3, 0 + dy, 10, 6, c.hair); p(3, 5 + dy, 10, 2, c.hair);
     }
   } else {
-    // side profile
-    pm(4, 9, 8, 6, c.shirt);
-    pm(3, 10, 1, 3, skin);
-    pm(4, 1, 8, 8, skin);
-    pm(3, 0, 10, 4, c.hair); pm(9, 3, 4, 4, c.hair);
-    pm(5, 5, 1, 2, "#3a3040");
+    // ── side view (left drawn, right mirrored) ──
+    // legs scissor: front foot ahead, back foot behind
+    const stride = frame === 1 ? 2 : frame === 3 ? -2 : 0;
+    pm(6 + stride, 14 + dy, 3, 5, c.pants);
+    pm(6 + stride, 18, 3, 1, shoe);
+    pm(7 - stride, 14 + dy, 3, 4, c.pants);
+    pm(7 - stride, 17, 3, 1, shoe);
+    // body
+    pm(4, 8 + dy, 8, 7, c.shirt);
+    // visible arm swings with the opposite leg
+    pm(6 - stride, 9 + dy, 2, 4, c.shirt);
+    pm(6 - stride, 12 + dy, 2, 2, skin);
+    // head
+    pm(4, 1 + dy, 8, 8, skin);
+    pm(3, 0 + dy, 10, 4, c.hair); pm(9, 3 + dy, 4, 4, c.hair);
+    pm(5, 5 + dy, 1, 2, "#3a3040");
   }
 }
 
@@ -257,16 +297,20 @@ export function generateTileset(scene: Phaser.Scene) {
   scene.textures.addCanvas("tiles", canvas);
 }
 
+/** 4 dirs × 4 frames; frame index = dir * 4 + frame. */
+export const CHAR_FRAMES = 4;
+
 export function generateCharSheet(scene: Phaser.Scene, key: string, colors: CharColors) {
-  const [canvas, ctx] = makeCanvas(CHAR_W * 12, CHAR_H);
+  const total = 4 * CHAR_FRAMES;
+  const [canvas, ctx] = makeCanvas(CHAR_W * total, CHAR_H);
   for (let dir = 0; dir < 4; dir++) {
-    for (let f = 0; f < 3; f++) {
-      paintChar(ctx, (dir * 3 + f) * CHAR_W, dir, f, colors);
+    for (let f = 0; f < CHAR_FRAMES; f++) {
+      paintChar(ctx, (dir * CHAR_FRAMES + f) * CHAR_W, dir, f, colors);
     }
   }
   const tex = scene.textures.addCanvas(key, canvas);
   if (!tex) return;
-  for (let i = 0; i < 12; i++) tex.add(i, 0, i * CHAR_W, 0, CHAR_W, CHAR_H);
+  for (let i = 0; i < total; i++) tex.add(i, 0, i * CHAR_W, 0, CHAR_W, CHAR_H);
 }
 
 export function generateIcons(scene: Phaser.Scene, iconKeys: string[]) {

@@ -1,6 +1,6 @@
 import * as Phaser from "phaser";
 import type { LocationId } from "@/core/types";
-import { generateCharSheet, generateIcons, generateTileset, generateUiTextures, TILE, TILE_COUNT } from "@/game/gfx/textures";
+import { CHAR_FRAMES, generateCharSheet, generateIcons, generateTileset, generateUiTextures, TILE, TILE_COUNT } from "@/game/gfx/textures";
 import { getMap } from "@/game/maps/maps";
 import { ITEMS } from "@/data/items";
 import { NPCS } from "@/data/npcs";
@@ -40,8 +40,9 @@ export class BootScene extends Phaser.Scene {
     dirs.forEach((dir, d) => {
       this.anims.create({
         key: `${key}-walk-${dir}`,
-        frames: [1, 0, 2, 0].map(f => ({ key, frame: d * 3 + f })),
-        frameRate: 8,
+        // stride A → pass → stride B → pass: a proper 4-beat gait
+        frames: [1, 2, 3, 2].map(f => ({ key, frame: d * CHAR_FRAMES + f })),
+        frameRate: 10,
         repeat: -1,
       });
     });

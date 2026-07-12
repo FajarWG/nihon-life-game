@@ -1,6 +1,9 @@
 import { readSave } from "@/core/db";
+import type { SaveData } from "@/core/types";
+import { loadContentPacks } from "@/features/content/registry";
 import { G } from "@/game/state/gameState";
 import { ensureMainQuest, rollDailyQuest } from "@/game/systems/quests";
+import { pullCloud } from "@/game/systems/save";
 
 /** Options handed from the React shell to the Phaser boot scene. */
 export interface LaunchOptions {
@@ -19,10 +22,19 @@ export function getLaunchOptions(): LaunchOptions { return options; }
  */
 export async function initializeRun(opts: LaunchOptions) {
   setLaunchOptions(opts);
+  await loadContentPacks(); // custom content from /admin (offline-cached)
   if (opts.mode === "continue") {
+    const candidates: SaveData[] = [];
     const manual = await readSave("manual");
     const auto = await readSave("auto");
-    const save = (manual?.savedAt ?? 0) >= (auto?.savedAt ?? 0) ? manual ?? auto : auto ?? manual;
+    if (manual) candidates.push(manual);
+    if (auto) candidates.push(auto);
+    // cloud copies compete on savedAt; newest wins
+    const cloudManual = await pullCloud("manual");
+    const cloudAuto = await pullCloud("auto");
+    if (cloudManual) candidates.push(cloudManual);
+    if (cloudAuto) candidates.push(cloudAuto);
+    const save = candidates.sort((a, b) => b.savedAt - a.savedAt)[0];
     if (save) G().applySave(save);
     else G().resetNew(opts.playerName || "Player");
   } else {

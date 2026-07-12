@@ -13,7 +13,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* Pixel font (graceful fallback to system JP fonts when offline) */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=DotGothic16&family=M+PLUS+Rounded+1c:wght@400;500;700&display=swap"
+          rel="stylesheet"
+        />
       </head>
       <body className="antialiased">{children}</body>
     </html>

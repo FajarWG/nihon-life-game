@@ -12,7 +12,12 @@
 html, body {
   background: var(--bg);
   color: var(--text);
-  font-family: "DotGothic16", "Hiragino Maru Gothic ProN", "Hiragino Sans", "Yu Gothic UI", system-ui, sans-serif;
+  font-family: "M PLUS Rounded 1c", "Hiragino Maru Gothic ProN", "Hiragino Sans", "Yu Gothic UI", system-ui, sans-serif;
+}
+
+/* pixel display font for titles/logos only */
+.font-pixel {
+  font-family: "DotGothic16", "Hiragino Maru Gothic ProN", monospace;
 }
 
 /* pixel-art panel used on the website pages (title screen etc.) */

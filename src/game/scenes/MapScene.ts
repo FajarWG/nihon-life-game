@@ -3,7 +3,7 @@ import type { LocationId, NpcDef, Season } from "@/core/types";
 import { NPCS } from "@/data/npcs";
 import { setRainAmbience, startBgm } from "@/game/audio/bgm";
 import { Bus } from "@/game/events";
-import { TILE } from "@/game/gfx/textures";
+import { CHAR_FRAMES, TILE } from "@/game/gfx/textures";
 import { getMap, SOLID_TILES, type CompiledMap } from "@/game/maps/maps";
 import { DAY_END, G } from "@/game/state/gameState";
 import { style } from "@/game/ui/theme";
@@ -208,7 +208,7 @@ export class MapScene extends Phaser.Scene {
             n.busy = false;
             n.sprite.anims.stop();
             const dirIdx = { down: 0, left: 1, right: 2, up: 3 }[dir];
-            n.sprite.setFrame(dirIdx * 3);
+            n.sprite.setFrame(dirIdx * CHAR_FRAMES);
             n.label.setPosition(n.sprite.x, n.sprite.y - 16);
           },
         });
@@ -378,7 +378,7 @@ export class MapScene extends Phaser.Scene {
     } else {
       this.player.anims.stop();
       const dirIdx = { down: 0, left: 1, right: 2, up: 3 }[this.facing];
-      this.player.setFrame(dirIdx * 3);
+      this.player.setFrame(dirIdx * CHAR_FRAMES);
     }
 
     if (this.doorCooldown > 0) this.doorCooldown -= dt;

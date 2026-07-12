@@ -12,12 +12,23 @@ npm install
 npm run dev        # http://localhost:3000
 ```
 
-Optional AI story events (the game is fully playable offline without them):
+Optional environment (`.env`, see `.env.example`) — the game is fully playable offline without any of it:
 
 ```bash
-GROQ_API_KEY=...    # tried first
-GEMINI_API_KEY=...  # automatic fallback on rate-limit / quota / timeout
+DATABASE_URL=postgresql://...   # cloud saves + custom content packs (password must be URL-encoded)
+GROQ_API_KEY=...                # AI stories, tried first
+GEMINI_API_KEY=...              # automatic fallback on rate-limit / quota / timeout
 ```
+
+## Content Workshop (/admin)
+
+Open **/admin** to grow the game's content without touching code:
+
+1. Pick a content type (vocabulary, grammar, items, recipes, NPCs, quests, …) and **Copy prompt** —
+   the prompt embeds the exact JSON shape plus all existing ids.
+2. Paste it into any AI chat, then paste the returned JSON array back and **Save pack**.
+3. Packs are stored in Postgres, merged into the game at launch, and cached in
+   IndexedDB so custom content keeps working offline. Built-in ids always win.
 
 ## Controls
 

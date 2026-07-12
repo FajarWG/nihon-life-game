@@ -12,15 +12,28 @@ interface StoryRow {
   played: boolean;
 }
 
+interface PackRow {
+  id: number;
+  type: string;
+  items: unknown[];
+}
+
 class NihonLifeDB extends Dexie {
   saves!: EntityTable<SaveRow, "slot">;
   stories!: EntityTable<StoryRow, "id">;
+  packs!: EntityTable<PackRow, "id">;
 
   constructor() {
     super("nihon-life");
     this.version(1).stores({
       saves: "slot",
       stories: "id, played",
+    });
+    // v2: offline cache of custom content packs
+    this.version(2).stores({
+      saves: "slot",
+      stories: "id, played",
+      packs: "id, type",
     });
   }
 }
