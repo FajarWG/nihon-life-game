@@ -1,5 +1,5 @@
 import * as Phaser from "phaser";
-import type { LocationId, NpcDef, Season } from "@/core/types";
+import { LOCATION_NAMES, type LocationId, type NpcDef, type Season } from "@/core/types";
 import { NPCS } from "@/data/npcs";
 import { setRainAmbience, startBgm } from "@/game/audio/bgm";
 import { Bus } from "@/game/events";
@@ -84,6 +84,20 @@ export class MapScene extends Phaser.Scene {
     const tileset = tilemap.addTilesetImage("tiles", "tiles")!;
     this.layer = tilemap.createLayer(0, tileset, 0, 0)!;
     this.layer.setCollision([...SOLID_TILES]);
+
+    // building name signs above every door (outdoor maps only)
+    if (this.map.def.outdoor) {
+      for (const door of this.map.doors) {
+        const name = LOCATION_NAMES[door.to];
+        if (!name) continue;
+        this.add.text(door.x * TILE + 8, door.y * TILE - 3, `${name.jp}\n${name.en}`, style(6, "#fff7e0", {
+          align: "center",
+          backgroundColor: "#201a2ecc",
+          padding: { x: 4, y: 2 },
+          lineSpacing: 1,
+        })).setOrigin(0.5, 1).setDepth(25);
+      }
+    }
 
     // player
     this.player = this.physics.add.sprite(spawnX * TILE + 8, spawnY * TILE + 10, "player", 0);

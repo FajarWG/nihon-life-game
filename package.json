@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "dexie": "^4.4.4",
     "framer-motion": "^12.42.2",
     "howler": "^2.2.4",
@@ -20,6 +21,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/bcryptjs": "^2.4.6",
     "@types/howler": "^2.2.13",
     "@types/node": "^20",
     "@types/pg": "^8.20.0",

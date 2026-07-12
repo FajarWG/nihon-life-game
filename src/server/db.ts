@@ -36,6 +36,11 @@ async function getPool(): Promise<Pool | null> {
         items JSONB NOT NULL,
         created_at TIMESTAMPTZ NOT NULL DEFAULT now()
       );
+      CREATE TABLE IF NOT EXISTS users (
+        username TEXT PRIMARY KEY,
+        password_hash TEXT NOT NULL,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      );
     `);
     schemaReady = true;
   }
@@ -88,4 +93,21 @@ export async function deletePack(id: number) {
   const p = await getPool();
   if (!p) throw new Error("db not configured");
   await p.query("DELETE FROM content_packs WHERE id = $1", [id]);
+}
+
+export async function getUserHash(username: string): Promise<string | null> {
+  const p = await getPool();
+  if (!p) throw new Error("db not configured");
+  const r = await p.query("SELECT password_hash FROM users WHERE username = $1", [username]);
+  return r.rows[0]?.password_hash ?? null;
+}
+
+export async function createUser(username: string, passwordHash: string): Promise<boolean> {
+  const p = await getPool();
+  if (!p) throw new Error("db not configured");
+  const r = await p.query(
+    "INSERT INTO users (username, password_hash) VALUES ($1, $2) ON CONFLICT (username) DO NOTHING",
+    [username, passwordHash],
+  );
+  return (r.rowCount ?? 0) > 0;
 }

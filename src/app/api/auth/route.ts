@@ -1,0 +1,73 @@
+import { NextResponse } from "next/server";
+import { createUser, dbConfigured, getUserHash } from "@/server/db";
+import {
+  hashPassword, makeSessionValue, sessionCookieName,
+  userFromRequest, validPassword, validUsername, verifyPassword,
+} from "@/server/auth";
+
+export const runtime = "nodejs";
+
+const COOKIE_OPTS = {
+  httpOnly: true,
+  sameSite: "lax" as const,
+  path: "/",
+  maxAge: 60 * 60 * 24 * 30, // 30 days
+};
+
+/** GET /api/auth — who am I? 200 {username} | 401 (login needed) | 503 (no/unreachable DB → guest). */
+export async function GET(req: Request) {
+  if (!dbConfigured()) return NextResponse.json({ error: "no database", guest: true }, { status: 503 });
+  const username = userFromRequest(req);
+  if (username) return NextResponse.json({ username });
+  // No session: only demand login when the DB is actually reachable,
+  // otherwise players would be locked out while their DB is down.
+  try {
+    await getUserHash("__reachability_probe__");
+    return NextResponse.json({ error: "not logged in" }, { status: 401 });
+  } catch {
+    return NextResponse.json({ error: "database unreachable", guest: true }, { status: 503 });
+  }
+}
+
+/** POST /api/auth — {action: "register"|"login"|"logout", username?, password?} */
+export async function POST(req: Request) {
+  let body: Record<string, unknown>;
+  try { body = await req.json(); } catch { return NextResponse.json({ error: "bad json" }, { status: 400 }); }
+  const action = String(body.action ?? "");
+
+  if (action === "logout") {
+    const res = NextResponse.json({ ok: true });
+    res.cookies.set(sessionCookieName(), "", { ...COOKIE_OPTS, maxAge: 0 });
+    return res;
+  }
+
+  if (!dbConfigured()) {
+    return NextResponse.json({ error: "No database configured — playing as guest is fine.", guest: true }, { status: 503 });
+  }
+  const { username, password } = body;
+  if (!validUsername(username)) {
+    return NextResponse.json({ error: "Username: 3-24 chars, letters/numbers/_/- only." }, { status: 400 });
+  }
+  if (!validPassword(password)) {
+    return NextResponse.json({ error: "Password: at least 4 characters." }, { status: 400 });
+  }
+
+  try {
+    if (action === "register") {
+      const created = await createUser(username, hashPassword(password));
+      if (!created) return NextResponse.json({ error: "Username already taken." }, { status: 409 });
+    } else if (action === "login") {
+      const hash = await getUserHash(username);
+      if (!hash || !verifyPassword(password, hash)) {
+        return NextResponse.json({ error: "Wrong username or password." }, { status: 401 });
+      }
+    } else {
+      return NextResponse.json({ error: "unknown action" }, { status: 400 });
+    }
+    const res = NextResponse.json({ ok: true, username });
+    res.cookies.set(sessionCookieName(), makeSessionValue(username), COOKIE_OPTS);
+    return res;
+  } catch (e) {
+    return NextResponse.json({ error: e instanceof Error ? e.message : "db error" }, { status: 502 });
+  }
+}

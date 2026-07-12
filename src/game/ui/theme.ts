@@ -1,10 +1,11 @@
 import { PAL } from "@/game/gfx/palette";
 
 /**
- * Rounded, easy-on-the-eyes JP font for gameplay text (loaded in the layout).
- * DotGothic16 stays as a decorative fallback for the pixel identity.
+ * Rounded, easy-on-the-eyes JP font for ALL gameplay text.
+ * No pixel font in the fallback chain — if the webfont is unavailable the
+ * stack degrades to clean system JP sans fonts, never to DotGothic.
  */
-export const FONT = '"M PLUS Rounded 1c", "Hiragino Maru Gothic ProN", "DotGothic16", "Hiragino Sans", "Yu Gothic UI", system-ui, sans-serif';
+export const FONT = '"M PLUS Rounded 1c", "Hiragino Maru Gothic ProN", "Hiragino Sans", "Yu Gothic UI", "Meiryo", system-ui, sans-serif';
 
 export const COLOR = {
   text: PAL.uiText,

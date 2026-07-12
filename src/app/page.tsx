@@ -13,10 +13,28 @@ export default function TitlePage() {
   const [hasSave, setHasSave] = useState(false);
   const [name, setName] = useState("");
   const [naming, setNaming] = useState(false);
+  const [user, setUser] = useState<string | null>(null);
+  const [needsLogin, setNeedsLogin] = useState(false);
 
   useEffect(() => {
     import("@/core/db").then(({ hasAnySave }) => hasAnySave().then(setHasSave)).catch(() => {});
+    fetch("/api/auth")
+      .then(async res => {
+        if (res.ok) setUser((await res.json()).username);
+        else if (res.status === 401) setNeedsLogin(true); // DB present but not logged in
+      })
+      .catch(() => {}); // offline → guest
   }, []);
+
+  const logout = async () => {
+    await fetch("/api/auth", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "logout" }),
+    }).catch(() => {});
+    setUser(null);
+    setNeedsLogin(true);
+  };
 
   const startNew = () => {
     const n = name.trim() || "Alex";
@@ -44,12 +62,28 @@ export default function TitlePage() {
         transition={{ delay: 0.3, duration: 0.6 }}
         className="pixel-panel p-8 flex flex-col items-center gap-4 w-full max-w-md"
       >
+        <div className="text-xs text-[#a89e8c] -mt-2 mb-1">
+          {user ? (
+            <span>👤 {user} · <button className="underline hover:text-[var(--accent)]" onClick={logout}>logout</button></span>
+          ) : needsLogin ? (
+            <a href="/login" className="underline hover:text-[var(--accent)]">🔑 ログイン (Log in to play)</a>
+          ) : (
+            <span>guest mode (local saves)</span>
+          )}
+        </div>
         {!naming ? (
           <>
-            <button className="pixel-btn w-64" onClick={() => setNaming(true)}>
+            <button
+              className="pixel-btn w-64"
+              onClick={() => (needsLogin ? router.push("/login") : setNaming(true))}
+            >
               ▶ はじめから (New Game)
             </button>
-            <button className="pixel-btn w-64" disabled={!hasSave} onClick={() => router.push("/play?mode=continue")}>
+            <button
+              className="pixel-btn w-64"
+              disabled={!hasSave && !user}
+              onClick={() => (needsLogin ? router.push("/login") : router.push("/play?mode=continue"))}
+            >
               つづきから (Continue)
             </button>
             <div className="text-xs text-[#a89e8c] mt-2 text-center leading-relaxed">

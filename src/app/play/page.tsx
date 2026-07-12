@@ -13,6 +13,15 @@ function GameHost() {
     let cancelled = false;
 
     (async () => {
+      // auth gate: logged in → play; 401 → login page; no DB (503) / offline → guest
+      try {
+        const res = await fetch("/api/auth");
+        if (res.status === 401) {
+          window.location.replace("/login");
+          return;
+        }
+      } catch { /* offline — guest play */ }
+
       const [{ createGame }, { initializeRun }] = await Promise.all([
         import("@/game"),
         import("@/game/launch"),
