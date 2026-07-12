@@ -54,12 +54,25 @@ export function validateStoryEvent(raw: string, ctx: StoryContext): StoryEvent {
     if (v > 0) xp[skill] = clamp(v, 1, 10);
   }
 
+  // optional interactive choice
+  let choice: StoryEvent["choice"];
+  const ch = o.choice as Record<string, unknown> | undefined;
+  if (ch && typeof ch.prompt === "string" && Array.isArray(ch.options)) {
+    const options = ch.options.slice(0, 3).flatMap(opt => {
+      const oo = opt as Record<string, unknown>;
+      return typeof oo.text === "string" && typeof oo.reply === "string"
+        ? [{ text: oo.text, reply: oo.reply }] : [];
+    });
+    if (options.length >= 2) choice = { prompt: ch.prompt, options };
+  }
+
   return {
     id: `story-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
     kind: (KINDS.has(String(o.kind)) ? o.kind : "daily") as StoryEvent["kind"],
     title, titleJp,
     level: (LEVELS.has(String(o.level)) ? o.level : ctx.level) as JlptLevel,
     setting, lines, vocabulary, grammarFocus,
+    choice,
     reward: { money, xp },
     createdAt: Date.now(),
   };

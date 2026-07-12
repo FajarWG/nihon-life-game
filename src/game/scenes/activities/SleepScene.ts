@@ -1,5 +1,6 @@
 import * as Phaser from "phaser";
 import { sfx } from "@/game/audio/sfx";
+import { Bus } from "@/game/events";
 import { autoSave } from "@/game/systems/save";
 import { rollDailyQuest } from "@/game/systems/quests";
 import { G } from "@/game/state/gameState";
@@ -33,6 +34,7 @@ export class SleepScene extends Phaser.Scene {
     const { xpGained, forced } = g.sleep(this.forced);
     rollDailyQuest(g.day);
     await autoSave();
+    this.prefetchStory();
 
     const s = G();
     panel(this, W / 2 - 220, H / 2 - 150, 440, 300);
@@ -52,5 +54,29 @@ export class SleepScene extends Phaser.Scene {
       G().setLocation("apartment", 2, 2);
       map.scene.restart({ mapId: "apartment", spawnX: 2, spawnY: 2 });
     }, { w: 220 });
+  }
+
+  /**
+   * Overnight, quietly ask the storyteller for tomorrow's tale.
+   * Fully optional: silently skipped when no AI keys are configured.
+   */
+  private async prefetchStory() {
+    try {
+      const { unplayedStory, storeStory } = await import("@/core/db");
+      if (await unplayedStory()) return; // one pending story is enough
+      const s = G();
+      const kind = (s.day % 28 === 14) ? "festival" : (s.day % 7 === 0) ? "encounter" : "daily";
+      const res = await fetch("/api/story", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ playerName: s.playerName, level: s.jlpt, day: s.day, season: s.season, weather: s.weather, kind }),
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      if (data?.event) {
+        await storeStory(data.event);
+        Bus.emit("toast", "新しい物語が届きました！(A story awaits at your table)", "quest");
+      }
+    } catch { /* offline is fine */ }
   }
 }

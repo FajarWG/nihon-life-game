@@ -46,6 +46,7 @@ Return ONLY a JSON object (no markdown, no commentary) with EXACTLY this shape:
   ],
   "vocabulary": [ { "jp": "word", "en": "meaning" } ],
   "grammarFocus": "one grammar point used, e.g. ~てもいい",
+  "choice": { "prompt": "english question for the player", "options": [ { "text": "option in simple japanese", "reply": "short japanese reply + english in parentheses" } ] },
   "reward": { "money": 100, "xp": { "reading": 5, "listening": 3 } }
 }
 

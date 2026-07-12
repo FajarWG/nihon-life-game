@@ -1,11 +1,10 @@
 import * as Phaser from "phaser";
-import { generateCharSheet, generateIcons, generateTileset, generateUiTextures } from "@/game/gfx/textures";
+import type { LocationId } from "@/core/types";
+import { generateCharSheet, generateIcons, generateTileset, generateUiTextures, TILE, TILE_COUNT } from "@/game/gfx/textures";
+import { getMap } from "@/game/maps/maps";
 import { ITEMS } from "@/data/items";
 import { NPCS } from "@/data/npcs";
-import { readSave } from "@/core/db";
 import { G } from "@/game/state/gameState";
-import { ensureMainQuest, rollDailyQuest } from "@/game/systems/quests";
-import { getLaunchOptions } from "@/game/launch";
 
 const CHAR_COLORS: Record<string, { hair: string; shirt: string; pants: string }> = {
   player: { hair: "#4a3428", shirt: "#4a7ab8", pants: "#3a3a4a" },
@@ -48,25 +47,81 @@ export class BootScene extends Phaser.Scene {
     });
   }
 
-  private async boot() {
-    const opts = getLaunchOptions();
-    if (opts.mode === "continue") {
-      const manual = await readSave("manual");
-      const auto = await readSave("auto");
-      const save = (manual?.savedAt ?? 0) >= (auto?.savedAt ?? 0) ? manual ?? auto : auto ?? manual;
-      if (save) G().applySave(save);
-      else G().resetNew(opts.playerName || "Player");
-    } else {
-      G().resetNew(opts.playerName || "Player");
-    }
-    ensureMainQuest();
-    if (!G().quests.active.some(q => q.id.startsWith("daily-"))) rollDailyQuest(G().day);
+  /**
+   * Tiled workflow:
+   * - Drop a Tiled JSON map at /public/maps/<locationId>.json and it replaces
+   *   the built-in ASCII map's visuals (doors/interactables stay data-driven).
+   * - In the browser console, `__nihon.exportTiledMap("town")` downloads the
+   *   current map as Tiled JSON and `__nihon.exportTilesetPNG()` downloads the
+   *   generated tileset, so maps can be opened and edited in Tiled directly.
+   */
+  private async loadTiledOverrides() {
+    const ids: LocationId[] = ["town", "apartment", "school", "konbini", "supermarket", "station", "company", "restaurant", "library"];
+    await Promise.all(ids.map(async id => {
+      try {
+        const res = await fetch(`/maps/${id}.json`);
+        if (!res.ok) return;
+        const data = await res.json();
+        this.cache.tilemap.add(`tiled-${id}`, { format: Phaser.Tilemaps.Formats.TILED_JSON, data });
+      } catch { /* no override — use the built-in ASCII map */ }
+    }));
+  }
 
-    // wait for the pixel font so Phaser text renders crisp
-    try { await document.fonts.ready; } catch { /* fallback fonts are fine */ }
+  private installExportHelpers() {
+    const download = (name: string, url: string) => {
+      const a = document.createElement("a");
+      a.href = url; a.download = name; a.click();
+    };
+    (window as unknown as Record<string, unknown>).__nihon = {
+      exportTilesetPNG: () => {
+        const src = this.textures.get("tiles").getSourceImage() as HTMLCanvasElement;
+        download("tileset.png", src.toDataURL("image/png"));
+      },
+      exportTiledMap: (id: LocationId) => {
+        const m = getMap(id);
+        const json = {
+          type: "map", version: "1.10", orientation: "orthogonal", renderorder: "right-down",
+          width: m.width, height: m.height, tilewidth: TILE, tileheight: TILE, infinite: false,
+          layers: [{
+            type: "tilelayer", name: "ground", id: 1, width: m.width, height: m.height,
+            opacity: 1, visible: true, x: 0, y: 0,
+            data: m.grid.flat().map(t => t + 1), // Tiled gids are 1-based
+          }],
+          tilesets: [{
+            firstgid: 1, name: "tiles", image: "tileset.png",
+            tilewidth: TILE, tileheight: TILE, tilecount: TILE_COUNT, columns: 8,
+            imagewidth: 8 * TILE, imageheight: Math.ceil(TILE_COUNT / 8) * TILE,
+          }],
+          nextlayerid: 2, nextobjectid: 1,
+        };
+        download(`${id}.json`, "data:application/json;charset=utf-8," + encodeURIComponent(JSON.stringify(json)));
+      },
+    };
+  }
 
-    const s = G();
-    this.scene.launch("UI");
-    this.scene.start("Map", { mapId: s.location, spawnX: s.posX, spawnY: s.posY });
+  /**
+   * Game state is already initialized by the React shell (initializeRun).
+   * Here we only wait briefly for the pixel font, with a hard timer fallback,
+   * and guard against the scene being torn down mid-boot (dev StrictMode).
+   */
+  private boot() {
+    this.installExportHelpers();
+    void this.loadTiledOverrides(); // best-effort; MapScene falls back to ASCII maps
+
+    let started = false;
+    const start = () => {
+      if (started) return;
+      if (!this.sys || !this.sys.game || !this.scene.isActive("Boot")) return;
+      started = true;
+      try {
+        const s = G();
+        this.scene.launch("UI");
+        this.scene.start("Map", { mapId: s.location, spawnX: s.posX, spawnY: s.posY });
+      } catch { /* scene torn down — nothing to start */ }
+    };
+    try {
+      document.fonts.ready.then(() => start()).catch(() => start());
+    } catch { /* no Font Loading API */ }
+    this.time.delayedCall(1200, start); // dies with the scene, so always safe
   }
 }

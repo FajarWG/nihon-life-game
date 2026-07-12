@@ -13,15 +13,16 @@ function GameHost() {
     let cancelled = false;
 
     (async () => {
-      const [{ createGame }, { setLaunchOptions }] = await Promise.all([
+      const [{ createGame }, { initializeRun }] = await Promise.all([
         import("@/game"),
         import("@/game/launch"),
       ]);
-      if (cancelled || !hostRef.current) return;
-      setLaunchOptions({
+      // prepare the shared game state before Phaser boots
+      await initializeRun({
         mode: params.get("mode") === "continue" ? "continue" : "new",
         playerName: params.get("name") ?? "Player",
       });
+      if (cancelled || !hostRef.current) return;
       game = createGame(hostRef.current);
     })();
 

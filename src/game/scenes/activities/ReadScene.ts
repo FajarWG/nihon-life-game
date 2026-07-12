@@ -1,4 +1,5 @@
 import { READINGS } from "@/data/drills";
+import { vocabByLevel } from "@/data/vocabulary";
 import { G } from "@/game/state/gameState";
 import { COLOR, style } from "@/game/ui/theme";
 import { ActivityBase, AW, PY } from "./ActivityBase";
@@ -28,11 +29,30 @@ export class ReadScene extends ActivityBase {
 
     const ok = await this.ask(passage.question, passage.options, passage.answer);
 
+    // kanji corner: match kanji words to their readings
+    const kanjiPool = vocabByLevel(s.jlpt).filter(v => v.jp !== v.kana);
+    let kanjiMistakes = -1;
+    if (kanjiPool.length >= 3) {
+      const start = (s.day * 3) % kanjiPool.length;
+      const three = [0, 1, 2].map(i => kanjiPool[(start + i) % kanjiPool.length]);
+      this.setTitle("漢字コーナー — Kanji Corner");
+      kanjiMistakes = await this.pairs(
+        "漢字の読み方を選んでください。(Match each kanji to its reading.)",
+        three.map(v => [v.jp, v.kana] as [string, string]),
+      );
+    }
+
     this.finishActivity({
       timeCost: 40,
       energyCost: 8,
-      xp: { reading: ok ? 8 : 3, kanji: 2 },
-      summary: [ok ? "Understood perfectly." : "A tricky one — you'll get it next time."],
+      xp: {
+        reading: ok ? 8 : 3,
+        kanji: kanjiMistakes === 0 ? 8 : kanjiMistakes > 0 ? 4 : 2,
+      },
+      summary: [
+        ok ? "Understood perfectly." : "A tricky one — you'll get it next time.",
+        kanjiMistakes === 0 ? "Kanji corner: perfect!" : kanjiMistakes > 0 ? "Kanji corner: keep practicing." : " ",
+      ],
     });
   }
 }

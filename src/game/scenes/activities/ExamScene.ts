@@ -2,7 +2,7 @@ import * as Phaser from "phaser";
 import { grammarByLevel } from "@/data/grammar";
 import { vocabByLevel } from "@/data/vocabulary";
 import { READINGS } from "@/data/drills";
-import { G } from "@/game/state/gameState";
+import { G, gameStore } from "@/game/state/gameState";
 import { COLOR, style } from "@/game/ui/theme";
 import { ActivityBase, AW, PY } from "./ActivityBase";
 
@@ -54,6 +54,7 @@ export class ExamScene extends ActivityBase {
 
     const passed = score >= 4;
     if (passed) s.passExam();
+    else gameStore.setState(st => ({ flags: { ...st.flags, examFailedDay: st.day } }));
 
     this.finishActivity({
       timeCost: 90,

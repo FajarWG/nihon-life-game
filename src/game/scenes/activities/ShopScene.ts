@@ -83,10 +83,17 @@ export class ShopScene extends ActivityBase {
       return;
     }
     sfx("coin");
-    g.addItem(id);
+    if (this.shop === "restaurant") {
+      // eat-in: food is enjoyed on the spot
+      g.addEnergy(def.energy ?? 10);
+      Bus.emit("quest-event", "eat", id);
+      Bus.emit("toast", `${def.nameJp}を食べました！(+${def.energy ?? 10} energy)`, "success");
+    } else {
+      g.addItem(id);
+      Bus.emit("toast", `${def.nameJp}（${def.nameEn}）を買いました`, "info");
+    }
     this.bought.push(id);
     Bus.emit("quest-event", "buy", id);
-    Bus.emit("toast", `${def.nameJp}（${def.nameEn}）を買いました`, "info");
     this.refresh();
   }
 

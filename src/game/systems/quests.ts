@@ -1,4 +1,5 @@
 import type { QuestDef, QuestEventKind } from "@/core/types";
+import { NPC_MAP } from "@/data/npcs";
 import { DAILY_TEMPLATES, QUESTS, QUEST_MAP } from "@/data/quests";
 import { Bus } from "@/game/events";
 import { G, gameStore } from "@/game/state/gameState";
@@ -95,6 +96,11 @@ export function adjustFriendship(npcId: string, amount: number) {
     const cur = st.npcs[npcId] ?? { friendship: 0, talkedToday: false, giftedToday: false };
     return { npcs: { ...st.npcs, [npcId]: { ...cur, friendship: Math.max(0, Math.min(10, cur.friendship + amount)) } } };
   });
+  // Friendship milestone unlocks that NPC's relationship quest.
+  const npc = NPC_MAP[npcId];
+  if (npc?.questId && (G().npcs[npcId]?.friendship ?? 0) >= 3) {
+    startQuest(npc.questId);
+  }
 }
 
 /** Ensure the main quest chain is running (new game). */

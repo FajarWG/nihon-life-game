@@ -31,6 +31,7 @@ export const NPCS: NpcDef[] = [
     id: "yuki", name: "Yuki", nameJp: "ゆき", age: 21, occupation: "Classmate (from Korea)",
     sprite: "npc-yuki", bio: "Your cheerful classmate. Dreams of opening a cafe in Osaka.",
     favoriteItems: ["pocky", "flowers"],
+    questId: "side-yuki-1",
     schedule: [
       { from: 8, to: 13, location: "school", x: 4, y: 6 },
       { from: 13, to: 18, location: "town", x: 33, y: 20 },

@@ -88,9 +88,17 @@ export class UIScene extends Phaser.Scene {
     this.add.text(W - 176, 38, "体力", style(9, COLOR.dim));
     this.energyBar = new Bar(this, W - 176, 52, 156, 10, 0x7cc35c);
 
-    this.questText = this.add.text(14, 68, "", style(9, "#d8d2c4", { lineSpacing: 4, wordWrap: { width: 240 } }));
+    this.questText = this.add.text(14, 68, "", style(10, "#e8e2d4", {
+      lineSpacing: 5,
+      wordWrap: { width: 260 },
+      backgroundColor: "#201a2ecc",
+      padding: { x: 8, y: 5 },
+    }));
 
-    this.add.text(W - 10, H - 8, "[E] interact · [I] bag · [Q] quests · [ESC] menu", style(9, COLOR.dim)).setOrigin(1);
+    this.add.text(W - 10, H - 8, "[E] interact · [I] bag · [Q] quests · [ESC] menu", style(10, "#d8d2c4", {
+      backgroundColor: "#201a2ecc",
+      padding: { x: 8, y: 4 },
+    })).setOrigin(1);
   }
 
   refreshHud() {
@@ -114,15 +122,15 @@ export class UIScene extends Phaser.Scene {
       const objs = def.objectives.map(o => `${(q.progress[o.id] ?? 0)}/${o.count}`).join(" ");
       lines.push(`▸ ${def.title}  ${objs}`);
     }
-    this.questText.setText(lines.join("\n"));
+    this.questText.setText(lines.join("\n")).setVisible(lines.length > 0);
   }
 
   toast(text: string, kind = "info") {
     const colors: Record<string, string> = {
       info: COLOR.text, success: COLOR.good, warn: "#f0c040", quest: "#9ad0f0", xp: "#c8a8f0",
     };
-    const t = this.add.text(W / 2, this.toastY, text, style(12, colors[kind] ?? COLOR.text, {
-      backgroundColor: "#201a2ee6", padding: { x: 10, y: 5 },
+    const t = this.add.text(W / 2, this.toastY, text, style(13, colors[kind] ?? COLOR.text, {
+      backgroundColor: "#201a2ef2", padding: { x: 12, y: 6 },
     })).setOrigin(0.5, 0).setDepth(100).setAlpha(0);
     this.toastY += 26;
     this.tweens.add({ targets: t, alpha: 1, y: t.y + 4, duration: 180 });
@@ -137,9 +145,9 @@ export class UIScene extends Phaser.Scene {
     this.dlgBox = this.add.container(0, 0).setDepth(200).setVisible(false);
     const bg = panel(this, 20, H - 158, W - 40, 138);
     this.dlgName = this.add.text(38, H - 172, "", style(12, "#181420", { backgroundColor: "#c8b888", padding: { x: 8, y: 3 } }));
-    this.dlgJp = this.add.text(40, H - 138, "", style(17, COLOR.text, { wordWrap: { width: W - 90 }, lineSpacing: 4 }));
-    this.dlgKana = this.add.text(40, H - 106, "", style(10, COLOR.kana, { wordWrap: { width: W - 90 } }));
-    this.dlgEn = this.add.text(40, H - 82, "", style(11, COLOR.dim, { wordWrap: { width: W - 90 }, fontStyle: "italic" }));
+    this.dlgJp = this.add.text(40, H - 140, "", style(18, COLOR.text, { wordWrap: { width: W - 90 }, lineSpacing: 4 }));
+    this.dlgKana = this.add.text(40, H - 106, "", style(11, COLOR.kana, { wordWrap: { width: W - 90 } }));
+    this.dlgEn = this.add.text(40, H - 80, "", style(12, "#c8beac", { wordWrap: { width: W - 90 }, fontStyle: "italic" }));
     this.dlgMore = this.add.text(W - 44, H - 36, "▼", style(13, COLOR.accent));
     this.dlgBox.add([bg, this.dlgName, this.dlgJp, this.dlgKana, this.dlgEn, this.dlgMore]);
     this.typer = new Typewriter(this, this.dlgJp);

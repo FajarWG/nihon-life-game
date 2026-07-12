@@ -13,13 +13,16 @@ const MX = 160, MY = 60, MW = 640, MH = 420;
 
 type Tab = "menu" | "inventory" | "quests";
 
+const PAGE_SIZE = 10;
+
 export class MenuScene extends Phaser.Scene {
   private tab: Tab = "menu";
+  private page = 0;
   private content!: Phaser.GameObjects.Container;
 
   constructor() { super("Menu"); }
 
-  init(data: { tab?: Tab }) { this.tab = data.tab ?? "menu"; }
+  init(data: { tab?: Tab }) { this.tab = data.tab ?? "menu"; this.page = 0; }
 
   create() {
     dim(this, 0.6);
@@ -80,7 +83,14 @@ export class MenuScene extends Phaser.Scene {
       add(this.add.text(W / 2, H / 2, "かばんは空です。(Your bag is empty.)", style(12, COLOR.dim)).setOrigin(0.5));
       return;
     }
-    entries.slice(0, 12).forEach(([id, qty], i) => {
+    const pages = Math.ceil(entries.length / PAGE_SIZE);
+    this.page = Math.min(this.page, pages - 1);
+    if (pages > 1) {
+      add(this.add.text(W / 2, MY + 66, `${this.page + 1} / ${pages}`, style(11, COLOR.dim)).setOrigin(0.5));
+      if (this.page > 0) this.content.add(new PixelButton(this, MX + MW - 200, MY + 52, "◀", () => { this.page--; this.render(); }, { w: 40, h: 28, size: 11 }));
+      if (this.page < pages - 1) this.content.add(new PixelButton(this, MX + MW - 150, MY + 52, "▶", () => { this.page++; this.render(); }, { w: 40, h: 28, size: 11 }));
+    }
+    entries.slice(this.page * PAGE_SIZE, this.page * PAGE_SIZE + PAGE_SIZE).forEach(([id, qty], i) => {
       const def = ITEM_MAP[id];
       if (!def) return;
       const col = i % 2, row = Math.floor(i / 2);

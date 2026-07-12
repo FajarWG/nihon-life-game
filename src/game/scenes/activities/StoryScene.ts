@@ -77,6 +77,20 @@ export class StoryScene extends ActivityBase {
       }, "▼");
     }
 
+    // interactive choice, when the story has one
+    if (event.choice?.options?.length) {
+      const picked = await new Promise<{ text: string; reply: string }>(resolve => {
+        this.clearContent();
+        this.content.add(this.add.text(AW / 2, PY + 100, event.choice!.prompt, style(14, COLOR.text, { wordWrap: { width: 600 }, align: "center" })).setOrigin(0.5));
+        event.choice!.options.slice(0, 3).forEach((opt, i) => {
+          this.content.add(new PixelButton(this, AW / 2 - 220, PY + 160 + i * 52, opt.text, () => resolve(opt), { w: 440 }));
+        });
+      });
+      await this.card(add => {
+        add(this.add.text(AW / 2, PY + 160, picked.reply, style(14, COLOR.kana, { wordWrap: { width: 600 }, align: "center", lineSpacing: 6 })).setOrigin(0.5));
+      }, "▼");
+    }
+
     // vocabulary recap
     if (event.vocabulary.length) {
       await this.card(add => {

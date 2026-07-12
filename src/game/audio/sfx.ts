@@ -1,4 +1,4 @@
-import { Howl } from "howler";
+import { Howl, Howler } from "howler";
 
 /**
  * All SFX are tiny synthesized WAVs encoded as data URIs at startup —
@@ -69,5 +69,5 @@ export function sfx(name: SfxName) {
   h.play();
 }
 
-export function setMuted(m: boolean) { muted = m; }
+export function setMuted(m: boolean) { muted = m; Howler.mute(m); }
 export function isMuted() { return muted; }
