@@ -150,6 +150,14 @@ export class MapScene extends Phaser.Scene {
     this.input.keyboard!.on("keydown-Z", () => this.tryInteract());
     this.input.keyboard!.on("keydown-SPACE", () => this.tryInteract());
 
+    this.events.on("resume", () => {
+      this.cursors.left.reset();
+      this.cursors.right.reset();
+      this.cursors.up.reset();
+      this.cursors.down.reset();
+      Object.values(this.wasd).forEach(k => k.reset());
+    });
+
     // facing prompt
     this.prompt = this.add.text(0, 0, "", style(7, "#ffe9a8", { backgroundColor: "#201a2ee0", padding: { x: 4, y: 2 } }))
       .setOrigin(0.5, 1).setDepth(30).setVisible(false);
@@ -295,7 +303,7 @@ export class MapScene extends Phaser.Scene {
   }
 
   private tryInteract() {
-    if (G().paused || this.transitioning) return;
+    if (G().paused || this.transitioning || !this.scene.isActive()) return;
     const found = this.findInteract();
     if (!found) return;
     const ui = this.scene.get("UI") as UIScene;

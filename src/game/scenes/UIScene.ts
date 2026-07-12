@@ -89,8 +89,8 @@ export class UIScene extends Phaser.Scene {
     this.add.text(W - 176, 38, "体力", style(9, COLOR.dim));
     this.energyBar = new Bar(this, W - 176, 52, 156, 10, 0x7cc35c);
 
-    this.questText = this.add.text(14, 68, "", style(10, "#e8e2d4", {
-      lineSpacing: 5,
+    this.questText = this.add.text(14, 68, "", style(11, "#e8e2d4", {
+      lineSpacing: 4,
       wordWrap: { width: 260 },
       backgroundColor: "#201a2ecc",
       padding: { x: 8, y: 5 },
@@ -121,11 +121,14 @@ export class UIScene extends Phaser.Scene {
   private refreshQuests() {
     const s = G();
     const lines: string[] = [];
-    for (const q of s.quests.active.slice(0, 3)) {
+    for (const q of s.quests.active.slice(0, 2)) {
       const def = questDef(q.id);
       if (!def) continue;
-      const objs = def.objectives.map(o => `${(q.progress[o.id] ?? 0)}/${o.count}`).join(" ");
-      lines.push(`▸ ${def.title}  ${objs}`);
+      lines.push(`▸ ${def.titleJp ? `${def.titleJp} (${def.title})` : def.title}`);
+      for (const o of def.objectives) {
+        const done = (q.progress[o.id] ?? 0) >= o.count;
+        lines.push(`  ${done ? "☑" : "☐"} ${o.desc} (${q.progress[o.id] ?? 0}/${o.count})`);
+      }
     }
     this.questText.setText(lines.join("\n")).setVisible(lines.length > 0);
   }
