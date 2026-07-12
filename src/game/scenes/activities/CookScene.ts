@@ -24,17 +24,17 @@ export class CookScene extends ActivityBase {
     RECIPES.forEach((r, i) => {
       const have = r.ingredients.every(id => (s.inventory[id] ?? 0) > 0);
       const x = PX + 40 + (i % 3) * 220, y = PY + 100 + Math.floor(i / 3) * 150;
-      const p = panel(this, x, y, 200, 128, true);
+      const p = panel(this, x, y, 200, 160, true);
       this.content.add(p);
-      this.content.add(this.add.image(x + 100, y + 26, "icons", ITEM_MAP[r.result]?.icon ?? "default").setScale(2.4));
-      this.content.add(this.add.text(x + 100, y + 52, r.nameJp, style(13)).setOrigin(0.5));
-      this.content.add(this.add.text(x + 100, y + 68, `${r.kana} — ${r.nameEn}`, style(8, COLOR.kana)).setOrigin(0.5));
+      this.content.add(this.add.image(x + 100, y + 28, "icons", ITEM_MAP[r.result]?.icon ?? "default").setScale(2.4));
+      this.content.add(this.add.text(x + 100, y + 56, r.nameJp, style(14)).setOrigin(0.5));
+      this.content.add(this.add.text(x + 100, y + 74, `${r.kana} — ${r.nameEn}`, style(10, COLOR.kana)).setOrigin(0.5));
       const missing = r.ingredients.filter(id => !(s.inventory[id] ?? 0));
       if (have) {
-        this.content.add(new PixelButton(this, x + 30, y + 86, L("作る", "Cook!", "Masak!"), () => this.cook(r.id), { w: 140, h: 30 }));
+        this.content.add(new PixelButton(this, x + 30, y + 106, L("作る", "Cook!", "Masak!"), () => this.cook(r.id), { w: 140, h: 32 }));
       } else {
         this.content.add(this.add.text(x + 100, y + 96, `${meaning("Missing", "Kurang")}: ${missing.map(id => ITEM_MAP[id]?.nameJp ?? id).join("、")}`,
-          style(10, COLOR.bad, { wordWrap: { width: 180 }, align: "center" })).setOrigin(0.5));
+          style(11, COLOR.bad, { wordWrap: { width: 180 }, align: "center" })).setOrigin(0.5, 0));
       }
     });
   }
@@ -46,11 +46,11 @@ export class CookScene extends ActivityBase {
     // read the recipe
     await this.card(add => {
       add(this.add.text(AW / 2, PY + 56, `${r.nameJp}（${r.kana}）`, style(18, COLOR.accent)).setOrigin(0.5));
-      add(this.add.text(AW / 2, PY + 82, `レシピをよく読んでください。(${meaning("Read the recipe carefully!", "Baca resepnya baik-baik!")})`, style(10, COLOR.dim)).setOrigin(0.5));
+      add(this.add.text(AW / 2, PY + 82, `レシピをよく読んでください。(${meaning("Read the recipe carefully!", "Baca resepnya baik-baik!")})`, style(12, COLOR.dim)).setOrigin(0.5));
       r.steps.forEach((step, i) => {
         const y = PY + 120 + i * 50;
-        add(this.add.text(AW / 2 - 300, y, `${i + 1}. ${step.jp}`, style(13)));
-        add(this.add.text(AW / 2 - 300, y + 18, `   ${M(step)}`, style(10, COLOR.dim)));
+        add(this.add.text(AW / 2 - 300, y, `${i + 1}. ${step.jp}`, style(14)));
+        add(this.add.text(AW / 2 - 300, y + 18, `   ${M(step)}`, style(11, COLOR.dim)));
       });
     }, L("作り始める", "Start cooking", "Mulai memasak"));
 

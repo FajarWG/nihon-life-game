@@ -19,11 +19,11 @@ export class ReadScene extends ActivityBase {
     const passage = pool[(s.day + s.minutes) % Math.max(1, pool.length)] ?? READINGS[0];
 
     await this.card(add => {
-      add(this.add.text(AW / 2, PY + 60, passage.title, style(16, COLOR.accent)).setOrigin(0.5));
+      add(this.add.text(AW / 2, PY + 60, passage.title, style(18, COLOR.accent)).setOrigin(0.5));
       passage.text.forEach((line, i) => {
-        const y = PY + 110 + i * 58;
-        add(this.add.text(AW / 2, y, line.jp, style(15)).setOrigin(0.5));
-        add(this.add.text(AW / 2, y + 20, line.kana ?? "", style(9, COLOR.kana)).setOrigin(0.5));
+        const y = PY + 110 + i * 65;
+        add(this.add.text(AW / 2, y, line.jp, style(17)).setOrigin(0.5));
+        add(this.add.text(AW / 2, y + 24, line.kana ?? "", style(12, COLOR.kana)).setOrigin(0.5));
       });
     }, "質問へ (To the question)");
 

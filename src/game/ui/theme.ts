@@ -5,7 +5,7 @@ import { PAL } from "@/game/gfx/palette";
  * No pixel font in the fallback chain — if the webfont is unavailable the
  * stack degrades to clean system JP sans fonts, never to DotGothic.
  */
-export const FONT = '"M PLUS Rounded 1c", "Hiragino Maru Gothic ProN", "Hiragino Sans", "Yu Gothic UI", "Meiryo", system-ui, sans-serif';
+export const FONT = '"Noto Sans JP", "Noto Sans", "M PLUS Rounded 1c", "Hiragino Sans", "Yu Gothic UI", "Meiryo", system-ui, sans-serif';
 
 export const COLOR = {
   text: PAL.uiText,

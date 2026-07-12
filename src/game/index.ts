@@ -27,6 +27,11 @@ export function createGame(parent: HTMLElement): Phaser.Game {
     roundPixels: true,
     backgroundColor: "#181420",
     physics: { default: "arcade", arcade: { debug: false } },
+    render: {
+      resolution: typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1,
+      antialias: true,
+      pixelArt: false,
+    } as any,
     scale: {
       mode: Phaser.Scale.FIT,
       autoCenter: Phaser.Scale.CENTER_BOTH,

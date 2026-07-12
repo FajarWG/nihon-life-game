@@ -62,19 +62,19 @@ export class StoryScene extends ActivityBase {
 
     // intro card
     await this.card(add => {
-      add(this.add.text(AW / 2, PY + 110, event.titleJp, style(22, COLOR.accent)).setOrigin(0.5));
-      add(this.add.text(AW / 2, PY + 146, event.title, style(12, COLOR.dim)).setOrigin(0.5));
-      add(this.add.text(AW / 2, PY + 200, event.setting, style(11, COLOR.text, { wordWrap: { width: 560 }, align: "center" })).setOrigin(0.5));
-      add(this.add.text(AW / 2, PY + 250, `文法: ${event.grammarFocus} · JLPT ${event.level}`, style(10, COLOR.kana)).setOrigin(0.5));
+      add(this.add.text(AW / 2, PY + 110, event.titleJp, style(24, COLOR.accent)).setOrigin(0.5));
+      add(this.add.text(AW / 2, PY + 146, event.title, style(14, COLOR.dim)).setOrigin(0.5));
+      add(this.add.text(AW / 2, PY + 200, event.setting, style(13, COLOR.text, { wordWrap: { width: 560 }, align: "center" })).setOrigin(0.5));
+      add(this.add.text(AW / 2, PY + 250, `文法: ${event.grammarFocus} · JLPT ${event.level}`, style(12, COLOR.kana)).setOrigin(0.5));
     }, "はじめる (Begin)");
 
     // play lines one card at a time
     for (const line of event.lines) {
       await this.card(add => {
-        add(this.add.text(AW / 2, PY + 90, line.speaker === "narrator" ? "" : `— ${line.speaker} —`, style(11, COLOR.dim)).setOrigin(0.5));
+        add(this.add.text(AW / 2, PY + 90, line.speaker === "narrator" ? "" : `— ${line.speaker} —`, style(13, COLOR.dim)).setOrigin(0.5));
         add(this.add.text(AW / 2, PY + 150, line.jp, style(18, COLOR.text, { wordWrap: { width: 620 }, align: "center", lineSpacing: 6 })).setOrigin(0.5));
-        add(this.add.text(AW / 2, PY + 210, line.kana ?? "", style(11, COLOR.kana, { wordWrap: { width: 620 }, align: "center" })).setOrigin(0.5));
-        add(this.add.text(AW / 2, PY + 250, M(line), style(11, COLOR.dim, { wordWrap: { width: 620 }, align: "center", fontStyle: "italic" })).setOrigin(0.5));
+        add(this.add.text(AW / 2, PY + 206, line.kana ?? "", style(14, COLOR.kana, { wordWrap: { width: 620 }, align: "center" })).setOrigin(0.5));
+        add(this.add.text(AW / 2, PY + 246, M(line), style(13, COLOR.dim, { wordWrap: { width: 620 }, align: "center", fontStyle: "italic" })).setOrigin(0.5));
       }, "▼");
     }
 
@@ -82,22 +82,22 @@ export class StoryScene extends ActivityBase {
     if (event.choice?.options?.length) {
       const picked = await new Promise<{ text: string; reply: string }>(resolve => {
         this.clearContent();
-        this.content.add(this.add.text(AW / 2, PY + 100, event.choice!.prompt, style(14, COLOR.text, { wordWrap: { width: 600 }, align: "center" })).setOrigin(0.5));
+        this.content.add(this.add.text(AW / 2, PY + 100, event.choice!.prompt, style(16, COLOR.text, { wordWrap: { width: 600 }, align: "center" })).setOrigin(0.5));
         event.choice!.options.slice(0, 3).forEach((opt, i) => {
           this.content.add(new PixelButton(this, AW / 2 - 220, PY + 160 + i * 52, opt.text, () => resolve(opt), { w: 440 }));
         });
       });
       await this.card(add => {
-        add(this.add.text(AW / 2, PY + 160, picked.reply, style(14, COLOR.kana, { wordWrap: { width: 600 }, align: "center", lineSpacing: 6 })).setOrigin(0.5));
+        add(this.add.text(AW / 2, PY + 160, picked.reply, style(15, COLOR.kana, { wordWrap: { width: 600 }, align: "center", lineSpacing: 6 })).setOrigin(0.5));
       }, "▼");
     }
 
     // vocabulary recap
     if (event.vocabulary.length) {
       await this.card(add => {
-        add(this.add.text(AW / 2, PY + 80, "今日の言葉 (Today's words)", style(14, COLOR.accent)).setOrigin(0.5));
+        add(this.add.text(AW / 2, PY + 80, "今日の言葉 (Today's words)", style(16, COLOR.accent)).setOrigin(0.5));
         event.vocabulary.forEach((v, i) => {
-          add(this.add.text(AW / 2, PY + 130 + i * 32, `${v.jp} — ${v.en}`, style(13)).setOrigin(0.5));
+          add(this.add.text(AW / 2, PY + 130 + i * 32, `${v.jp} — ${v.en}`, style(15)).setOrigin(0.5));
         });
       }, "おわり (Finish)");
     }

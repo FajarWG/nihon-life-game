@@ -149,11 +149,11 @@ export class UIScene extends Phaser.Scene {
   private buildDialogue() {
     this.dlgBox = this.add.container(0, 0).setDepth(200).setVisible(false);
     const bg = panel(this, 20, H - 158, W - 40, 138);
-    this.dlgName = this.add.text(38, H - 172, "", style(12, "#181420", { backgroundColor: "#c8b888", padding: { x: 8, y: 3 } }));
-    this.dlgJp = this.add.text(40, H - 140, "", style(18, COLOR.text, { wordWrap: { width: W - 90 }, lineSpacing: 4 }));
-    this.dlgKana = this.add.text(40, H - 106, "", style(11, COLOR.kana, { wordWrap: { width: W - 90 } }));
-    this.dlgEn = this.add.text(40, H - 80, "", style(12, "#c8beac", { wordWrap: { width: W - 90 }, fontStyle: "italic" }));
-    this.dlgMore = this.add.text(W - 44, H - 36, "▼", style(13, COLOR.accent));
+    this.dlgName = this.add.text(38, H - 174, "", style(13, "#181420", { backgroundColor: "#c8b888", padding: { x: 8, y: 3 } }));
+    this.dlgJp = this.add.text(40, H - 142, "", style(19, COLOR.text, { wordWrap: { width: W - 90 }, lineSpacing: 4 }));
+    this.dlgKana = this.add.text(40, H - 106, "", style(13, COLOR.kana, { wordWrap: { width: W - 90 } }));
+    this.dlgEn = this.add.text(40, H - 80, "", style(13, "#c8beac", { wordWrap: { width: W - 90 }, fontStyle: "italic" }));
+    this.dlgMore = this.add.text(W - 44, H - 36, "▼", style(14, COLOR.accent));
     this.dlgBox.add([bg, this.dlgName, this.dlgJp, this.dlgKana, this.dlgEn, this.dlgMore]);
     this.typer = new Typewriter(this, this.dlgJp);
     bg.setInteractive().on("pointerdown", () => this.advanceDialogue());

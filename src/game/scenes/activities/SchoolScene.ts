@@ -43,11 +43,11 @@ export class SchoolScene extends ActivityBase {
     const reading = readings[(s.day - 1) % Math.max(1, readings.length)] ?? READINGS[0];
     this.setTitle("読解 — Reading");
     await this.card(add => {
-      add(this.add.text(AW / 2, PY + 60, reading.title, style(16, COLOR.accent)).setOrigin(0.5));
+      add(this.add.text(AW / 2, PY + 60, reading.title, style(18, COLOR.accent)).setOrigin(0.5));
       reading.text.forEach((line, i) => {
-        const y = PY + 110 + i * 58;
-        add(this.add.text(AW / 2, y, line.jp, style(15)).setOrigin(0.5));
-        add(this.add.text(AW / 2, y + 20, line.kana ?? "", style(9, COLOR.kana)).setOrigin(0.5));
+        const y = PY + 110 + i * 65;
+        add(this.add.text(AW / 2, y, line.jp, style(17)).setOrigin(0.5));
+        add(this.add.text(AW / 2, y + 24, line.kana ?? "", style(12, COLOR.kana)).setOrigin(0.5));
       });
     }, "質問へ (To the question)");
     const readOk = await this.ask(reading.question, reading.options, reading.answer);
@@ -96,7 +96,7 @@ export class SchoolScene extends ActivityBase {
         const btn: PixelButton = new PixelButton(this, AW / 2 - 190, y + 30 + i * 48, opt, () => {
           if (opt === answer) {
             btn.flash(true);
-            this.content.add(this.add.text(AW / 2, y + 30 + options.length * 48 + 8, audioJp, style(10, COLOR.kana)).setOrigin(0.5));
+            this.content.add(this.add.text(AW / 2, y + 30 + options.length * 48 + 8, audioJp, style(12, COLOR.kana)).setOrigin(0.5));
             this.time.delayedCall(900, () => resolve(first));
           } else {
             btn.flash(false);

@@ -62,8 +62,8 @@ export class ShopScene extends ActivityBase {
     this.moneyText = this.add.text(PX + PW - 150, PY + 18, "", style(13, COLOR.accent));
     if (this.listItems.length) {
       panel(this, PX + 16, PY + 44, 240, 96, true);
-      this.add.text(PX + 28, PY + 52, L("買い物リスト", "Shopping list", "Daftar belanja"), style(10, COLOR.dim));
-      this.listText = this.add.text(PX + 28, PY + 72, "", style(12));
+      this.add.text(PX + 28, PY + 52, L("買い物リスト", "Shopping list", "Daftar belanja"), style(12, COLOR.dim));
+      this.listText = this.add.text(PX + 28, PY + 72, "", style(14));
     }
 
     this.shelf = this.add.container(0, 0);
@@ -96,9 +96,9 @@ export class ShopScene extends ActivityBase {
         const x = PX + 280 + col * 112, y = PY + 48 + row * 106;
         this.shelf.add(panel(this, x, y, 102, 96, true));
         this.shelf.add(this.add.image(x + 51, y + 20, "icons", def.icon).setScale(2));
-        this.shelf.add(this.add.text(x + 51, y + 42, def.nameJp, style(12)).setOrigin(0.5));
-        this.shelf.add(this.add.text(x + 51, y + 57, def.kana, style(9, COLOR.kana)).setOrigin(0.5));
-        const buyBtn: PixelButton = new PixelButton(this, x + 10, y + 66, `¥${def.price}`, () => this.buy(id, buyBtn), { w: 82, h: 24, size: 11 });
+        this.shelf.add(this.add.text(x + 51, y + 42, def.nameJp, style(13)).setOrigin(0.5));
+        this.shelf.add(this.add.text(x + 51, y + 56, def.kana, style(10, COLOR.kana)).setOrigin(0.5));
+        const buyBtn: PixelButton = new PixelButton(this, x + 10, y + 68, `¥${def.price}`, () => this.buy(id, buyBtn), { w: 82, h: 24, size: 11 });
         this.shelf.add(buyBtn);
       });
 

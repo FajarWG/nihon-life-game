@@ -24,7 +24,7 @@ export class TrainScene extends ActivityBase {
 
     // route map card
     await this.card(add => {
-      add(this.add.text(AW / 2, PY + 56, `${line.nameJp}（${line.nameEn}）`, style(15, "#e86ca4")).setOrigin(0.5));
+      add(this.add.text(AW / 2, PY + 56, `${line.nameJp}（${line.nameEn}）`, style(17, "#e86ca4")).setOrigin(0.5));
       const y = PY + 130;
       const startX = AW / 2 - 300;
       add(this.add.rectangle(AW / 2, y, 600, 4, line.color));
@@ -32,11 +32,11 @@ export class TrainScene extends ActivityBase {
         const st = STATION_MAP[sid];
         const x = startX + (600 / (line.stations.length - 1)) * i;
         add(this.add.rectangle(x, y, 10, 10, 0xffffff));
-        add(this.add.text(x, y - 34, st.nameJp, style(12)).setOrigin(0.5));
-        add(this.add.text(x, y - 16, st.kana, style(8, COLOR.kana)).setOrigin(0.5));
-        add(this.add.text(x, y + 14, st.romaji, style(8, COLOR.dim)).setOrigin(0.5));
+        add(this.add.text(x, y - 38, st.nameJp, style(14)).setOrigin(0.5));
+        add(this.add.text(x, y - 18, st.kana, style(10, COLOR.kana)).setOrigin(0.5));
+        add(this.add.text(x, y + 16, st.romaji, style(9, COLOR.dim)).setOrigin(0.5));
       });
-      add(this.add.text(AW / 2, y + 60, `会社は「${dest.nameJp}」駅の近くです。(The company is near ${dest.romaji} station.)`, style(11, COLOR.dim)).setOrigin(0.5));
+      add(this.add.text(AW / 2, y + 60, `会社は「${dest.nameJp}」駅の近くです。(The company is near ${dest.romaji} station.)`, style(13, COLOR.dim)).setOrigin(0.5));
     }, "ホームへ (To the platform)");
 
     // announcement

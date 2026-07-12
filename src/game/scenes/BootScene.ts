@@ -124,8 +124,10 @@ export class BootScene extends Phaser.Scene {
       // Explicitly load the JP glyph subsets so canvas text never falls back
       // to a hard-to-read font. (Google Fonts JP splits into lazy subsets.)
       Promise.all([
+        document.fonts.load('16px "Noto Sans JP"', "日本語あいうアイウ英語ABCabc0123｜「」"),
+        document.fonts.load('bold 16px "Noto Sans JP"', "日本語ABC"),
+        document.fonts.load('16px "Noto Sans"', "abcABC0123"),
         document.fonts.load('16px "M PLUS Rounded 1c"', "日本語あいうアイウ英語ABCabc0123｜「」"),
-        document.fonts.load('bold 16px "M PLUS Rounded 1c"', "日本語ABC"),
       ]).then(() => start()).catch(() => start());
     } catch { /* no Font Loading API */ }
     this.time.delayedCall(1500, start); // dies with the scene, so always safe
