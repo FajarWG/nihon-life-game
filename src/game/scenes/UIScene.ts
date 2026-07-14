@@ -6,9 +6,9 @@ import { sfx } from "@/game/audio/sfx";
 import { adjustFriendship, questDef } from "@/game/systems/quests";
 import { NPC_MAP } from "@/data/npcs";
 import { G, gameStore, MAX_ENERGY } from "@/game/state/gameState";
-import { getUiLang, L, M, meaning } from "@/game/i18n";
+import { getUiLang, getShowKana, getShowMeaning, L, M, meaning } from "@/game/i18n";
 import { COLOR, style } from "@/game/ui/theme";
-import { Bar, panel, PixelButton, Typewriter } from "@/game/ui/widgets";
+import { Bar, flatPanel, PixelButton, Typewriter } from "@/game/ui/widgets";
 
 const W = 960, H = 540;
 const WEEKDAYS = ["月", "火", "水", "木", "金", "土", "日"];
@@ -78,12 +78,12 @@ export class UIScene extends Phaser.Scene {
   /* ── HUD ─────────────────────────────────────────────────────────────── */
 
   private buildHud() {
-    panel(this, 8, 8, 172, 52);
+    flatPanel(this, 8, 8, 172, 52);
     this.dayText = this.add.text(18, 15, "", style(12, COLOR.accent));
     this.clockText = this.add.text(18, 34, "", style(14));
     this.weatherIcon = this.add.image(158, 34, "wx-sunny").setScale(1.6);
 
-    panel(this, W - 188, 8, 180, 74);
+    flatPanel(this, W - 188, 8, 180, 74);
     this.moneyText = this.add.text(W - 176, 15, "", style(13, COLOR.accent));
     this.jlptText = this.add.text(W - 60, 15, "", style(13, "#9ad0f0"));
     this.add.text(W - 176, 38, "体力", style(9, COLOR.dim));
@@ -151,7 +151,7 @@ export class UIScene extends Phaser.Scene {
 
   private buildDialogue() {
     this.dlgBox = this.add.container(0, 0).setDepth(200).setVisible(false);
-    const bg = panel(this, 20, H - 158, W - 40, 138);
+    const bg = flatPanel(this, 20, H - 158, W - 40, 138, "dark");
     this.dlgName = this.add.text(38, H - 174, "", style(13, "#181420", { backgroundColor: "#c8b888", padding: { x: 8, y: 3 } }));
     this.dlgJp = this.add.text(40, H - 142, "", style(19, COLOR.text, { wordWrap: { width: W - 90 }, lineSpacing: 4 }));
     this.dlgKana = this.add.text(40, H - 106, "", style(13, COLOR.kana, { wordWrap: { width: W - 90 } }));
@@ -184,12 +184,14 @@ export class UIScene extends Phaser.Scene {
     const line = this.dlgLines[this.dlgIndex];
     const name = this.speakerName(line);
     this.dlgName.setText(name).setVisible(!!name);
-    this.dlgKana.setText("");
-    this.dlgEn.setText("");
+    this.dlgKana.setText("").setVisible(false);
+    this.dlgEn.setText("").setVisible(false);
     this.dlgMore.setVisible(false);
     this.typer.play(line.jp, 40, () => {
-      this.dlgKana.setText(line.kana ?? "");
-      this.dlgEn.setText(M(line));
+      const showKana = getShowKana();
+      const showMeaning = getShowMeaning();
+      this.dlgKana.setText(showKana ? (line.kana ?? "") : "").setVisible(showKana && !!line.kana);
+      this.dlgEn.setText(showMeaning ? M(line) : "").setVisible(showMeaning);
       this.dlgMore.setVisible(true);
     });
   }
@@ -201,8 +203,10 @@ export class UIScene extends Phaser.Scene {
     const line = this.dlgLines[this.dlgIndex];
     if (!this.typer.done) {
       this.typer.finish(line.jp);
-      this.dlgKana.setText(line.kana ?? "");
-      this.dlgEn.setText(M(line));
+      const showKana = getShowKana();
+      const showMeaning = getShowMeaning();
+      this.dlgKana.setText(showKana ? (line.kana ?? "") : "").setVisible(showKana && !!line.kana);
+      this.dlgEn.setText(showMeaning ? M(line) : "").setVisible(showMeaning);
       this.dlgMore.setVisible(true);
       return;
     }

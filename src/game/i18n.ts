@@ -12,15 +12,23 @@ export type MeaningLang = "idn" | "en";
 
 const UI_KEY = "nihon-ui-lang";
 const MEANING_KEY = "nihon-meaning-lang";
+const KANA_KEY = "nihon-show-kana";
+const MEANING_SHOW_KEY = "nihon-show-meaning";
 
 let uiLang: UiLang = "ja-en";
 let meaningLang: MeaningLang = "idn";
+let showKana = false;
+let showMeaning = false;
 
 if (typeof window !== "undefined") {
   const u = localStorage.getItem(UI_KEY) as UiLang | null;
   const m = localStorage.getItem(MEANING_KEY) as MeaningLang | null;
+  const k = localStorage.getItem(KANA_KEY);
+  const s = localStorage.getItem(MEANING_SHOW_KEY);
   if (u === "ja-en" || u === "ja" || u === "en") uiLang = u;
   if (m === "idn" || m === "en") meaningLang = m;
+  showKana = k === "1";
+  showMeaning = s === "1";
 }
 
 export function getUiLang(): UiLang { return uiLang; }
@@ -34,6 +42,18 @@ export function setUiLang(l: UiLang) {
 export function setMeaningLang(l: MeaningLang) {
   meaningLang = l;
   try { localStorage.setItem(MEANING_KEY, l); } catch { /* private mode */ }
+}
+
+export function getShowKana(): boolean { return showKana; }
+export function setShowKana(v: boolean) {
+  showKana = v;
+  try { localStorage.setItem(KANA_KEY, v ? "1" : "0"); } catch { /* private mode */ }
+}
+
+export function getShowMeaning(): boolean { return showMeaning; }
+export function setShowMeaning(v: boolean) {
+  showMeaning = v;
+  try { localStorage.setItem(MEANING_SHOW_KEY, v ? "1" : "0"); } catch { /* private mode */ }
 }
 
 /** Meaning/translation of Japanese content: Indonesian when available & selected. */

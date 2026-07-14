@@ -1,7 +1,7 @@
 import type { WorkTask } from "@/core/types";
 import { WORK_TASKS } from "@/data/workTasks";
 import { G } from "@/game/state/gameState";
-import { M } from "@/game/i18n";
+import { getShowKana, getShowMeaning, M } from "@/game/i18n";
 import { COLOR, style } from "@/game/ui/theme";
 import { ActivityBase, AW, PY } from "./ActivityBase";
 
@@ -35,9 +35,13 @@ export class WorkScene extends ActivityBase {
         add(this.add.text(AW / 2, PY + 60, `【${task.title}】`, style(16, COLOR.accent)).setOrigin(0.5));
         add(this.add.text(AW / 2, PY + 84, task.titleEn, style(10, COLOR.dim)).setOrigin(0.5));
         task.body.forEach((line, li) => {
-          const y = PY + 130 + li * 52;
+          const showKana = getShowKana();
+          const showMeaning = getShowMeaning();
+          const spacing = (showKana ? 20 : 0) + (showMeaning ? 20 : 0);
+          const y = PY + 130 + li * (spacing > 0 ? 52 : 32);
           add(this.add.text(AW / 2, y, line.jp, style(14, COLOR.text, { wordWrap: { width: 620 }, align: "center" })).setOrigin(0.5));
-          add(this.add.text(AW / 2, y + 20, M(line), style(10, COLOR.dim)).setOrigin(0.5));
+          if (showKana) add(this.add.text(AW / 2, y + 20, line.kana ?? "", style(10, COLOR.kana)).setOrigin(0.5));
+          if (showMeaning) add(this.add.text(AW / 2, y + (showKana ? 40 : 20), M(line), style(10, COLOR.dim)).setOrigin(0.5));
         });
       }, "作業する (Work on it)");
 

@@ -1,6 +1,6 @@
 import { GRAMMAR, grammarByLevel } from "@/data/grammar";
 import { G } from "@/game/state/gameState";
-import { L, M, meaning } from "@/game/i18n";
+import { getShowKana, getShowMeaning, L, M, meaning } from "@/game/i18n";
 import { COLOR, style } from "@/game/ui/theme";
 import { ActivityBase, AW, PY } from "./ActivityBase";
 
@@ -30,9 +30,13 @@ export class StudyScene extends ActivityBase {
       add(this.add.text(AW / 2, PY + 98, meaning(g.meaning, g.meaningIdn), style(14, COLOR.kana)).setOrigin(0.5));
       add(this.add.text(AW / 2, PY + 140, meaning(g.explanation, g.explanationIdn), style(13, COLOR.text, { wordWrap: { width: 620 }, align: "center", lineSpacing: 6 })).setOrigin(0.5, 0));
       g.examples.forEach((ex, i) => {
-        const y = PY + 215 + i * 62;
+        const y = PY + 215 + i * (getShowKana() || getShowMeaning() ? 58 : 36);
         add(this.add.text(AW / 2, y, ex.jp, style(16)).setOrigin(0.5));
-        add(this.add.text(AW / 2, y + 22, `${ex.kana ?? ""}  —  ${M(ex)}`, style(11, COLOR.dim)).setOrigin(0.5));
+        if (getShowKana()) add(this.add.text(AW / 2, y + 22, ex.kana ?? "", style(11, COLOR.kana)).setOrigin(0.5));
+        if (getShowMeaning()) {
+          const meaningY = y + (getShowKana() ? 38 : 22);
+          add(this.add.text(AW / 2, meaningY, M(ex), style(11, COLOR.dim)).setOrigin(0.5));
+        }
       });
     }, L("練習する", "Practice", "Latihan"));
 

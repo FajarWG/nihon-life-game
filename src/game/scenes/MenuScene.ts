@@ -5,9 +5,9 @@ import { Bus } from "@/game/events";
 import { manualSave } from "@/game/systems/save";
 import { activeQuests, questDef } from "@/game/systems/quests";
 import { G } from "@/game/state/gameState";
-import { getMeaningLang, getUiLang, L, meaning, setMeaningLang, setUiLang } from "@/game/i18n";
+import { getMeaningLang, getShowKana, getShowMeaning, getUiLang, L, meaning, setMeaningLang, setShowKana, setShowMeaning, setUiLang } from "@/game/i18n";
 import { COLOR, style } from "@/game/ui/theme";
-import { dim, panel, PixelButton } from "@/game/ui/widgets";
+import { dim, flatPanel, PixelButton } from "@/game/ui/widgets";
 
 const W = 960, H = 540;
 const MX = 160, MY = 60, MW = 640, MH = 420;
@@ -27,7 +27,7 @@ export class MenuScene extends Phaser.Scene {
 
   create() {
     dim(this, 0.6);
-    panel(this, MX, MY, MW, MH);
+    flatPanel(this, MX, MY, MW, MH);
     this.content = this.add.container(0, 0);
 
     const tabs: [Tab, string][] = [["menu", L("メニュー", "Menu", "Menu")], ["inventory", L("かばん", "Bag", "Tas")], ["quests", L("クエスト", "Quests", "Misi")]];
@@ -78,10 +78,18 @@ export class MenuScene extends Phaser.Scene {
         setMeaningLang(getMeaningLang() === "idn" ? "en" : "idn");
         this.render();
       }],
+      [`${getShowKana() ? "☑" : "☐"} ${meaning("Kana", "Kana")}`, () => {
+        setShowKana(!getShowKana());
+        this.render();
+      }],
+      [`${getShowMeaning() ? "☑" : "☐"} ${meaning("Translation", "Terjemahan")}`, () => {
+        setShowMeaning(!getShowMeaning());
+        this.render();
+      }],
       [L("タイトルへ", "Quit to title", "Keluar ke judul"), () => { window.location.href = "/"; }],
     ];
     buttons.forEach(([label, cb], i) => {
-      this.content.add(new PixelButton(this, W / 2 - 130, MY + 156 + i * 44, label, cb, { w: 260, h: 38 }));
+      this.content.add(new PixelButton(this, W / 2 - 130, MY + 140 + i * 34, label, cb, { w: 260, h: 30 }));
     });
   }
 
@@ -107,7 +115,7 @@ export class MenuScene extends Phaser.Scene {
       if (!def) return;
       const col = i % 2, row = Math.floor(i / 2);
       const x = MX + 24 + col * 300, y = MY + 92 + row * 64;
-      add(panel(this, x, y, 288, 58, true));
+      add(flatPanel(this, x, y, 288, 58, "light"));
       add(this.add.image(x + 26, y + 29, "icons", def.icon).setScale(2.4));
       add(this.add.text(x + 50, y + 10, `${def.nameJp} ×${qty}`, style(14)));
       add(this.add.text(x + 50, y + 33, def.nameEn, style(11, COLOR.dim)));

@@ -2,7 +2,7 @@ import * as Phaser from "phaser";
 import { LISTENINGS, READINGS } from "@/data/drills";
 import { vocabByLevel } from "@/data/vocabulary";
 import { speakJapanese } from "@/game/audio/speech";
-import { M } from "@/game/i18n";
+import { getShowKana, M } from "@/game/i18n";
 import { G, gameStore } from "@/game/state/gameState";
 import { COLOR, style } from "@/game/ui/theme";
 import { PixelButton } from "@/game/ui/widgets";
@@ -45,9 +45,10 @@ export class SchoolScene extends ActivityBase {
     await this.card(add => {
       add(this.add.text(AW / 2, PY + 60, reading.title, style(18, COLOR.accent)).setOrigin(0.5));
       reading.text.forEach((line, i) => {
-        const y = PY + 110 + i * 65;
+        const showKana = getShowKana();
+        const y = PY + 110 + i * (showKana ? 65 : 45);
         add(this.add.text(AW / 2, y, line.jp, style(17)).setOrigin(0.5));
-        add(this.add.text(AW / 2, y + 24, line.kana ?? "", style(12, COLOR.kana)).setOrigin(0.5));
+        if (showKana) add(this.add.text(AW / 2, y + 24, line.kana ?? "", style(12, COLOR.kana)).setOrigin(0.5));
       });
     }, "質問へ (To the question)");
     const readOk = await this.ask(reading.question, reading.options, reading.answer);

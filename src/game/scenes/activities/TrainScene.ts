@@ -1,5 +1,6 @@
 import { LINES, STATION_MAP } from "@/data/stations";
 import { speakJapanese } from "@/game/audio/speech";
+import { getShowKana } from "@/game/i18n";
 import { G } from "@/game/state/gameState";
 import { COLOR, style } from "@/game/ui/theme";
 import { PixelButton } from "@/game/ui/widgets";
@@ -30,10 +31,11 @@ export class TrainScene extends ActivityBase {
       add(this.add.rectangle(AW / 2, y, 600, 4, line.color));
       line.stations.forEach((sid, i) => {
         const st = STATION_MAP[sid];
+        const showKana = getShowKana();
         const x = startX + (600 / (line.stations.length - 1)) * i;
         add(this.add.rectangle(x, y, 10, 10, 0xffffff));
-        add(this.add.text(x, y - 38, st.nameJp, style(14)).setOrigin(0.5));
-        add(this.add.text(x, y - 18, st.kana, style(10, COLOR.kana)).setOrigin(0.5));
+        add(this.add.text(x, y - (showKana ? 38 : 28), st.nameJp, style(14)).setOrigin(0.5));
+        if (showKana) add(this.add.text(x, y - 18, st.kana, style(10, COLOR.kana)).setOrigin(0.5));
         add(this.add.text(x, y + 16, st.romaji, style(9, COLOR.dim)).setOrigin(0.5));
       });
       add(this.add.text(AW / 2, y + 60, `会社は「${dest.nameJp}」駅の近くです。(The company is near ${dest.romaji} station.)`, style(13, COLOR.dim)).setOrigin(0.5));

@@ -14,22 +14,15 @@ const COOKIE_OPTS = {
   maxAge: 60 * 60 * 24 * 30, // 30 days
 };
 
-/** GET /api/auth — who am I? 200 {username} | 401 (login needed) | 503 (no/unreachable DB → guest). */
+/** GET /api/auth — who am I? 200 {username} | 401 (login needed) | 503 (no DB configured). */
 export async function GET(req: Request) {
-  if (!dbConfigured()) return NextResponse.json({ error: "no database", guest: true }, { status: 503 });
+  if (!dbConfigured()) return NextResponse.json({ error: "no database" }, { status: 503 });
   const username = userFromRequest(req);
   if (username) return NextResponse.json({ username });
-  // No session: only demand login when the DB is actually reachable,
-  // otherwise players would be locked out while their DB is down.
-  try {
-    await getUserHash("__reachability_probe__");
-    return NextResponse.json({ error: "not logged in" }, { status: 401 });
-  } catch {
-    return NextResponse.json({ error: "database unreachable", guest: true }, { status: 503 });
-  }
+  return NextResponse.json({ error: "not logged in" }, { status: 401 });
 }
 
-/** POST /api/auth — {action: "register"|"login"|"logout", username?, password?} */
+/** POST /api/auth — {action: "register"|"login"|"logout", username?, password?, confirmPassword?} */
 export async function POST(req: Request) {
   let body: Record<string, unknown>;
   try { body = await req.json(); } catch { return NextResponse.json({ error: "bad json" }, { status: 400 }); }
@@ -42,9 +35,9 @@ export async function POST(req: Request) {
   }
 
   if (!dbConfigured()) {
-    return NextResponse.json({ error: "No database configured — playing as guest is fine.", guest: true }, { status: 503 });
+    return NextResponse.json({ error: "No database configured. Cannot authenticate." }, { status: 503 });
   }
-  const { username, password } = body;
+  const { username, password, confirmPassword } = body;
   if (!validUsername(username)) {
     return NextResponse.json({ error: "Username: 3-24 chars, letters/numbers/_/- only." }, { status: 400 });
   }
@@ -54,6 +47,8 @@ export async function POST(req: Request) {
 
   try {
     if (action === "register") {
+      const cp = typeof confirmPassword === "string" ? confirmPassword : "";
+      if (password !== cp) return NextResponse.json({ error: "Passwords do not match." }, { status: 400 });
       const created = await createUser(username, hashPassword(password));
       if (!created) return NextResponse.json({ error: "Username already taken." }, { status: 409 });
     } else if (action === "login") {

@@ -1,6 +1,7 @@
 import { READINGS } from "@/data/drills";
 import { vocabByLevel } from "@/data/vocabulary";
 import { G } from "@/game/state/gameState";
+import { getShowKana } from "@/game/i18n";
 import { COLOR, style } from "@/game/ui/theme";
 import { ActivityBase, AW, PY } from "./ActivityBase";
 
@@ -21,9 +22,10 @@ export class ReadScene extends ActivityBase {
     await this.card(add => {
       add(this.add.text(AW / 2, PY + 60, passage.title, style(18, COLOR.accent)).setOrigin(0.5));
       passage.text.forEach((line, i) => {
-        const y = PY + 110 + i * 65;
+        const showKana = getShowKana();
+        const y = PY + 110 + i * (showKana ? 65 : 45);
         add(this.add.text(AW / 2, y, line.jp, style(17)).setOrigin(0.5));
-        add(this.add.text(AW / 2, y + 24, line.kana ?? "", style(12, COLOR.kana)).setOrigin(0.5));
+        if (showKana) add(this.add.text(AW / 2, y + 24, line.kana ?? "", style(12, COLOR.kana)).setOrigin(0.5));
       });
     }, "質問へ (To the question)");
 

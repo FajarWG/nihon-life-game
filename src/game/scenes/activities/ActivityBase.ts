@@ -4,7 +4,7 @@ import { sfx } from "@/game/audio/sfx";
 import { G } from "@/game/state/gameState";
 import { L, meaning } from "@/game/i18n";
 import { COLOR, style } from "@/game/ui/theme";
-import { dim, panel, PixelButton } from "@/game/ui/widgets";
+import { dim, flatPanel, PixelButton } from "@/game/ui/widgets";
 
 export const AW = 960, AH = 540;
 /** main content panel bounds */
@@ -31,7 +31,7 @@ export abstract class ActivityBase extends Phaser.Scene {
 
   protected chrome(title: string, cancellable = true) {
     dim(this, 0.65);
-    panel(this, PX, PY, PW, PH);
+    flatPanel(this, PX, PY, PW, PH);
     this.titleText = this.add.text(PX + 20, PY + 14, title, style(16, COLOR.accent));
     if (cancellable) {
       new PixelButton(this, PX + PW - 46, PY + 10, "✕", () => this.cancel(), { w: 32, h: 26, size: 12 });

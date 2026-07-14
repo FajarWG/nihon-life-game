@@ -8,6 +8,19 @@ export function panel(scene: Phaser.Scene, x: number, y: number, w: number, h: n
   return scene.add.nineslice(x, y, light ? "panel-light" : "panel", undefined, w, h, 6, 6, 6, 6).setOrigin(0);
 }
 
+/** Flat rectangle panel — clean border, no 9-slice texture. Used for E-key menus. */
+export function flatPanel(
+  scene: Phaser.Scene,
+  x: number, y: number, w: number, h: number,
+  theme: "dark" | "light" = "dark",
+) {
+  const bg = theme === "light" ? "#3a2f4c" : "#2a2138";
+  const border = theme === "light" ? "#c8b888" : "#8a7a5c";
+  const panel = scene.add.rectangle(x, y, w, h, 0, 0).setOrigin(0).setStrokeStyle(2, Phaser.Display.Color.HexStringToColor(border).color);
+  panel.setFillStyle(Phaser.Display.Color.HexStringToColor(bg).color);
+  return panel;
+}
+
 export interface ButtonOpts {
   w?: number;
   h?: number;

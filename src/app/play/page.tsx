@@ -13,14 +13,23 @@ function GameHost() {
     let cancelled = false;
 
     (async () => {
-      // auth gate: logged in → play; 401 → login page; no DB (503) / offline → guest
+      // auth gate: logged in → play; 401 → title; 503 (no DB) → error
       try {
         const res = await fetch("/api/auth");
         if (res.status === 401) {
-          window.location.replace("/login");
+          window.location.replace("/");
           return;
         }
-      } catch { /* offline — guest play */ }
+        if (res.status === 503) {
+          // DB not configured — show error, can't play
+          window.location.replace("/");
+          return;
+        }
+      } catch {
+        // offline — can't verify, redirect to title
+        window.location.replace("/");
+        return;
+      }
 
       const [{ createGame }, { initializeRun }] = await Promise.all([
         import("@/game"),

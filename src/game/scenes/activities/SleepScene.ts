@@ -6,7 +6,7 @@ import { rollDailyQuest } from "@/game/systems/quests";
 import { G } from "@/game/state/gameState";
 import { meaning } from "@/game/i18n";
 import { COLOR, style } from "@/game/ui/theme";
-import { panel, PixelButton } from "@/game/ui/widgets";
+import { flatPanel, PixelButton } from "@/game/ui/widgets";
 
 const W = 960, H = 540;
 
@@ -38,7 +38,7 @@ export class SleepScene extends Phaser.Scene {
     this.prefetchStory();
 
     const s = G();
-    panel(this, W / 2 - 220, H / 2 - 150, 440, 300);
+    flatPanel(this, W / 2 - 220, H / 2 - 150, 440, 300);
     this.add.text(W / 2, H / 2 - 118, `Day ${s.day - 1} → Day ${s.day}`, style(18, COLOR.accent)).setOrigin(0.5);
     const lines = [
       `今日のXP (XP today): ${xpGained}`,
