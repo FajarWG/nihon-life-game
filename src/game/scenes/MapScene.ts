@@ -322,6 +322,13 @@ export class MapScene extends Phaser.Scene {
     const hour = s.minutes / 60;
     switch (kind) {
       case "sleep":
+        if (s.minutes < 1200) {
+          ui.toast(
+            L("まだ早すぎる…", "It's too early to sleep…", "Masih terlalu awal untuk tidur…"),
+            "info",
+          );
+          return;
+        }
         ui.startDialogue(
           [{ speaker: "narrator", jp: "もう寝ますか。", kana: "もうねますか。", en: "Sleep and end the day?", idn: "Tidur dan akhiri hari ini?" }],
           {
@@ -356,6 +363,7 @@ export class MapScene extends Phaser.Scene {
         if (s.energy < 20) return ui.toast("Too tired to work…", "warn");
         this.launchActivity("Work"); break;
       case "read":
+        if (s.activitiesDone.includes("reading")) return ui.toast("You already visited the library today.", "info");
         if (s.energy < 8) return ui.toast("Too tired to read…", "warn");
         this.launchActivity("Read"); break;
       case "exam":
@@ -388,6 +396,12 @@ export class MapScene extends Phaser.Scene {
         G().advanceMinutes(2);
       }
       if (G().minutes >= DAY_END) {
+        this.transitioning = true;
+        this.scene.pause();
+        this.scene.launch("Sleep", { forced: true });
+        return;
+      }
+      if (G().energy <= 0) {
         this.transitioning = true;
         this.scene.pause();
         this.scene.launch("Sleep", { forced: true });

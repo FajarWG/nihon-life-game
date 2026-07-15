@@ -21,7 +21,6 @@ export function style(size: number, color: string = COLOR.text, extra: Partial<P
     fontFamily: FONT,
     fontSize: `${size}px`,
     color,
-    resolution: 3,
     // subtle drop shadow so text stays readable over any background
     shadow: { offsetX: 1, offsetY: 1, color: "#100c18", blur: 0, stroke: false, fill: true },
     ...extra,

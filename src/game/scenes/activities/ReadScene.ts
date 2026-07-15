@@ -45,6 +45,7 @@ export class ReadScene extends ActivityBase {
     }
 
     this.finishActivity({
+      activity: "reading",
       timeCost: 40,
       energyCost: 8,
       xp: {

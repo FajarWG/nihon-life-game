@@ -59,7 +59,7 @@ export class ExamScene extends ActivityBase {
     this.finishActivity({
       timeCost: 90,
       energyCost: 15,
-      xp: passed ? {} : { grammar: 5 },
+      xp: passed ? { grammar: 20, reading: 10 } : { grammar: 5 },
       title: passed ? `合格！ (PASSED!) — Welcome to ${G().jlpt}` : "不合格… (Not this time)",
       summary: [
         `Score: ${score}/${total}`,

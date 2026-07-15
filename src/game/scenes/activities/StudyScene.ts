@@ -54,7 +54,7 @@ export class StudyScene extends ActivityBase {
       }
     }
 
-    s.learnGrammarPoint(g.id);
+    if (score > 0) s.learnGrammarPoint(g.id);
     const xp = 10 + score * 5;
     this.finishActivity({
       activity: "study",

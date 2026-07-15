@@ -245,6 +245,20 @@ export class ShopScene extends ActivityBase {
     const boughtIds = Object.keys(this.cart);
     this.cart = {};
 
+    // hide shop UI so results screen is visible
+    this.moneyText.setVisible(false);
+    this.listText?.setVisible(false);
+    this.cartPanel.setVisible(false);
+    this.cartListText.setVisible(false);
+    this.cartTotalText.setVisible(false);
+    this.checkoutBtn.setVisible(false);
+    this.shelf.setVisible(false);
+    this.prevBtn.setVisible(false);
+    this.nextBtn.setVisible(false);
+    this.pageText.setVisible(false);
+    this.cartRowObjs.forEach(o => o.destroy());
+    this.cartRowObjs = [];
+
     const listDone = this.listItems.length > 0 && this.listItems.every(id => boughtIds.includes(id));
     const uniqueWords = new Set(boughtIds).size;
 
