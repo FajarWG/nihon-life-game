@@ -324,4 +324,6 @@ export interface SaveData {
   npcs: Record<string, { friendship: number; talkedToday: boolean; giftedToday: boolean }>;
   examPassed: JlptLevel[];
   flags: Record<string, boolean | number | string>;
+  /** Leitner box for vocabulary review: box 1-5, interval = [1,2,4,8,16] days. */
+  vocabReview: Record<string, { box: number; lastSeenDay: number }>;
 }

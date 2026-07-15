@@ -35,6 +35,12 @@ class NihonLifeDB extends Dexie {
       stories: "id, played",
       packs: "id, type",
     });
+    // v3: vocabReview added to SaveData (Leitner box)
+    this.version(3).stores({
+      saves: "slot",
+      stories: "id, played",
+      packs: "id, type",
+    });
   }
 }
 

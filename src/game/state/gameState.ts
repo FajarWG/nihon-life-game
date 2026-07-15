@@ -89,6 +89,7 @@ const freshSave = (playerName: string): SaveData => ({
   npcs: {},
   examPassed: [],
   flags: {},
+  vocabReview: {},
 });
 
 export const gameStore = createStore<GameState>()((set, get) => ({
@@ -198,7 +199,7 @@ export const gameStore = createStore<GameState>()((set, get) => ({
       skills: s.skills, location: s.location, posX: s.posX, posY: s.posY,
       inventory: s.inventory, learnedGrammar: s.learnedGrammar, learnedVocab: s.learnedVocab,
       activitiesDone: s.activitiesDone, quests: s.quests, npcs: s.npcs,
-      examPassed: s.examPassed, flags: s.flags,
+      examPassed: s.examPassed, flags: s.flags, vocabReview: s.vocabReview,
     };
   },
   applySave: (save) => set({ ...save }),

@@ -4,6 +4,8 @@ import { getShowKana, getShowMeaning, L, M, meaning } from "@/game/i18n";
 import { COLOR, style } from "@/game/ui/theme";
 import { ActivityBase, AW, PY } from "./ActivityBase";
 
+const STUDY_PEEK_PENALTY = 0.2;
+
 /** Morning grammar study at the apartment desk. */
 export class StudyScene extends ActivityBase {
   constructor() { super("Study"); }
@@ -43,19 +45,28 @@ export class StudyScene extends ActivityBase {
     // 2. exercises
     let score = 0;
     let total = 0;
+    let peekCount = 0;
     for (const ex of g.exercises) {
       total++;
       if (ex.kind === "order" && ex.tiles) {
-        const mistakes = await this.order(`「${ex.prompt}」— build the sentence`, ex.tiles, ex.translation);
+        const peekRef = { peeked: false };
+        const peekHint = ex.translation ?? "";
+        const mistakes = await this.order(`「${ex.prompt}」— build the sentence`, ex.tiles, ex.translation, peekHint, peekRef);
         if (mistakes === 0) score++;
+        if (peekRef.peeked) peekCount++;
       } else if (ex.kind === "fill" && ex.sentence && ex.options && ex.answer) {
-        const ok = await this.ask(ex.sentence, ex.options, ex.answer, `${ex.prompt} — ${ex.translation}`);
+        const peekRef = { peeked: false };
+        const peekHint = meaning(ex.translation ?? "");
+        const ok = await this.ask(ex.sentence, ex.options, ex.answer, `${ex.prompt} — ${ex.translation}`, peekHint, peekRef);
         if (ok) score++;
+        if (peekRef.peeked) peekCount++;
       }
     }
 
     if (score > 0) s.learnGrammarPoint(g.id);
-    const xp = 10 + score * 5;
+    const rawXp = 10 + score * 5;
+    const penaltyXp = Math.round(peekCount * 5 * STUDY_PEEK_PENALTY);
+    const xp = Math.max(1, rawXp - penaltyXp);
     this.finishActivity({
       activity: "study",
       timeCost: 60,
@@ -63,7 +74,7 @@ export class StudyScene extends ActivityBase {
       xp: { grammar: xp },
       summary: [
         `${meaning("Learned", "Dipelajari")}: ${g.title} — ${meaning(g.meaning, g.meaningIdn)}`,
-        `Exercises: ${score}/${total} perfect`,
+        `Exercises: ${score}/${total} perfect${peekCount > 0 ? ` (peeked ×${peekCount}, −${penaltyXp} XP)` : ""}`,
       ],
     });
   }

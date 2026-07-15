@@ -85,7 +85,7 @@ export abstract class ActivityBase extends Phaser.Scene {
   /* ── awaitable widgets ───────────────────────────────────────────────── */
 
   /** Multiple choice. Resolves true if correct (first try). */
-  protected ask(question: string, options: string[], answer: string, subtitle?: string): Promise<boolean> {
+  protected ask(question: string, options: string[], answer: string, subtitle?: string, peekHint?: string, peekRef?: { peeked: boolean }): Promise<boolean> {
     return new Promise(resolve => {
       this.clearContent();
       let y = PY + 70;
@@ -109,11 +109,25 @@ export abstract class ActivityBase extends Phaser.Scene {
         }, { w: 440, h: 40 });
         this.content.add(btn);
       });
+
+      if (peekHint && peekRef) {
+        const peekBtnY = y + 14 + options.length * 48 + 8;
+        let peekTimer: Phaser.Time.TimerEvent | undefined;
+        let peekLabel: Phaser.GameObjects.Text | undefined;
+        const peekBtn = new PixelButton(this, AW / 2 - 80, peekBtnY, "👁 Peek", () => {
+          peekRef!.peeked = true;
+          if (peekTimer) peekTimer.remove();
+          if (peekLabel) peekLabel.destroy();
+          peekLabel = this.add.text(AW / 2, peekBtnY - 28, peekHint!, style(11, COLOR.kana, { wordWrap: { width: PW - 80 }, align: "center", backgroundColor: "#100c18cc", padding: { x: 8, y: 4 } })).setOrigin(0.5).setDepth(20);
+          peekTimer = this.time.delayedCall(7000, () => { peekLabel?.destroy(); peekLabel = undefined; });
+        }, { w: 160, h: 30, size: 11 });
+        this.content.add(peekBtn);
+      }
     });
   }
 
   /** Arrange tiles in order. Resolves number of mistakes. */
-  protected order(prompt: string, tiles: string[], translation?: string): Promise<number> {
+  protected order(prompt: string, tiles: string[], translation?: string, peekHint?: string, peekRef?: { peeked: boolean }): Promise<number> {
     return new Promise(resolve => {
       this.clearContent();
       this.content.add(this.add.text(AW / 2, PY + 66, prompt, style(13, COLOR.text, { wordWrap: { width: PW - 80 }, align: "center" })).setOrigin(0.5, 0));
@@ -156,6 +170,20 @@ export abstract class ActivityBase extends Phaser.Scene {
         );
         this.content.add(btn);
       });
+
+      if (peekHint && peekRef) {
+        const peekBtnY = PY + 190 + Math.ceil(tiles.length / 4) * 52 + 10;
+        let peekTimer: Phaser.Time.TimerEvent | undefined;
+        let peekLabel: Phaser.GameObjects.Text | undefined;
+        const peekBtn = new PixelButton(this, AW / 2 - 80, peekBtnY, "👁 Peek", () => {
+          peekRef!.peeked = true;
+          if (peekTimer) peekTimer.remove();
+          if (peekLabel) peekLabel.destroy();
+          peekLabel = this.add.text(AW / 2, peekBtnY - 28, peekHint!, style(11, COLOR.kana, { wordWrap: { width: PW - 80 }, align: "center", backgroundColor: "#100c18cc", padding: { x: 8, y: 4 } })).setOrigin(0.5).setDepth(20);
+          peekTimer = this.time.delayedCall(7000, () => { peekLabel?.destroy(); peekLabel = undefined; });
+        }, { w: 160, h: 30, size: 11 });
+        this.content.add(peekBtn);
+      }
     });
   }
 

@@ -6,13 +6,14 @@ import { manualSave } from "@/game/systems/save";
 import { activeQuests, questDef } from "@/game/systems/quests";
 import { G } from "@/game/state/gameState";
 import { getMeaningLang, getShowKana, getShowMeaning, getShowRomaji, getUiLang, L, meaning, setMeaningLang, setShowKana, setShowMeaning, setShowRomaji, setUiLang } from "@/game/i18n";
+import type { UiLang } from "@/game/i18n";
 import { COLOR, style } from "@/game/ui/theme";
 import { dim, flatPanel, PixelButton } from "@/game/ui/widgets";
 
 const W = 960, H = 540;
 const MX = 160, MY = 60, MW = 640, MH = 420;
 
-type Tab = "menu" | "inventory" | "quests";
+type Tab = "menu" | "inventory" | "quests" | "settings";
 
 const PAGE_SIZE = 8; // 2 cols × 4 taller, readable rows
 
@@ -30,9 +31,9 @@ export class MenuScene extends Phaser.Scene {
     flatPanel(this, MX, MY, MW, MH);
     this.content = this.add.container(0, 0);
 
-    const tabs: [Tab, string][] = [["menu", L("メニュー", "Menu", "Menu")], ["inventory", L("かばん", "Bag", "Tas")], ["quests", L("クエスト", "Quests", "Misi")]];
+    const tabs: [Tab, string][] = [["menu", L("メニュー", "Menu", "Menu")], ["inventory", L("かばん", "Bag", "Tas")], ["quests", L("クエスト", "Quests", "Misi")], ["settings", "⚙"]];
     tabs.forEach(([t, label], i) => {
-      new PixelButton(this, MX + 16 + i * 150, MY + 12, label, () => { this.tab = t; this.render(); }, { w: 140, h: 34, size: 13 });
+      new PixelButton(this, MX + 16 + i * 122, MY + 12, label, () => { this.tab = t; this.render(); }, { w: 112, h: 34, size: 13 });
     });
     new PixelButton(this, MX + MW - 46, MY + 12, "✕", () => this.close(), { w: 32, h: 30, size: 12 });
 
@@ -50,7 +51,8 @@ export class MenuScene extends Phaser.Scene {
     this.content.removeAll(true);
     if (this.tab === "menu") this.renderMenu();
     else if (this.tab === "inventory") this.renderInventory();
-    else this.renderQuests();
+    else if (this.tab === "quests") this.renderQuests();
+    else this.renderSettings();
   }
 
   private renderMenu() {
@@ -63,33 +65,11 @@ export class MenuScene extends Phaser.Scene {
       add(this.add.text(MX + 90 + (i % 3) * 170, MY + 108 + Math.floor(i / 3) * 28, `${skill}: ${xp}`, style(13, COLOR.dim)));
     });
 
-    const uiLangName = { "ja-en": "日本語+Arti", ja: "日本語", en: "Arti saja" }[getUiLang()];
-    const meaningName = getMeaningLang() === "idn" ? "Indonesia" : "English";
     const buttons: [string, () => void][] = [
       [L("つづける", "Resume", "Lanjut"), () => this.close()],
       [L("セーブ", "Save game", "Simpan"), async () => { await manualSave(); }],
       [isMuted() ? L("音を出す", "Unmute", "Bunyikan") : L("ミュート", "Mute", "Bisukan"), () => { setMuted(!isMuted()); this.render(); }],
-      [`UI: ${uiLangName}`, () => {
-        const order = ["ja-en", "ja", "en"] as const;
-        setUiLang(order[(order.indexOf(getUiLang()) + 1) % order.length]);
-        this.render();
-      }],
-      [`${meaning("Meaning", "Arti")}: ${meaningName}`, () => {
-        setMeaningLang(getMeaningLang() === "idn" ? "en" : "idn");
-        this.render();
-      }],
-      [`${getShowKana() ? "☑" : "☐"} ${meaning("Kana", "Kana")}`, () => {
-        setShowKana(!getShowKana());
-        this.render();
-      }],
-      [`${getShowMeaning() ? "☑" : "☐"} ${meaning("Translation", "Terjemahan")}`, () => {
-        setShowMeaning(!getShowMeaning());
-        this.render();
-      }],
-      [`${getShowRomaji() ? "☑" : "☐"} Romaji`, () => {
-        setShowRomaji(!getShowRomaji());
-        this.render();
-      }],
+      [L("表示設定", "Language & Display", "Bahasa & Tampilan"), () => { this.tab = "settings"; this.render(); }],
       [L("タイトルへ", "Quit to title", "Keluar ke judul"), () => { window.location.href = "/"; }],
     ];
     buttons.forEach(([label, cb], i) => {
@@ -154,5 +134,56 @@ export class MenuScene extends Phaser.Scene {
     }
     const completed = G().quests.completed.length;
     add(this.add.text(MX + 24, MY + MH - 36, `${meaning("Completed quests", "Misi selesai")}: ${completed}`, style(12, COLOR.dim)));
+  }
+
+  private renderSettings() {
+    const add = (go: Phaser.GameObjects.GameObject) => this.content.add(go);
+    add(this.add.text(W / 2, MY + 68, "表示設定 — Language & Display", style(16, COLOR.accent)).setOrigin(0.5));
+
+    const uiLangName: Record<string, string> = { "ja-en": "日本語+Arti", ja: "日本語のみ", en: "Arti saja" };
+    const meaningName: Record<string, string> = { idn: "Bahasa Indonesia", en: "English" };
+    const currentUi = getUiLang();
+    const currentMeaning = getMeaningLang();
+
+    const rows: [string, () => void, string?][] = [
+      [
+        `UI: ${uiLangName[currentUi]}`,
+        () => {
+          const order: UiLang[] = ["ja-en", "ja", "en"];
+          setUiLang(order[(order.indexOf(getUiLang()) + 1) % order.length]);
+          this.render();
+        },
+        "Feature labels: Japanese+EN, Japanese-only, or translation-only",
+      ],
+      [
+        `${meaning("Meaning", "Arti")}: ${meaningName[currentMeaning]}`,
+        () => {
+          setMeaningLang(currentMeaning === "idn" ? "en" : "idn");
+          this.render();
+        },
+        "Translations of Japanese text shown in this language",
+      ],
+      [
+        `${getShowKana() ? "☑" : "☐"} ${meaning("Show Kana", "Tampilkan Kana")}`,
+        () => { setShowKana(!getShowKana()); this.render(); },
+        "Furigana / reading above kanji",
+      ],
+      [
+        `${getShowMeaning() ? "☑" : "☐"} ${meaning("Show Translation", "Tampilkan Terjemahan")}`,
+        () => { setShowMeaning(!getShowMeaning()); this.render(); },
+        "Inline translation below Japanese text",
+      ],
+      [
+        `${getShowRomaji() ? "☑" : "☐"} ${meaning("Show Romaji", "Tampilkan Romaji")}`,
+        () => { setShowRomaji(!getShowRomaji()); this.render(); },
+        "Latin alphabet reading (a, i, u, e, o)",
+      ],
+    ];
+
+    rows.forEach(([label, cb, hint], i) => {
+      const y = MY + 108 + i * 42;
+      this.content.add(new PixelButton(this, W / 2 - 180, y, label, cb, { w: 360, h: 36 }));
+      if (hint) add(this.add.text(W / 2, y + 36, hint, style(9, COLOR.dim)).setOrigin(0.5, 0));
+    });
   }
 }

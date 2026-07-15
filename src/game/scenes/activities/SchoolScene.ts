@@ -8,6 +8,9 @@ import { COLOR, style } from "@/game/ui/theme";
 import { PixelButton } from "@/game/ui/widgets";
 import { ActivityBase, AW, PY } from "./ActivityBase";
 
+/** Leitner box intervals (days). */
+const BOX_INTERVALS = [0, 1, 2, 4, 8, 16]; // index 1-5, index 0 unused
+
 /** A full lesson: vocabulary, reading, listening. */
 export class SchoolScene extends ActivityBase {
   constructor() { super("School"); }
@@ -20,12 +23,30 @@ export class SchoolScene extends ActivityBase {
   private async run() {
     const s = G();
     const level = s.jlpt;
+    const today = s.day;
 
-    // 1. vocabulary matching
+    // 1. vocabulary matching — Leitner-aware selection
     const pool = vocabByLevel(level);
-    const offset = ((s.day - 1) * 4) % Math.max(1, pool.length - 4);
-    const todays = pool.slice(offset, offset + 4);
+    const review = s.vocabReview;
+
+    // find learned words due for review
+    const due = s.learnedVocab.filter(id => {
+      const r = review[id];
+      if (!r) return false;
+      const interval = BOX_INTERVALS[r.box] ?? 16;
+      return today >= r.lastSeenDay + interval;
+    });
+    const dueSample = Phaser.Utils.Array.Shuffle(due).slice(0, 2);
+
+    // fill remaining slots with new words (not yet learned)
+    const newWords = pool.filter(v => !s.learnedVocab.includes(v.id));
+    const needed = Math.max(0, 4 - dueSample.length);
+    const offset = ((today - 1) * needed) % Math.max(1, newWords.length - needed);
+    const newSample = newWords.slice(offset, offset + needed);
+
+    const todays = [...dueSample.map(id => pool.find(v => v.id === id)!).filter(Boolean), ...newSample];
     let vocabMistakes = 0;
+
     if (todays.length >= 2) {
       this.setTitle("語彙 — Vocabulary");
       vocabMistakes = await this.pairs(
@@ -35,10 +56,23 @@ export class SchoolScene extends ActivityBase {
           return [`${v.jp}（${v.kana}${showRomaji ? " — " + v.romaji : ""}）`, M(v)] as [string, string];
         }),
       );
-      // record these words as learned
-      gameStore.setState(st => ({
-        learnedVocab: [...new Set([...st.learnedVocab, ...todays.map(v => v.id)])],
-      }));
+
+      // update Leitner boxes
+      const reviewUpdate = { ...review };
+      const learnedUpdate = [...new Set([...s.learnedVocab, ...todays.map(v => v.id)])];
+      for (const v of todays) {
+        const existing = reviewUpdate[v.id];
+        if (vocabMistakes === 0) {
+          // perfect: promote to next box (starting at 1 for new words)
+          const newBox = Math.min(5, (existing?.box ?? 0) + 1);
+          reviewUpdate[v.id] = { box: newBox, lastSeenDay: today };
+        } else {
+          // mistakes: reset to box 1
+          reviewUpdate[v.id] = { box: 1, lastSeenDay: today };
+        }
+      }
+
+      gameStore.setState({ learnedVocab: learnedUpdate, vocabReview: reviewUpdate });
     }
 
     // 2. reading
