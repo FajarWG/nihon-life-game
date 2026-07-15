@@ -5,7 +5,7 @@ import { Bus } from "@/game/events";
 import { manualSave } from "@/game/systems/save";
 import { activeQuests, questDef } from "@/game/systems/quests";
 import { G } from "@/game/state/gameState";
-import { getMeaningLang, getShowKana, getShowMeaning, getUiLang, L, meaning, setMeaningLang, setShowKana, setShowMeaning, setUiLang } from "@/game/i18n";
+import { getMeaningLang, getShowKana, getShowMeaning, getShowRomaji, getUiLang, L, meaning, setMeaningLang, setShowKana, setShowMeaning, setShowRomaji, setUiLang } from "@/game/i18n";
 import { COLOR, style } from "@/game/ui/theme";
 import { dim, flatPanel, PixelButton } from "@/game/ui/widgets";
 
@@ -84,6 +84,10 @@ export class MenuScene extends Phaser.Scene {
       }],
       [`${getShowMeaning() ? "☑" : "☐"} ${meaning("Translation", "Terjemahan")}`, () => {
         setShowMeaning(!getShowMeaning());
+        this.render();
+      }],
+      [`${getShowRomaji() ? "☑" : "☐"} Romaji`, () => {
+        setShowRomaji(!getShowRomaji());
         this.render();
       }],
       [L("タイトルへ", "Quit to title", "Keluar ke judul"), () => { window.location.href = "/"; }],

@@ -3,6 +3,7 @@ import { grammarByLevel } from "@/data/grammar";
 import { vocabByLevel } from "@/data/vocabulary";
 import { READINGS } from "@/data/drills";
 import { G, gameStore } from "@/game/state/gameState";
+import { getShowRomaji } from "@/game/i18n";
 import { COLOR, style } from "@/game/ui/theme";
 import { ActivityBase, AW, PY } from "./ActivityBase";
 
@@ -39,7 +40,8 @@ export class ExamScene extends ActivityBase {
     for (const v of vocab.slice(0, 3)) {
       this.setTitle("語彙 — Vocabulary");
       const wrong = vocab.filter(w => w.id !== v.id).slice(0, 2).map(w => w.en);
-      if (await this.ask(`「${v.jp}」（${v.kana}）の意味は？`, [v.en, ...wrong], v.en)) score++;
+      const showRomaji = getShowRomaji();
+      if (await this.ask(`「${v.jp}」（${v.kana}${showRomaji ? " — " + v.romaji : ""}）の意味は？`, [v.en, ...wrong], v.en)) score++;
     }
 
     // 1 reading
