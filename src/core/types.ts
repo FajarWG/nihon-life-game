@@ -36,7 +36,18 @@ export interface VocabEntry {
   romaji: string;
   en: string;
   idn?: string;            // Indonesian gloss
-  category: "school" | "food" | "shopping" | "train" | "work" | "daily" | "time" | "place";
+  category: "school" | "food" | "shopping" | "train" | "work" | "daily" | "time" | "place" | "number" | "color" | "family" | "body";
+}
+
+export interface KanjiEntry {
+  id: string;
+  character: string;
+  onyomi: string[];
+  kunyomi: string[];
+  meaning: { en: string; idn: string };
+  strokeCount: number;
+  level: JlptLevel;
+  exampleVocabIds: string[];
 }
 
 export interface GrammarExercise {
