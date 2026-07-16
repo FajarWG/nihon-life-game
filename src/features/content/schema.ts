@@ -8,7 +8,7 @@
 export const CONTENT_TYPES = [
   "vocabulary", "grammar", "items", "recipes", "stations",
   "lines", "npcs", "quests", "workTasks", "readings", "listenings",
-  "kanji",
+  "kanji", "stories",
 ] as const;
 
 export type ContentType = (typeof CONTENT_TYPES)[number];
@@ -27,6 +27,7 @@ const REQUIRED_KEYS: Record<ContentType, string[]> = {
   readings: ["id", "level", "title", "text", "question", "options", "answer"],
   listenings: ["id", "level", "audioJp", "question", "options", "answer"],
   kanji: ["id", "character", "onyomi", "kunyomi", "meaning", "strokeCount", "level", "exampleVocabIds"],
+  stories: ["id", "kind", "title", "titleJp", "level", "setting", "lines", "vocabulary", "grammarFocus", "reward", "createdAt"],
 };
 
 export function validatePackItems(type: string, items: unknown):

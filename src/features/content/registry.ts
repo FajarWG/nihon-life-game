@@ -1,6 +1,6 @@
 import type {
   GrammarPoint, ItemDef, KanjiEntry, ListeningDrill, NpcDef, QuestDef,
-  ReadingPassage, Recipe, Station, TrainLine, VocabEntry, WorkTask,
+  ReadingPassage, Recipe, Station, StoryEvent, TrainLine, VocabEntry, WorkTask,
 } from "@/core/types";
 import { GRAMMAR } from "@/data/grammar";
 import { ITEMS, ITEM_MAP } from "@/data/items";

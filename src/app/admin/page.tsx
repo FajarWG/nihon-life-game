@@ -12,6 +12,7 @@ const TYPE_LABELS: Record<ContentType, string> = {
   npcs: "NPC", quests: "クエスト Quests", workTasks: "仕事 Work Tasks",
   readings: "読解 Readings", listenings: "聴解 Listenings",
   kanji: "漢字 Kanji",
+  stories: "物語 Stories",
 };
 
 /** Content workshop — lives outside the game, manages custom packs in Postgres. */

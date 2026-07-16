@@ -82,3 +82,13 @@ export async function unplayedStory(): Promise<StoryEvent | undefined> {
 export async function markStoryPlayed(id: string) {
   await db.stories.update(id, { played: true });
 }
+
+export async function getPlayedStoryIds(): Promise<Set<string>> {
+  const rows = await db.stories.filter(s => s.played).toArray();
+  return new Set(rows.map(r => r.id));
+}
+
+export async function hasPlayedStory(id: string): Promise<boolean> {
+  const row = await db.stories.get(id);
+  return !!row?.played;
+}

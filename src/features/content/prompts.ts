@@ -8,6 +8,7 @@ import { LISTENINGS, READINGS } from "@/data/drills";
 import { VOCABULARY } from "@/data/vocabulary";
 import { WORK_TASKS } from "@/data/workTasks";
 import { ALL_KANJI } from "@/data/kanji";
+import { STORIES } from "@/data/stories";
 import type { ContentType } from "./schema";
 
 /**
@@ -125,6 +126,27 @@ const SHAPES: Record<ContentType, string> = {
   "level": "N5" | "N4" | "N3",
   "exampleVocabIds": ["v5-xxx"]  // vocab ids that actually contain this kanji
 }`,
+  stories: `{
+  "id": "story-builtin-xxx",           // unique story id
+  "kind": "daily" | "encounter" | "festival" | "season" | "quest" | "holiday",
+  "title": "English Title",
+  "titleJp": "日本語タイトル",
+  "level": "N5" | "N4" | "N3",
+  "setting": "short scene description in english",
+  "lines": [
+    { "speaker": "narrator" | "player" | "<npc name>", "jp": "...", "kana": "...", "en": "...", "idn": "..." }
+  ],
+  "vocabulary": [ { "jp": "単語", "en": "word meaning" } ],   // 1-8 words, ALL from real vocab data
+  "grammarFocus": "grammar pattern name in english",
+  "choice": {                                                      // optional, 2-3 options
+    "prompt": "npc question or situation in japanese",
+    "options": [
+      { "text": "player response option", "reply": "npc reply in japanese" }
+    ]
+  },
+  "reward": { "money": 200, "xp": { "vocabulary": 3, "reading": 2 } },
+  "createdAt": 1715000000000                                         // unix timestamp ms
+}`,
 };
 
 const EXISTING: Record<ContentType, () => string[]> = {
@@ -140,6 +162,7 @@ const EXISTING: Record<ContentType, () => string[]> = {
   readings: () => READINGS.map(r => r.id),
   listenings: () => LISTENINGS.map(l => l.id),
   kanji: () => ALL_KANJI.map(k => k.id),
+  stories: () => STORIES.map(s => s.id),
 };
 
 const EXTRA_NOTES: Partial<Record<ContentType, string>> = {
@@ -148,6 +171,7 @@ const EXTRA_NOTES: Partial<Record<ContentType, string>> = {
   npcs: `Locations & sizes: town(46x32) apartment(11x8) school(14x10) konbini(12x9) supermarket(14x10) station(14x9) company(16x10) restaurant(12x9) library(12x9). Pick x/y INSIDE walls on a floor tile.`,
   quests: `Quest events: talk/gift target = npc id · buy/eat target = item id · cook target = recipe id · activity target = study|school|shopping|train|work|cooking · visit target = location id.`,
   kanji: `CRITICAL: (1) id HARUS mencerminkan reading/karakter entri itu sendiri, JANGAN pakai id yang konsepnya sudah dipakai untuk karakter lain (contoh salah: id 'chikara' dipasang di karakter 度 padahal 'chikara' sudah berarti karakter 力). (2) JANGAN buat karakter yang sudah ada di daftar existing ids berikut - kalau karakter sudah punya entri, jangan generate ulang. (3) kunyomi HANYA yang umum dipakai bahasa Jepang modern - kalau ragu/arkais, kosongkan saja, jangan asal isi. (4) exampleVocabIds harus vocab id yang BENAR-BENAR ada dan benar-benar memuat karakter itu.\nExisting characters (do NOT generate duplicates): ${ALL_KANJI.map(k => k.character).join("")}`,
+  stories: `Available vocabulary (all jp/en pairs used MUST come from this list): ${VOCABULARY.map(v => `${v.jp}=${v.en}`).join(", ")}. Valid kind values: daily, encounter, festival, season, quest, holiday.`,
 };
 
 export function buildPrompt(type: ContentType, count: number, level: string): string {

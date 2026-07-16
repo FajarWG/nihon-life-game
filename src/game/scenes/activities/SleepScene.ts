@@ -7,8 +7,33 @@ import { G } from "@/game/state/gameState";
 import { meaning } from "@/game/i18n";
 import { COLOR, style } from "@/game/ui/theme";
 import { flatPanel, PixelButton } from "@/game/ui/widgets";
+import { STORIES } from "@/data/stories";
+import type { JlptLevel, StoryEvent } from "@/core/types";
 
 const W = 960, H = 540;
+
+const LEVEL_ORDER: JlptLevel[] = ["N5", "N4", "N3"];
+
+function levelIndex(lv: JlptLevel): number {
+  return LEVEL_ORDER.indexOf(lv);
+}
+
+function pickStory(kind: string, playerLevel: JlptLevel): StoryEvent | undefined {
+  const playerIdx = levelIndex(playerLevel);
+  const eligible = STORIES.filter(s => {
+    if (s.kind !== kind) return false;
+    const sIdx = levelIndex(s.level);
+    return sIdx <= playerIdx;
+  });
+  if (eligible.length === 0) {
+    const fallback = STORIES.filter(s => levelIndex(s.level) <= playerIdx);
+    if (fallback.length === 0) return undefined;
+    const idx = Math.floor(Math.random() * fallback.length);
+    return fallback[idx];
+  }
+  const idx = Math.floor(Math.random() * eligible.length);
+  return eligible[idx];
+}
 
 /** End-of-day transition: sleep, summary, autosave, new morning. */
 export class SleepScene extends Phaser.Scene {
@@ -58,26 +83,23 @@ export class SleepScene extends Phaser.Scene {
   }
 
   /**
-   * Overnight, quietly ask the storyteller for tomorrow's tale.
-   * Fully optional: silently skipped when no AI keys are configured.
+   * Pick a story from the local pool (built-in STORIES + custom packs merged by registry).
+   * Prefers stories matching the day's kind and the player's level or below.
+   * Falls back to any available story if the pool is empty for that kind.
    */
   private async prefetchStory() {
     try {
       const { unplayedStory, storeStory } = await import("@/core/db");
-      if (await unplayedStory()) return; // one pending story is enough
+      if (await unplayedStory()) return;
       const s = G();
       const kind = (s.day % 28 === 14) ? "festival" : (s.day % 7 === 0) ? "encounter" : "daily";
-      const res = await fetch("/api/story", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ playerName: s.playerName, level: s.jlpt, day: s.day, season: s.season, weather: s.weather, kind }),
-      });
-      if (!res.ok) return;
-      const data = await res.json();
-      if (data?.event) {
-        await storeStory(data.event);
-        Bus.emit("toast", "新しい物語が届きました！(A story awaits at your table)", "quest");
+      const event = pickStory(kind, s.jlpt);
+      if (!event) {
+        Bus.emit("toast", "今夜の物語が見つかりませんでした。明日をお楽しみに！", "warn");
+        return;
       }
+      await storeStory(event);
+      Bus.emit("toast", "新しい物語が届きました！(A story awaits at your table)", "quest");
     } catch { /* offline is fine */ }
   }
 }
