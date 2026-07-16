@@ -68,6 +68,20 @@ export class UIScene extends Phaser.Scene {
       Bus.on("xp", ((skill: string, amt: number) => this.toast(`+${amt} ${skill} XP`, "xp")) as never),
       Bus.on("exam-ready", (() => this.toast("JLPT exam unlocked! Visit the library desk.", "success")) as never),
       Bus.on("leveled-up", ((lv: string) => { sfx("levelup"); this.toast(`You passed! Welcome to ${lv}!`, "success"); this.refreshHud(); }) as never),
+      Bus.on("quest-completed", ((questId: string) => {
+        const s = G();
+        if (questId === "main-5" && !s.flags.epiloguePlayed) {
+          gameStore.setState(st => ({ flags: { ...st.flags, epiloguePlayed: true } }));
+          this.startDialogue([
+            { speaker: "narrator", jp: "あれから…たくさんの日々が過ぎました。", kana: "あれから…たくさんのひびがすぎました。", en: "Since then… so many days have passed.", idn: "Sejak saat itu… begitu banyak hari telah berlalu." },
+            { speaker: "narrator", jp: "知らない街だったのに、今ではここが「日常」です。", kana: "しらないまちだったのに、いまではここが「にちじょう」です。", en: "A city that was once unknown — now it's simply everyday life.", idn: "Kota yang dulunya asing — sekarang sudah jadi keseharian." },
+            { speaker: "tanaka", jp: "君の日本語、本当にすごい成長だよ。", kana: "きみのにほんご、ほんとうにすごいせいちょうだよ。", en: "Your Japanese has really come a long way.", idn: "Bahasa Jepangmu benar-benar berkembang luar biasa." },
+            { speaker: "yuki", jp: "友達になってくれてありがとう！また遊ぼうね。", kana: "ともだちになってくれてありがとう！またあそぼうね。", en: "Thanks for being my friend! Let's hang out again.", idn: "Terima kasih sudah jadi temanku! Ayo main lagi ya." },
+            { speaker: "narrator", jp: "桜町での生活は、まだまだこれからです。", kana: "さくらまちでのせいかつは、まだまだこれからです。", en: "Your life in Sakura Town — there's still so much ahead.", idn: "Kehidupanmu di Kota Sakura — masih banyak yang akan datang." },
+            { speaker: "narrator", jp: "物語は続きます。自分のペースで、一歩ずつ。", kana: "ものがたりはつづきます。じぶんのぺーすで、いっぽずつ。", en: "The story continues. At your own pace, one step at a time.", idn: "Cerita terus berlanjut. Dengan langkahmu sendiri, selangkah demi selangkah." },
+          ]);
+        }
+      }) as never),
     ];
     this.events.on(Phaser.Scenes.Events.SHUTDOWN, () => { this.unsubs.forEach(u => u()); this.unsubs = []; });
 

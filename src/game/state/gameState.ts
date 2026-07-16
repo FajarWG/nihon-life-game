@@ -88,7 +88,7 @@ const freshSave = (playerName: string): SaveData => ({
   quests: { active: [], completed: [] },
   npcs: {},
   examPassed: [],
-  flags: {},
+  flags: { introPlayed: false },
   vocabReview: {},
 });
 

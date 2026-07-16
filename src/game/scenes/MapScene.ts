@@ -5,7 +5,7 @@ import { setRainAmbience, startBgm } from "@/game/audio/bgm";
 import { Bus } from "@/game/events";
 import { CHAR_FRAMES, TILE } from "@/game/gfx/textures";
 import { getMap, SOLID_TILES, type CompiledMap } from "@/game/maps/maps";
-import { DAY_END, G } from "@/game/state/gameState";
+import { DAY_END, G, gameStore } from "@/game/state/gameState";
 import { L } from "@/game/i18n";
 import { style } from "@/game/ui/theme";
 import type { UIScene } from "./UIScene";
@@ -188,6 +188,19 @@ export class MapScene extends Phaser.Scene {
     });
 
     Bus.emit("map-changed", mapId);
+
+    const s = G();
+    if (s.flags.introPlayed === false) {
+      gameStore.setState(st => ({ flags: { ...st.flags, introPlayed: true } }));
+      this.time.delayedCall(400, () => {
+        const ui = this.scene.get("UI") as UIScene;
+        ui.startDialogue([
+          { speaker: "narrator", jp: "ようこそ、桜町へ。", kana: "ようこそ、さくらまちへ。", en: "Welcome to Sakura Town.", idn: "Selamat datang di Kota Sakura." },
+          { speaker: "narrator", jp: "新しい仕事と新しい生活が、ここで始まります。", kana: "あたらしいしごととあたらしいせいかつが、ここではじまります。", en: "A new job and a new life begin here.", idn: "Pekerjaan baru dan kehidupan baru dimulai di sini." },
+          { speaker: "narrator", jp: "日本語を学びながら、自分の物語を紡いでいきましょう。", kana: "にほんごをまなびながら、じぶんのものがたりをつむいでいきましょう。", en: "Learn Japanese as you weave your own story.", idn: "Belajar bahasa Jepang sambil merajut ceritamu sendiri." },
+        ]);
+      });
+    }
   }
 
   /* ── NPCs ────────────────────────────────────────────────────────────── */
