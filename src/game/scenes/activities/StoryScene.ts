@@ -1,10 +1,14 @@
+import * as Phaser from "phaser";
 import type { StoryEvent } from "@/core/types";
 import { markStoryPlayed, storeStory, unplayedStory } from "@/core/db";
 import { G } from "@/game/state/gameState";
-import { getShowKana, getShowMeaning, M } from "@/game/i18n";
+import { getShowKana, getShowMeaning, getShowRomaji, kanaToRomaji, M } from "@/game/i18n";
 import { COLOR, style } from "@/game/ui/theme";
 import { PixelButton } from "@/game/ui/widgets";
 import { ActivityBase, AW, PY, PH } from "./ActivityBase";
+
+/** Same one-time XP peek fee as the main dialogue box (UIScene). */
+const PEEK_XP_COST = 2;
 
 /**
  * Story time at the apartment table. Plays AI-generated story events.
@@ -68,17 +72,59 @@ export class StoryScene extends ActivityBase {
       add(this.add.text(AW / 2, PY + 250, `文法: ${event.grammarFocus} · JLPT ${event.level}`, style(12, COLOR.kana)).setOrigin(0.5));
     }, "はじめる (Begin)");
 
-    // play lines one card at a time
+    // play lines one card at a time — same peek toggles (furigana/romaji/translate)
+    // as the main dialogue box, session-scoped per line with a one-time XP fee.
+    let kanaOn = getShowKana();
+    let romajiOn = getShowRomaji();
+    let meaningOn = getShowMeaning();
+    const peeked = { kana: false, romaji: false, meaning: false };
+
     for (const line of event.lines) {
-      const showKana = getShowKana();
-      const showMeaning = getShowMeaning();
-      await this.card(add => {
-        add(this.add.text(AW / 2, PY + 90, line.speaker === "narrator" ? "" : `— ${line.speaker} —`, style(13, COLOR.dim)).setOrigin(0.5));
-        const jpY = showKana ? 130 : 160;
-        add(this.add.text(AW / 2, jpY, line.jp, style(18, COLOR.text, { wordWrap: { width: 620 }, align: "center", lineSpacing: 6 })).setOrigin(0.5));
-        if (showKana) add(this.add.text(AW / 2, 206, line.kana ?? "", style(14, COLOR.kana, { wordWrap: { width: 620 }, align: "center" })).setOrigin(0.5));
-        if (showMeaning) add(this.add.text(AW / 2, showKana ? 246 : 206, M(line), style(13, COLOR.dim, { wordWrap: { width: 620 }, align: "center", fontStyle: "italic" })).setOrigin(0.5));
-      }, "▼");
+      await new Promise<void>(resolve => {
+        this.clearContent();
+        this.content.add(this.add.text(AW / 2, PY + 90, line.speaker === "narrator" ? "" : `— ${line.speaker} —`, style(13, COLOR.dim)).setOrigin(0.5));
+        const jpText = this.add.text(AW / 2, 160, line.jp, style(18, COLOR.text, { wordWrap: { width: 620 }, align: "center", lineSpacing: 6 })).setOrigin(0.5);
+        this.content.add(jpText);
+
+        let kanaText: Phaser.GameObjects.Text | undefined;
+        let meaningText: Phaser.GameObjects.Text | undefined;
+        const redraw = () => {
+          kanaText?.destroy();
+          meaningText?.destroy();
+          const kanaPart = kanaOn && line.kana ? line.kana : "";
+          const romajiPart = romajiOn && line.kana ? kanaToRomaji(line.kana) : "";
+          const combined = [kanaPart, romajiPart ? `(${romajiPart})` : ""].filter(Boolean).join("  ");
+          jpText.setY(combined ? 130 : 160);
+          if (combined) {
+            kanaText = this.add.text(AW / 2, 206, combined, style(14, COLOR.kana, { wordWrap: { width: 620 }, align: "center" })).setOrigin(0.5);
+            this.content.add(kanaText);
+          }
+          if (meaningOn) {
+            meaningText = this.add.text(AW / 2, combined ? 246 : 206, M(line), style(13, COLOR.dim, { wordWrap: { width: 620 }, align: "center", fontStyle: "italic" })).setOrigin(0.5);
+            this.content.add(meaningText);
+          }
+        };
+
+        const togglePeek = (kind: "kana" | "romaji" | "meaning") => {
+          const turningOn = kind === "kana" ? !kanaOn : kind === "romaji" ? !romajiOn : !meaningOn;
+          if (turningOn && !peeked[kind]) { peeked[kind] = true; G().addXp("vocabulary", -PEEK_XP_COST); }
+          if (kind === "kana") kanaOn = !kanaOn;
+          if (kind === "romaji") romajiOn = !romajiOn;
+          if (kind === "meaning") meaningOn = !meaningOn;
+          btnKana.setText(`${kanaOn ? "☑" : "☐"} 振`);
+          btnRomaji.setText(`${romajiOn ? "☑" : "☐"} Aa`);
+          btnMeaning.setText(`${meaningOn ? "☑" : "☐"} 訳`);
+          redraw();
+        };
+
+        const btnKana = new PixelButton(this, AW - 258, PY + 44, `${kanaOn ? "☑" : "☐"} 振`, () => togglePeek("kana"), { w: 74, h: 22, size: 10 });
+        const btnRomaji = new PixelButton(this, AW - 180, PY + 44, `${romajiOn ? "☑" : "☐"} Aa`, () => togglePeek("romaji"), { w: 74, h: 22, size: 10 });
+        const btnMeaning = new PixelButton(this, AW - 102, PY + 44, `${meaningOn ? "☑" : "☐"} 訳`, () => togglePeek("meaning"), { w: 74, h: 22, size: 10 });
+        this.content.add([btnKana, btnRomaji, btnMeaning]);
+
+        redraw();
+        this.content.add(new PixelButton(this, AW / 2 - 90, PY + PH - 70, "▼", () => resolve(), { w: 180 }));
+      });
     }
 
     // interactive choice, when the story has one

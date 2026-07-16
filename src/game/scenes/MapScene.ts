@@ -206,7 +206,10 @@ export class MapScene extends Phaser.Scene {
   /* ── NPCs ────────────────────────────────────────────────────────────── */
 
   private buildNpcs() {
-    this.npcs.forEach(n => { n.sprite.destroy(); n.label.destroy(); });
+    // kill any in-flight wander tween first — otherwise a tween's onComplete
+    // can fire after its sprite is destroyed (e.g. schedule change mid-walk)
+    // and crash on n.sprite.anims being undefined.
+    this.npcs.forEach(n => { this.tweens.killTweensOf(n.sprite); n.sprite.destroy(); n.label.destroy(); });
     this.npcs = [];
     const hour = Math.floor(G().minutes / 60);
     const mapId = this.map.def.id;
@@ -259,9 +262,12 @@ export class MapScene extends Phaser.Scene {
           targets: n.sprite,
           x: tx * TILE + 8, y: ty * TILE + 10,
           duration: 420,
-          onUpdate: () => n.label.setPosition(n.sprite.x, n.sprite.y - 16),
+          onUpdate: () => { if (n.sprite.anims) n.label.setPosition(n.sprite.x, n.sprite.y - 16); },
           onComplete: () => {
             n.busy = false;
+            // sprite may have been destroyed (e.g. schedule rebuilt mid-walk) —
+            // killTweensOf in buildNpcs() should prevent this, but guard anyway.
+            if (!n.sprite.anims) return;
             n.sprite.anims.stop();
             const dirIdx = { down: 0, left: 1, right: 2, up: 3 }[dir];
             n.sprite.setFrame(dirIdx * CHAR_FRAMES);

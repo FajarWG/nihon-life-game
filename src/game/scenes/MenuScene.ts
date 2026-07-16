@@ -13,7 +13,7 @@ import { dim, flatPanel, PixelButton } from "@/game/ui/widgets";
 const W = 960, H = 540;
 const MX = 160, MY = 60, MW = 640, MH = 420;
 
-type Tab = "menu" | "inventory" | "quests" | "settings";
+export type Tab = "menu" | "inventory" | "quests" | "settings";
 
 const PAGE_SIZE = 8; // 2 cols × 4 taller, readable rows
 
@@ -37,7 +37,16 @@ export class MenuScene extends Phaser.Scene {
     });
     new PixelButton(this, MX + MW - 46, MY + 12, "✕", () => this.close(), { w: 32, h: 30, size: 12 });
 
-    this.input.keyboard!.on("keydown-ESC", () => this.close());
+    // ESC is handled centrally by UIScene (open/close toggle) so there's only
+    // one listener deciding whether a press should open, switch tab, or
+    // close — having a second ESC listener here used to fire alongside
+    // UIScene's on the same keypress once the menu was already open.
+    this.render();
+  }
+
+  /** Called by UIScene when a shortcut (I/Q/ESC) is pressed while the menu is already open. */
+  setTab(tab: Tab) {
+    this.tab = tab;
     this.render();
   }
 
@@ -65,6 +74,12 @@ export class MenuScene extends Phaser.Scene {
       add(this.add.text(MX + 90 + (i % 3) * 170, MY + 108 + Math.floor(i / 3) * 28, `${skill}: ${xp}`, style(13, COLOR.dim)));
     });
 
+    // button list used to start at a fixed offset sized for a single stat
+    // row; with 5 skills (2 rows of 3) the 2nd row got covered by the first
+    // button. Start below however many stat rows there actually are.
+    const statRows = Math.ceil(skills.length / 3);
+    const buttonsY = MY + 108 + statRows * 28 + 14;
+
     const buttons: [string, () => void][] = [
       [L("つづける", "Resume", "Lanjut"), () => this.close()],
       [L("セーブ", "Save game", "Simpan"), async () => { await manualSave(); }],
@@ -73,7 +88,7 @@ export class MenuScene extends Phaser.Scene {
       [L("タイトルへ", "Quit to title", "Keluar ke judul"), () => { window.location.href = "/"; }],
     ];
     buttons.forEach(([label, cb], i) => {
-      this.content.add(new PixelButton(this, W / 2 - 130, MY + 140 + i * 34, label, cb, { w: 260, h: 30 }));
+      this.content.add(new PixelButton(this, W / 2 - 130, buttonsY + i * 34, label, cb, { w: 260, h: 30 }));
     });
   }
 
@@ -181,9 +196,9 @@ export class MenuScene extends Phaser.Scene {
     ];
 
     rows.forEach(([label, cb, hint], i) => {
-      const y = MY + 108 + i * 42;
+      const y = MY + 108 + i * 58;
       this.content.add(new PixelButton(this, W / 2 - 180, y, label, cb, { w: 360, h: 36 }));
-      if (hint) add(this.add.text(W / 2, y + 36, hint, style(9, COLOR.dim)).setOrigin(0.5, 0));
+      if (hint) add(this.add.text(W / 2, y + 40, hint, style(9, COLOR.dim)).setOrigin(0.5, 0));
     });
   }
 }

@@ -5,14 +5,17 @@ import { Bus } from "@/game/events";
 import { sfx } from "@/game/audio/sfx";
 import { adjustFriendship, questDef } from "@/game/systems/quests";
 import { NPC_MAP } from "@/data/npcs";
-import { G, gameStore, MAX_ENERGY } from "@/game/state/gameState";
-import { getUiLang, getShowKana, getShowMeaning, L, M, meaning } from "@/game/i18n";
+import { G, gameStore, LEVEL_XP, MAX_ENERGY, NEXT_LEVEL } from "@/game/state/gameState";
+import { getUiLang, getShowKana, getShowMeaning, getShowRomaji, kanaToRomaji, L, M, meaning } from "@/game/i18n";
 import { COLOR, style } from "@/game/ui/theme";
 import { Bar, flatPanel, PixelButton, Typewriter } from "@/game/ui/widgets";
+import type { MenuScene, Tab } from "./MenuScene";
 
 const W = 960, H = 540;
 const WEEKDAYS = ["月", "火", "水", "木", "金", "土", "日"];
 const SEASON_JP = { spring: "春", summer: "夏", autumn: "秋", winter: "冬" } as const;
+/** XP cost (from vocabulary skill, floored at 0) the first time a peek toggle is turned on per dialogue. */
+const PEEK_XP_COST = 2;
 
 interface DialogueOpts {
   name?: string;
@@ -25,6 +28,7 @@ export class UIScene extends Phaser.Scene {
   private dayText!: Phaser.GameObjects.Text;
   private moneyText!: Phaser.GameObjects.Text;
   private jlptText!: Phaser.GameObjects.Text;
+  private xpText!: Phaser.GameObjects.Text;
   private energyBar!: Bar;
   private weatherIcon!: Phaser.GameObjects.Image;
   private questText!: Phaser.GameObjects.Text;
@@ -45,6 +49,17 @@ export class UIScene extends Phaser.Scene {
   private dlgChoiceButtons: PixelButton[] = [];
   private unsubs: (() => void)[] = [];
 
+  // per-dialogue peek toggles (furigana / romaji / translate) — session-scoped,
+  // start from the player's global settings, cost a small one-time XP peek fee
+  // the first time each is switched ON during a given dialogue.
+  private btnKana!: PixelButton;
+  private btnRomaji!: PixelButton;
+  private btnMeaning!: PixelButton;
+  private dlgKanaOn = false;
+  private dlgRomajiOn = false;
+  private dlgMeaningOn = false;
+  private dlgPeeked = { kana: false, romaji: false, meaning: false };
+
   constructor() { super("UI"); }
 
   create() {
@@ -54,7 +69,17 @@ export class UIScene extends Phaser.Scene {
     this.input.keyboard!.on("keydown-SPACE", () => this.advanceDialogue());
     this.input.keyboard!.on("keydown-Z", () => this.advanceDialogue());
     this.input.keyboard!.on("keydown-ENTER", () => this.advanceDialogue());
-    this.input.keyboard!.on("keydown-ESC", () => this.openMenu());
+    // ESC is an explicit open/close toggle owned here (single source of
+    // truth); I/Q open the menu on that tab, or switch to it if the menu is
+    // already open. Previously I/Q's "already open" case was a silent no-op
+    // and ESC's close relied on MenuScene's OWN duplicate ESC listener,
+    // which — since UIScene stays active/unpaused while Menu is open — could
+    // double-fire on the same keypress and made repeated presses feel like
+    // they randomly closed the menu.
+    this.input.keyboard!.on("keydown-ESC", () => {
+      if (this.scene.isActive("Menu")) this.closeMenu();
+      else this.openMenu();
+    });
     this.input.keyboard!.on("keydown-I", () => this.openMenu("inventory"));
     this.input.keyboard!.on("keydown-Q", () => this.openMenu("quests"));
 
@@ -65,7 +90,7 @@ export class UIScene extends Phaser.Scene {
       Bus.on("map-changed", (() => this.refreshHud()) as never),
       Bus.on("quest-updated", (() => this.refreshQuests()) as never),
       Bus.on("toast", ((text: string, kind?: string) => this.toast(text, kind)) as never),
-      Bus.on("xp", ((skill: string, amt: number) => this.toast(`+${amt} ${skill} XP`, "xp")) as never),
+      Bus.on("xp", ((skill: string, amt: number) => this.toast(`${amt >= 0 ? "+" : "-"}${Math.abs(amt)} ${skill} XP`, amt >= 0 ? "xp" : "warn")) as never),
       Bus.on("exam-ready", (() => this.toast("JLPT exam unlocked! Visit the library desk.", "success")) as never),
       Bus.on("leveled-up", ((lv: string) => { sfx("levelup"); this.toast(`You passed! Welcome to ${lv}!`, "success"); this.refreshHud(); }) as never),
       Bus.on("quest-completed", ((questId: string) => {
@@ -97,11 +122,12 @@ export class UIScene extends Phaser.Scene {
     this.clockText = this.add.text(18, 34, "", style(14));
     this.weatherIcon = this.add.image(158, 34, "wx-sunny").setScale(1.6);
 
-    flatPanel(this, W - 188, 8, 180, 74);
+    flatPanel(this, W - 188, 8, 180, 86);
     this.moneyText = this.add.text(W - 176, 15, "", style(13, COLOR.accent));
     this.jlptText = this.add.text(W - 60, 15, "", style(13, "#9ad0f0"));
-    this.add.text(W - 176, 38, "体力", style(9, COLOR.dim));
-    this.energyBar = new Bar(this, W - 176, 52, 156, 10, 0x7cc35c);
+    this.xpText = this.add.text(W - 176, 34, "", style(9, COLOR.dim));
+    this.add.text(W - 176, 50, "体力", style(9, COLOR.dim));
+    this.energyBar = new Bar(this, W - 176, 64, 156, 10, 0x7cc35c);
 
     this.questText = this.add.text(14, 68, "", style(11, "#e8e2d4", {
       lineSpacing: 4,
@@ -128,6 +154,13 @@ export class UIScene extends Phaser.Scene {
     this.clockText.setText(`${String(hh).padStart(2, "0")}:${String(mm).padStart(2, "0")}`);
     this.moneyText.setText(`¥${s.money.toLocaleString()}`);
     this.jlptText.setText(s.jlpt);
+    const next = NEXT_LEVEL[s.jlpt];
+    const need = LEVEL_XP[s.jlpt];
+    if (need !== undefined && (next === "N4" || next === "N3")) {
+      this.xpText.setText(`${Math.min(s.totalXp(), need)}/${need} XP → ${next}`);
+    } else {
+      this.xpText.setText(meaning("Content coming soon", "Konten segera hadir"));
+    }
     this.energyBar.set(s.energy / MAX_ENERGY);
     this.weatherIcon.setTexture(`wx-${s.weather}`);
   }
@@ -171,7 +204,16 @@ export class UIScene extends Phaser.Scene {
     this.dlgKana = this.add.text(40, H - 106, "", style(13, COLOR.kana, { wordWrap: { width: W - 90 } }));
     this.dlgEn = this.add.text(40, H - 80, "", style(13, "#c8beac", { wordWrap: { width: W - 90 }, fontStyle: "italic" }));
     this.dlgMore = this.add.text(W - 44, H - 36, "▼", style(14, COLOR.accent));
-    this.dlgBox.add([bg, this.dlgName, this.dlgJp, this.dlgKana, this.dlgEn, this.dlgMore]);
+
+    // top-right peek toggles: furigana / romaji / translate — costs a small
+    // one-time XP fee per dialogue when switched ON, so new players always
+    // have a way to understand a line without being permanently blocked.
+    this.btnKana = new PixelButton(this, W - 258, H - 178, "", () => this.togglePeek("kana"), { w: 74, h: 22, size: 10 });
+    this.btnRomaji = new PixelButton(this, W - 180, H - 178, "", () => this.togglePeek("romaji"), { w: 74, h: 22, size: 10 });
+    this.btnMeaning = new PixelButton(this, W - 102, H - 178, "", () => this.togglePeek("meaning"), { w: 74, h: 22, size: 10 });
+    [this.btnKana, this.btnRomaji, this.btnMeaning].forEach(b => b.setDepth(205));
+
+    this.dlgBox.add([bg, this.dlgName, this.dlgJp, this.dlgKana, this.dlgEn, this.dlgMore, this.btnKana, this.btnRomaji, this.btnMeaning]);
     this.typer = new Typewriter(this, this.dlgJp);
     bg.setInteractive().on("pointerdown", () => this.advanceDialogue());
   }
@@ -182,6 +224,13 @@ export class UIScene extends Phaser.Scene {
     this.dlgIndex = 0;
     this.dlgOpts = opts;
     this.dlgOpenAt = this.time.now;
+    // toggles start from the player's global display settings for this dialogue;
+    // the peek-fee only applies the first time each is switched ON from here.
+    this.dlgKanaOn = getShowKana();
+    this.dlgRomajiOn = getShowRomaji();
+    this.dlgMeaningOn = getShowMeaning();
+    this.dlgPeeked = { kana: false, romaji: false, meaning: false };
+    this.refreshPeekButtons();
     G().setPaused(true);
     this.dlgBox.setVisible(true);
     this.showLine();
@@ -194,6 +243,38 @@ export class UIScene extends Phaser.Scene {
     return NPC_MAP[line.speaker]?.nameJp ?? line.speaker;
   }
 
+  /** Turn one peek toggle on/off. Turning ON for the first time this dialogue costs a small XP fee. */
+  private togglePeek(kind: "kana" | "romaji" | "meaning") {
+    const turningOn = kind === "kana" ? !this.dlgKanaOn : kind === "romaji" ? !this.dlgRomajiOn : !this.dlgMeaningOn;
+    if (turningOn && !this.dlgPeeked[kind]) {
+      this.dlgPeeked[kind] = true;
+      G().addXp("vocabulary", -PEEK_XP_COST);
+    }
+    if (kind === "kana") this.dlgKanaOn = !this.dlgKanaOn;
+    if (kind === "romaji") this.dlgRomajiOn = !this.dlgRomajiOn;
+    if (kind === "meaning") this.dlgMeaningOn = !this.dlgMeaningOn;
+    sfx("click");
+    this.refreshPeekButtons();
+    this.updateLineDisplay();
+  }
+
+  private refreshPeekButtons() {
+    this.btnKana.setText(`${this.dlgKanaOn ? "☑" : "☐"} 振`);
+    this.btnRomaji.setText(`${this.dlgRomajiOn ? "☑" : "☐"} Aa`);
+    this.btnMeaning.setText(`${this.dlgMeaningOn ? "☑" : "☐"} 訳`);
+  }
+
+  /** Apply current peek toggles to the currently-shown line (kana/romaji combined, translation separate). */
+  private updateLineDisplay() {
+    const line = this.dlgLines[this.dlgIndex];
+    if (!line) return;
+    const kanaPart = this.dlgKanaOn && line.kana ? line.kana : "";
+    const romajiPart = this.dlgRomajiOn && line.kana ? kanaToRomaji(line.kana) : "";
+    const combined = [kanaPart, romajiPart ? `(${romajiPart})` : ""].filter(Boolean).join("  ");
+    this.dlgKana.setText(combined).setVisible(!!combined);
+    this.dlgEn.setText(this.dlgMeaningOn ? M(line) : "").setVisible(this.dlgMeaningOn);
+  }
+
   private showLine() {
     const line = this.dlgLines[this.dlgIndex];
     const name = this.speakerName(line);
@@ -202,10 +283,7 @@ export class UIScene extends Phaser.Scene {
     this.dlgEn.setText("").setVisible(false);
     this.dlgMore.setVisible(false);
     this.typer.play(line.jp, 40, () => {
-      const showKana = getShowKana();
-      const showMeaning = getShowMeaning();
-      this.dlgKana.setText(showKana ? (line.kana ?? "") : "").setVisible(showKana && !!line.kana);
-      this.dlgEn.setText(showMeaning ? M(line) : "").setVisible(showMeaning);
+      this.updateLineDisplay();
       this.dlgMore.setVisible(true);
     });
   }
@@ -217,10 +295,7 @@ export class UIScene extends Phaser.Scene {
     const line = this.dlgLines[this.dlgIndex];
     if (!this.typer.done) {
       this.typer.finish(line.jp);
-      const showKana = getShowKana();
-      const showMeaning = getShowMeaning();
-      this.dlgKana.setText(showKana ? (line.kana ?? "") : "").setVisible(showKana && !!line.kana);
-      this.dlgEn.setText(showMeaning ? M(line) : "").setVisible(showMeaning);
+      this.updateLineDisplay();
       this.dlgMore.setVisible(true);
       return;
     }
@@ -318,11 +393,22 @@ export class UIScene extends Phaser.Scene {
 
   /* ── menu ────────────────────────────────────────────────────────────── */
 
-  private openMenu(tab: string = "menu") {
+  private openMenu(tab: Tab = "menu") {
     if (this.dlgBox.visible) return;
-    if (this.scene.isActive("Menu")) return;
+    if (this.scene.isActive("Menu")) {
+      // already open — switch tabs instead of no-op'ing (or, worse,
+      // relaunching, which Phaser restarts an already-active scene).
+      (this.scene.get("Menu") as MenuScene).setTab(tab);
+      return;
+    }
     const map = this.scene.get("Map");
     if (map.scene.isActive()) map.scene.pause();
     this.scene.launch("Menu", { tab });
+  }
+
+  private closeMenu() {
+    if (!this.scene.isActive("Menu")) return;
+    this.scene.stop("Menu");
+    this.scene.resume("Map");
   }
 }

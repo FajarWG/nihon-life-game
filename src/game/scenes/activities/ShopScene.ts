@@ -21,7 +21,10 @@ const TITLES: Record<string, string> = {
   restaurant: "レストラン — Restaurant",
 };
 
-const COLS = 3, ROWS = 4, PAGE_SIZE = COLS * ROWS;
+// ROWS=4 used to overflow past the shop panel's bottom edge (and even the
+// canvas edge), covering the pagination buttons; 3 rows keeps everything
+// inside PH.
+const COLS = 3, ROWS = 3, PAGE_SIZE = COLS * ROWS;
 
 export class ShopScene extends ActivityBase {
   private shop!: string;
@@ -69,10 +72,14 @@ export class ShopScene extends ActivityBase {
     // cart panel
     this.cartPanel = this.add.container(0, 0);
     const cartY = this.listItems.length ? PY + 144 : PY + 44;
-    flatPanel(this, PX + 12, cartY, 246, 248, "dark");
-    this.add.text(PX + 22, cartY + 10, L("カート", "Cart", "Keranjang"), style(14, COLOR.accent));
+    const cartBg = flatPanel(this, PX + 12, cartY, 246, 248, "dark");
+    const cartHeader = this.add.text(PX + 22, cartY + 10, L("カート", "Cart", "Keranjang"), style(14, COLOR.accent));
+    // total sits in the header row (right-aligned) instead of a fixed offset
+    // near the bottom — that fixed offset used to land right inside the
+    // checkout button's own bounds and get covered by it.
+    this.cartTotalText = this.add.text(PX + 12 + 246 - 10, cartY + 10, "", style(14, COLOR.accent)).setOrigin(1, 0);
+    this.cartPanel.add([cartBg, cartHeader, this.cartTotalText]);
     this.cartListText = this.add.text(PX + 22, cartY + 38, "", style(12, COLOR.text, { lineSpacing: 6 }));
-    this.cartTotalText = this.add.text(PX + 22, cartY + 216, "", style(14, COLOR.accent));
 
     this.checkoutBtn = new PixelButton(this, PX + 24, cartY + 188, L("会計する", "Check out", "Bayar"), () => this.checkout(), { w: 220, h: 34 });
     this.checkoutBtn.setVisible(false);
@@ -94,6 +101,7 @@ export class ShopScene extends ActivityBase {
     }
 
     this.renderShelf();
+    this.renderCart();
     this.refresh();
   }
 
@@ -113,7 +121,12 @@ export class ShopScene extends ActivityBase {
         const def = ITEM_MAP[id];
         const col = i % COLS, row = Math.floor(i / COLS);
         const x = startX + col * 142, y = PY + 40 + row * 114;
-        flatPanel(this, x, y, 132, 104, "light");
+        // add the background into the same container as its content (and add
+        // it FIRST) — otherwise flatPanel's rectangle lands in the scene's
+        // root display list, added after `this.shelf`, and renders on top of
+        // the icon/name/price it's supposed to sit behind.
+        const cellBg = flatPanel(this, x, y, 132, 104, "light");
+        this.shelf.add(cellBg);
         this.shelf.add(this.add.image(x + 66, y + 18, "icons", def.icon).setScale(2));
         this.shelf.add(this.add.text(x + 66, y + 40, def.nameJp, style(13)).setOrigin(0.5));
         if (showKana) this.shelf.add(this.add.text(x + 66, y + 54, def.kana, style(10, COLOR.kana)).setOrigin(0.5));
@@ -178,15 +191,37 @@ export class ShopScene extends ActivityBase {
     const cartY = this.listItems.length ? PY + 144 : PY + 44;
     const total = this.getCartTotal();
 
-    entries.forEach(([id, qty], i) => {
+    // Cart panel height is fixed, but some shops stock a LOT of distinct
+    // items (supermarket alone has 22) — with no cap, enough unique items in
+    // the cart pushed rows straight through the checkout button and off the
+    // bottom of the screen. Cap visible rows to what actually fits and fold
+    // the rest into a "+N more" line; the real cart/total/checkout still use
+    // the full `this.cart` regardless of what's shown here.
+    const ROW_H = 24;
+    const listTop = cartY + 38;
+    const listBottom = cartY + 178; // leaves a gap above the checkout button
+    const maxRows = Math.max(1, Math.floor((listBottom - listTop) / ROW_H));
+    const overflow = entries.length > maxRows;
+    const shown = overflow ? entries.slice(0, maxRows - 1) : entries;
+
+    shown.forEach(([id, qty], i) => {
       const def = ITEM_MAP[id];
-      const rowY = cartY + 38 + i * 38;
+      const rowY = listTop + i * ROW_H;
       const nameText = this.add.text(PX + 22, rowY, `${def.nameJp}`, style(11, COLOR.text));
       const qtyText = this.add.text(PX + 130, rowY, `×${qty}`, style(11, COLOR.accent));
       const priceText = this.add.text(PX + 168, rowY, `¥${def.price * qty}`, style(10, COLOR.dim));
-      const minusBtn = new PixelButton(this, PX + 96, rowY - 2, "−", () => this.removeFromCart(id), { w: 26, h: 22, size: 9 });
+      const minusBtn = new PixelButton(this, PX + 96, rowY - 3, "−", () => this.removeFromCart(id), { w: 24, h: 20, size: 9 });
       this.cartRowObjs.push(nameText, qtyText, priceText, minusBtn);
     });
+
+    if (overflow) {
+      const hidden = entries.length - shown.length;
+      this.cartRowObjs.push(this.add.text(
+        PX + 22, listTop + shown.length * ROW_H,
+        `+${hidden} ${meaning("more item(s)", "barang lainnya")}`,
+        style(10, COLOR.dim, { fontStyle: "italic" }),
+      ));
+    }
 
     this.cartListText.setText(entries.length === 0 ? L("カートは空です", "Cart is empty", "Keranjang kosong") : "");
     if (entries.length === 0) {

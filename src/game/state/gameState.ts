@@ -51,7 +51,7 @@ export interface GameState extends SaveData {
   resetNew: (playerName: string) => void;
 }
 
-const NEXT_LEVEL: Partial<Record<JlptLevel, JlptLevel>> = { N5: "N4", N4: "N3", N3: "N2" };
+export const NEXT_LEVEL: Partial<Record<JlptLevel, JlptLevel>> = { N5: "N4", N4: "N3", N3: "N2" };
 
 function rollWeather(season: Season): Weather {
   const r = Math.random();
@@ -133,7 +133,7 @@ export const gameStore = createStore<GameState>()((set, get) => ({
 
   addXp: (skill, amount) => {
     set(s => ({
-      skills: { ...s.skills, [skill]: s.skills[skill] + amount },
+      skills: { ...s.skills, [skill]: Math.max(0, s.skills[skill] + amount) },
       flags: { ...s.flags, xpToday: ((s.flags["xpToday"] as number) ?? 0) + amount },
     }));
     Bus.emit("xp", skill, amount);
