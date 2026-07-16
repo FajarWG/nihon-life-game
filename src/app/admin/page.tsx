@@ -11,6 +11,7 @@ const TYPE_LABELS: Record<ContentType, string> = {
   recipes: "レシピ Recipes", stations: "駅 Stations", lines: "路線 Lines",
   npcs: "NPC", quests: "クエスト Quests", workTasks: "仕事 Work Tasks",
   readings: "読解 Readings", listenings: "聴解 Listenings",
+  kanji: "漢字 Kanji",
 };
 
 /** Content workshop — lives outside the game, manages custom packs in Postgres. */
@@ -28,12 +29,17 @@ export default function AdminPage() {
     try {
       const res = await fetch("/api/content");
       const data = await res.json();
+      if (res.status === 401) throw { status: 401, message: data.error ?? "unauthorized" };
       if (!res.ok) throw new Error(data.error ?? `HTTP ${res.status}`);
       setPacks(data.packs ?? []);
       setDbError(null);
-    } catch (e) {
+    } catch (e: any) {
       setPacks([]);
-      setDbError(e instanceof Error ? e.message : "cannot reach database");
+      if (e?.status === 401) {
+        setDbError("__AUTH__");
+      } else {
+        setDbError(e instanceof Error ? e.message : "cannot reach database");
+      }
     }
   }, []);
 
@@ -95,7 +101,14 @@ export default function AdminPage() {
         <a href="/" className="pixel-btn text-sm">← Title</a>
       </header>
 
-      {dbError && (
+      {dbError === "__AUTH__" && (
+        <div className="pixel-panel p-4 mb-6 text-sm text-[#e09555]">
+          Login sebagai admin dulu di{" "}
+          <a href="/" className="text-[var(--accent)] underline">halaman utama</a>, lalu kembali ke sini.
+        </div>
+      )}
+
+      {dbError && dbError !== "__AUTH__" && (
         <div className="pixel-panel p-4 mb-6 text-sm text-[#e05555]">
           Database unavailable: {dbError}. Set DATABASE_URL in .env and make sure Postgres is running.
         </div>

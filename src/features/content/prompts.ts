@@ -7,6 +7,7 @@ import { LINES, STATIONS } from "@/data/stations";
 import { LISTENINGS, READINGS } from "@/data/drills";
 import { VOCABULARY } from "@/data/vocabulary";
 import { WORK_TASKS } from "@/data/workTasks";
+import { ALL_KANJI } from "@/data/kanji";
 import type { ContentType } from "./schema";
 
 /**
@@ -114,6 +115,16 @@ const SHAPES: Record<ContentType, string> = {
   "question": "english question",
   "options": ["a","b","c"], "answer": "a"
 }`,
+  kanji: `{
+  "id": "k5-xxx",            // prefix k5-/k4-/k3- by level, use reading as suffix
+  "character": "字",
+  "onyomi": ["ジ"],
+  "kunyomi": ["あざ"],
+  "meaning": { "en": "character / letter", "idn": "karakter / huruf" },
+  "strokeCount": 6,
+  "level": "N5" | "N4" | "N3",
+  "exampleVocabIds": ["v5-xxx"]  // vocab ids that actually contain this kanji
+}`,
 };
 
 const EXISTING: Record<ContentType, () => string[]> = {
@@ -128,6 +139,7 @@ const EXISTING: Record<ContentType, () => string[]> = {
   workTasks: () => WORK_TASKS.map(w => w.id),
   readings: () => READINGS.map(r => r.id),
   listenings: () => LISTENINGS.map(l => l.id),
+  kanji: () => ALL_KANJI.map(k => k.id),
 };
 
 const EXTRA_NOTES: Partial<Record<ContentType, string>> = {
@@ -135,6 +147,7 @@ const EXTRA_NOTES: Partial<Record<ContentType, string>> = {
   recipes: `Existing item ids for ingredients: ${ITEMS.filter(i => i.category === "ingredient").map(i => i.id).join(", ")}.`,
   npcs: `Locations & sizes: town(46x32) apartment(11x8) school(14x10) konbini(12x9) supermarket(14x10) station(14x9) company(16x10) restaurant(12x9) library(12x9). Pick x/y INSIDE walls on a floor tile.`,
   quests: `Quest events: talk/gift target = npc id · buy/eat target = item id · cook target = recipe id · activity target = study|school|shopping|train|work|cooking · visit target = location id.`,
+  kanji: `CRITICAL: (1) id HARUS mencerminkan reading/karakter entri itu sendiri, JANGAN pakai id yang konsepnya sudah dipakai untuk karakter lain (contoh salah: id 'chikara' dipasang di karakter 度 padahal 'chikara' sudah berarti karakter 力). (2) JANGAN buat karakter yang sudah ada di daftar existing ids berikut - kalau karakter sudah punya entri, jangan generate ulang. (3) kunyomi HANYA yang umum dipakai bahasa Jepang modern - kalau ragu/arkais, kosongkan saja, jangan asal isi. (4) exampleVocabIds harus vocab id yang BENAR-BENAR ada dan benar-benar memuat karakter itu.\nExisting characters (do NOT generate duplicates): ${ALL_KANJI.map(k => k.character).join("")}`,
 };
 
 export function buildPrompt(type: ContentType, count: number, level: string): string {

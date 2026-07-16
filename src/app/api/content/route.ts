@@ -1,11 +1,16 @@
 import { NextResponse } from "next/server";
 import { addPack, dbConfigured, deletePack, listPacks } from "@/server/db";
 import { CONTENT_TYPES, validatePackItems } from "@/features/content/schema";
+import { isAdmin, userFromRequest } from "@/server/auth";
 
 export const runtime = "nodejs";
 
 /** Custom content packs (admin page writes, game reads at boot). */
-export async function GET() {
+export async function GET(req: Request) {
+  const username = userFromRequest(req);
+  if (!isAdmin(username)) {
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
   if (!dbConfigured()) return NextResponse.json({ packs: [] });
   try {
     return NextResponse.json({ packs: await listPacks() });
@@ -15,6 +20,10 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
+  const username = userFromRequest(req);
+  if (!isAdmin(username)) {
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
   if (!dbConfigured()) return NextResponse.json({ error: "no database configured" }, { status: 503 });
   try {
     const body = await req.json();
@@ -32,6 +41,10 @@ export async function POST(req: Request) {
 }
 
 export async function DELETE(req: Request) {
+  const username = userFromRequest(req);
+  if (!isAdmin(username)) {
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
   if (!dbConfigured()) return NextResponse.json({ error: "no database configured" }, { status: 503 });
   const id = Number(new URL(req.url).searchParams.get("id"));
   if (!Number.isInteger(id)) return NextResponse.json({ error: "bad id" }, { status: 400 });

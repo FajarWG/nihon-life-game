@@ -1,5 +1,5 @@
 import type {
-  GrammarPoint, ItemDef, ListeningDrill, NpcDef, QuestDef,
+  GrammarPoint, ItemDef, KanjiEntry, ListeningDrill, NpcDef, QuestDef,
   ReadingPassage, Recipe, Station, TrainLine, VocabEntry, WorkTask,
 } from "@/core/types";
 import { GRAMMAR } from "@/data/grammar";
@@ -11,6 +11,7 @@ import { LINES, STATIONS, STATION_MAP } from "@/data/stations";
 import { LISTENINGS, READINGS } from "@/data/drills";
 import { VOCABULARY } from "@/data/vocabulary";
 import { WORK_TASKS } from "@/data/workTasks";
+import { ALL_KANJI } from "@/data/kanji";
 import { db } from "@/core/db";
 import type { ContentType } from "./schema";
 
@@ -42,6 +43,7 @@ export function mergePack(type: ContentType, items: unknown[]) {
     case "workTasks": mergeInto<WorkTask>(WORK_TASKS, null, items); break;
     case "readings": mergeInto<ReadingPassage>(READINGS, null, items); break;
     case "listenings": mergeInto<ListeningDrill>(LISTENINGS, null, items); break;
+    case "kanji": mergeInto<KanjiEntry>(ALL_KANJI, null, items); break;
   }
 }
 

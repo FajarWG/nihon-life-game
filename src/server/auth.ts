@@ -62,3 +62,8 @@ export function validUsername(u: unknown): u is string {
 export function validPassword(p: unknown): p is string {
   return typeof p === "string" && p.length >= 4 && p.length <= 72;
 }
+
+export function isAdmin(username: string | null): boolean {
+  const admin = process.env.ADMIN_USERNAME;
+  return !!admin && username === admin;
+}
