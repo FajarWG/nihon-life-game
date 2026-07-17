@@ -33,8 +33,11 @@ export class CookScene extends ActivityBase {
       if (have) {
         this.content.add(new PixelButton(this, x + 30, y + 106, L("作る", "Cook!", "Masak!"), () => this.cook(r.id), { w: 140, h: 32 }));
       } else {
-        this.content.add(this.add.text(x + 100, y + 96, `${meaning("Missing", "Kurang")}: ${missing.map(id => ITEM_MAP[id]?.nameJp ?? id).join("、")}`,
-          style(11, COLOR.bad, { wordWrap: { width: 180 }, align: "center" })).setOrigin(0.5, 0));
+        const missingLabel = this.add.text(x + 100, y + 96, `${meaning("Missing", "Kurang")}: ${missing.map(id => ITEM_MAP[id]?.nameJp ?? id).join("、")}`,
+          style(9, "#ffcc77", { wordWrap: { width: 170 }, align: "center", lineSpacing: 2 })).setOrigin(0.5, 0);
+        const mask = this.make.graphics().fillRect(x + 5, y + 5, 190, 155).createGeometryMask();
+        missingLabel.setMask(mask);
+        this.content.add(missingLabel);
       }
     });
   }

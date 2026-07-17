@@ -14,5 +14,8 @@
 # data
 See [data/taste.md](data/taste.md)
 
+# rendering
+- When text looks blurry/unreadable on the game map, investigate resolution and camera zoom settings first (not font size) — the multi-pass canvas scaling pipeline is usually the root cause. Confidence: 0.70
+
 # quests
 - Before using a QuestEventKind in quest objectives, grep the codebase for `Bus.emit("quest-event"` to verify the event kind is actually emitted — use only events that exist in the system, never ones only defined in types. Confidence: 0.75
