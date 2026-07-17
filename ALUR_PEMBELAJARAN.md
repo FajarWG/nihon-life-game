@@ -1,6 +1,10 @@
 # 📚 ALUR_PEMBELAJARAN.md — Learning Flow & Pedagogy Audit
 
-> **Reverse-engineered dari codebase `src/` — status per 2026-07-14**
+> **Reverse-engineered dari codebase `src/` — status per 2026-07-17 (revisi ke-2)**
+>
+> Revisi sebelumnya (2026-07-14) mencatat gap terbesar: **tidak ada sistem review/SRS sama sekali**,
+> `learnedVocab` adalah data mati, tidak ada in-game settings UI, exam tidak memberi XP saat lulus,
+> dan ReadScene tidak dibatasi harian. **Semua lima ini sudah diperbaiki.**
 
 ---
 
@@ -8,287 +12,262 @@
 
 ### 1.1 Kosakata Baru (Vocabulary)
 
-**Satu-satunya cara pemain bertemu kosakata baru yang terstruktur: SchoolScene (kelas)**
+**SchoolScene tetap jadi jalur utama, tapi sekarang dengan seleksi Leitner-aware (bukan cuma sliding-window murni).**
 
 | Mekanisme | Detail |
 |-----------|--------|
 | **File** | `src/game/scenes/activities/SchoolScene.ts` |
-| **Seleksi** | `vocabByLevel(G().jlpt)` — 4 kata per sesi, sliding window `(day-1)*4 % (pool.length - 4)` |
-| **Metode** | Pair-matching (`pairs()` widget): JP term kiri, arti (EN/IDN) kanan, shuffled |
-| **Recording** | Kata yang sudah dimainkan di pair-matching ditulis ke `gameStore.setState({ learnedVocab: [...s.learnedVocab, id] })` di `SchoolScene.ts` |
-| **Status `learnedVocab`** | [DATA MATI] — ditulis ke save data tapi **tidak pernah dibaca kembali** oleh sistem manapun. Tidak ada logic yang pakai `learnedVocab` untuk filtering/review/repetition |
+| **Seleksi kata due-review** | `s.learnedVocab.filter(id => { interval = BOX_INTERVALS[box]; return today >= lastSeenDay + interval })` — kata yang sudah dipelajari dan jatuh tempo direview diambil dulu (maks 2 per sesi) |
+| **Seleksi kata baru** | Sisa slot (sampai total 4) diisi dari `pool.filter(v => !learnedVocab.includes(id))`, sliding-window berdasarkan hari |
+| **Metode** | Pair-matching (`pairs()` widget), sekarang menampilkan romaji juga kalau toggle `getShowRomaji()` aktif |
+| **Recording** | `learnedVocab` + `vocabReview[id] = { box, lastSeenDay }` di-update setelah tiap sesi |
+| **Status `learnedVocab`** | ✅ **[FIXED]** — dulu "data mati" (ditulis tapi tak pernah dibaca), sekarang **aktif dipakai** untuk menentukan kata mana yang jatuh tempo direview (lihat §4) |
 
-**Cara lain bertemu kosakata (tidak terstruktur):**
+**Cara lain bertemu kosakata (tidak terstruktur, tidak berubah dari sebelumnya):**
 
 | Sumber | Konteks | Terstruktur? |
 |--------|---------|-------------|
-| **ShopScene** | Nama item di toko (onigiri, bento, dll) | ❌ Hanya pajangan, tidak di-test |
-| **CookScene** | Nama bahan & langkah resep | ❌ Hanya display, tidak di-test |
-| **TrainScene** | Pengumuman stasiun, nama stasiun (kanji + kana) | ❌ Tidak di-test sebagai vocab |
-| **ExamScene** | 3 pertanyaan vocab meaning (multiple choice) | ⚠️ Testing saja, bukan teaching |
-| **WorkScene** | Briefing kerja dalam JP | ❌ Tidak di-test sebagai vocab |
-| **StoryScene** | Vocab recap setelah cerita AI | ⚠️ Hanya review, bukan first encounter |
-| **Board Notices** | 3 notifikasi di papan kantor | ❌ Pajangan pasif |
+| **ShopScene** | Nama item di toko | ❌ Hanya pajangan |
+| **CookScene** | Nama bahan & langkah resep | ❌ Hanya display |
+| **TrainScene** | Pengumuman stasiun, nama stasiun | ❌ Tidak di-test sebagai vocab |
+| **ExamScene** | 3 pertanyaan vocab meaning (kini bisa tampil dengan romaji jika toggle aktif) | ⚠️ Testing saja |
+| **WorkScene** | Briefing kerja dalam JP | ❌ Tidak di-test |
+| **StoryScene** | Vocab recap setelah cerita (7 built-in + AI) | ⚠️ Review, bukan first encounter |
+| **Board Notices** | 3 notifikasi papan kantor | ❌ Pajangan pasif |
+| **Dialog NPC** (talk) | 40 baris dialog (4 NPC × 5 tier) | ❌ Tidak di-test sebagai vocab, tapi kini didampingi toggle furigana/romaji/translate (lihat §2) |
 
 ### 1.2 Grammar Baru
 
-**Satu-satunya cara: StudyScene (belajar di meja)**
+**Tidak berubah secara mekanisme, tapi kini dengan bilingual explanation penuh dan sistem peek-penalty.**
 
 | Mekanisme | Detail |
 |-----------|--------|
 | **File** | `src/game/scenes/activities/StudyScene.ts` |
-| **Seleksi** | `grammarByLevel(s.jlpt).find(g => !s.learnedGrammar.includes(g.id))` — cari grammar yang belum pernah dipelajari. Jika semua sudah dipelajari, rotasi via `(day - 1) % pool.length` |
-| **Penyajian** | Card dengan: title (JP), meaning (EN), explanation (EN — `explanationIdn` tidak pernah diisi!), 2 example sentences (JP + EN + kana) |
-| **Latihan** | 2–4 exercises per grammar point (mix `order` untuk menyusun kalimat, `fill` untuk memilih kata/partikel) |
-| **Recording** | `G().learnGrammarPoint(id)` dipanggil setelah sesi selesai — **tanpa memandang performa**. Meskipun 0/3 benar, grammar tetap di-mark sebagai "learned" |
-| **XP** | `10 + (perfectExercises × 5)` |
+| **Seleksi** | `grammarByLevel(s.jlpt).find(g => !learnedGrammar.includes(g.id))` — cari yang belum dipelajari; kalau semua sudah, rotasi `(day-1) % pool.length` |
+| **Penyajian** | Card: title (JP), meaning, **explanation dwibahasa (EN/IDN — dulu selalu EN)**, contoh kalimat |
+| **Latihan** | 2–4 exercise (`order`/`fill`), masing-masing kini punya opsi **"👁 Peek"** — buka hint selama 7 detik, ditandai `peeked` |
+| **Recording** | `G().learnGrammarPoint(id)` dipanggil **hanya jika `score > 0`** (minimal 1 exercise benar) — ⚠️ **[SEBAGIAN FIXED]**: dulu di-mark "learned" tanpa syarat sama sekali (0/3 pun tetap "learned"); sekarang ada syarat minimal, tapi belum ada threshold performa penuh (mis. wajib ≥50%) |
+| **XP** | `10 + (score × 5)`, dikurangi penalti kalau memakai peek: `penaltyXp = round(peekCount × 5 × 0.2)`, minimum XP akhir 1 |
+
+> ✅ **[BARU]** Sistem peek dengan penalti kecil (`STUDY_PEEK_PENALTY = 0.2`) memberi jalan keluar untuk pemain yang benar-benar buntu, tanpa membuat "mencontek" sepenuhnya gratis.
 
 ### 1.3 Kanji
 
-**Tidak ada sistem pengajaran kanji terpisah.**
+**Data sekarang jauh lebih kaya (306 entri terstruktur — lihat ALUR_KURIKULUM.md §2), tapi ALUR PENGAJARANNYA belum berubah dari sebelumnya.**
 
-Kanji hanya muncul secara **implisit** melalui:
-- **ReadScene "Kanji Corner"** — puzzle match kanji↔kana untuk 3 kata dari `vocabByLevel(level).filter(v => v.jp !== v.kana)`, diseleksi dengan `(day * 3) % pool.length`
-- **Tampilan kosakata** di SchoolScene/ShopScene — pemain melihat kanji tapi tidak diajari stroke order, radical, on/kun reading
+Kanji masih hanya muncul secara implisit melalui:
+- **ReadScene "Kanji Corner"** — puzzle match kanji↔kana untuk 3 kata dari `vocabByLevel(level).filter(v => v.jp !== v.kana)`, diseleksi `(day * 3) % pool.length`. Kini punya kolam kata yang lebih besar (172 dari 180 kata punya kanji) berkat penambahan Fase 3.
+- **Tampilan kosakata** di SchoolScene/ShopScene/dialog — pemain melihat kanji tapi tidak diajari stroke order, radical, atau distinction on/kun secara eksplisit dalam UI, **meskipun data untuk itu (`onyomi`, `kunyomi`, `strokeCount`) sudah tersedia penuh di `kanji.ts`**.
 
-**Tidak ada:** daftar kanji per level, pengajaran stroke order, radical breakdown, on-yomi/kun-yomi distinction, atau kanji-specific exercise.
+> 🟡 **Gap yang masih terbuka:** infrastruktur data kanji sudah lengkap (306 entri dengan bacaan on/kun + jumlah goresan), tapi belum ada scene/UI yang benar-benar memanfaatkannya untuk pengajaran terstruktur (mis. flashcard kanji dengan stroke order, atau quiz on'yomi vs kun'yomi). Ini adalah gap arsitektur berikutnya yang paling jelas untuk ditutup, karena datanya sudah siap pakai.
 
 ---
 
-## 2. SISTEM TAMPILAN: KANA, FURIGANA, TRANSLATE, ROMAJI
+## 2. [BARU] SISTEM TAMPILAN: KANA, FURIGANA, TRANSLATE, ROMAJI
 
-### 2.1 Toggle Settings
+Bagian ini berubah signifikan sejak revisi sebelumnya — dulu toggle hanya bisa diubah lewat localStorage manual ("Tidak ada in-game settings menu yang terlihat di codebase"). **Sekarang ada dua lapis kontrol: menu Settings permanen, dan toggle cepat per sesi dialog.**
 
-| Setting | localStorage Key | Values | Default | File |
-|---------|-----------------|--------|---------|------|
-| UI Language | `nihon-ui-lang` | `"ja-en"`, `"ja"`, `"en"` | `"ja-en"` | `src/game/i18n.ts:95` |
-| Meaning Language | `nihon-meaning-lang` | `"idn"`, `"en"` | `"idn"` | `src/game/i18n.ts:96` |
-| Show Kana | `nihon-show-kana` | `"1"`, `"0"` | `"0"` (OFF) | `src/game/i18n.ts:97` |
-| Show Meaning | `nihon-show-meaning` | `"1"`, `"0"` | `"0"` (OFF) | `src/game/i18n.ts:98` |
+### 2.1 Toggle Settings (Permanen, via Menu)
 
-### 2.2 Bagaimana Toggle Bekerja
+| Setting | localStorage Key | Values | Default |
+|---------|-------------------|--------|---------|
+| UI Language | `nihon-ui-lang` | `"ja-en"`, `"ja"`, `"en"` | `"ja-en"` |
+| Meaning Language | `nihon-meaning-lang` | `"idn"`, `"en"` | `"idn"` |
+| Show Kana | `nihon-show-kana` | `"1"`, `"0"` | `"0"` (OFF) |
+| Show Meaning | `nihon-show-meaning` | `"1"`, `"0"` | `"0"` (OFF) |
+| Show Romaji **(baru)** | `nihon-show-romaji` | `"1"`, `"0"` | `"0"` (OFF) |
 
-#### `L(jp, en, idn?)` — Label Fitur (tombol, judul scene, prompt)
-```typescript
-// src/game/i18n.ts:79-94
-export function L(jp: string, en: string, idn?: string): string {
-  const ui = getUiLang();
-  if (ui === "ja") return jp;                                    // かばん
-  if (ui === "en") return getMeaningLang() === "idn" && idn ? idn : en;  // Tas
-  return `${jp} (${getMeaningLang() === "idn" && idn ? idn : en})`;      // かばん (Tas)
-}
+> ✅ **[FIXED]** Semua 5 toggle di atas kini bisa diubah langsung dari **tab ⚙ Settings di Menu** (`MenuScene.renderSettings()`), bukan cuma lewat localStorage manual dari developer console. Ini menutup gap 🟠 LOW lama "Tidak Ada In-Game Settings UI".
+
+### 2.2 [BARU] Toggle Cepat Per-Dialog (Session-Scoped)
+
+Selain setting permanen di atas, sejak sesi bug-fix terakhir setiap **kotak dialog** (NPC talk box di `UIScene`, dan `StoryScene`) punya 3 tombol kecil di kanan-atas:
+
+| Tombol | Fungsi |
+|--------|--------|
+| 振 (Furigana) | Nyalakan/matikan tampilan kana untuk sesi dialog ini |
+| Aa (Romaji) | Nyalakan/matikan romaji (dihasilkan on-the-fly dari kana via `kanaToRomaji()`) |
+| 訳 (Translate) | Nyalakan/matikan terjemahan baris saat ini |
+
+**Perilaku:**
+- Toggle ini **mulai dari nilai setting global** (§2.1) tiap kali dialog baru dibuka, lalu bisa diubah bebas selama sesi tanpa mengubah setting permanen.
+- Menyalakan salah satu untuk **pertama kali** dalam satu sesi dialog memotong **2 XP vocabulary** (`PEEK_XP_COST`), dicatat lewat flag `dlgPeeked` per jenis (kana/romaji/meaning) — hanya kena sekali per toggle per sesi, bukan tiap kali switch on/off berulang.
+- Berlaku identik di `StoryScene` (baik cerita bawaan maupun AI-generated).
+
+> Tujuan desainnya eksplisit: pemain baru yang bingung "ini percakapan apa" bisa langsung intip furigana/romaji/arti tanpa keluar ke menu, dengan trade-off XP kecil yang menjaga insentif untuk mencoba membaca dulu.
+
+### 2.3 Romaji — Kini Ditampilkan, Bukan Cuma Data Statis
+
+```
+Gap lama: "Romaji hanya ada di data, tidak pernah ditampilkan di UI game."
+
+Status sekarang: ✅ FIXED. Field `romaji` di VocabEntry kini dipakai aktif
+(SchoolScene pair-matching, ExamScene vocab question). Untuk konten yang
+TIDAK punya field romaji statis (dialogue line, story line, quest text),
+dibuatkan utility kanaToRomaji() yang mentransliterasi field `kana` secara
+mekanis (Hepburn-style, termasuk youon/sokuon/choonpu) — sehingga romaji
+tetap muncul di dialog & cerita tanpa perlu backfill data manual di semua
+konten lama.
 ```
 
-#### `M(obj)` — Arti dari Objek Konten (dialogue line, step resep, vocab)
-```typescript
-// src/game/i18n.ts:102-104
-export function M(o: { en: string; idn?: string }): string {
-  return getMeaningLang() === "idn" && o.idn ? o.idn : o.en;
-}
-```
+### 2.4 Di Mana Kana/Furigana/Romaji/Translate Ditampilkan (Ringkasan Terbaru)
 
-#### `meaning(en, idn?)` — Pasangan String Lepas
-```typescript
-// src/game/i18n.ts:106-108
-export function meaning(en: string, idn?: string): string {
-  return getMeaningLang() === "idn" && idn ? idn : en;
-}
-```
-
-### 2.3 Di Mana Kana/Furigana Ditampilkan
-
-Kana (furigana/reading) ditampilkan di **semua lokasi teks Jepang utama** dengan pola yang konsisten:
-
-| Lokasi | File | Kapan Kana Muncul |
-|--------|------|-------------------|
-| **Dialogue Box** | `UIScene.ts:191` | Setelah typewriter selesai, jika `getShowKana()` true DAN `line.kana` ada |
-| **SchoolScene vocab** | Pairs widget teks JP (ada kana di VocabEntry, tapi pairs hanya menampilkan `jp`) | — |
-| **StudyScene card** | Example sentences punya `kana` di data grammar | Jika `getShowKana()` true |
-| **CookScene steps** | `JpText.kana` per step resep | Jika `getShowKana()` true |
-| **ReadScene passage** | `ReadingPassage.lines[].kana` | Jika `getShowKana()` true |
-| **ExamScene questions** | Vocab questions: `jp（kana）` — SELALU ditampilkan dengan kana | `src/game/scenes/activities/ExamScene.ts` |
-| **ShopScene shelf** | `ITEM_MAP[id].kana` di bawah nama item | Jika `getShowKana()` true |
-| **StoryScene cards** | `line.kana` dari AI-generated story | Jika `getShowKana()` true |
-
-### 2.4 Di Mana Terjemahan Ditampilkan
-
-| Lokasi | Kapan Meaning Muncul |
-|--------|---------------------|
-| **Dialogue Box** | Setelah typewriter selesai, jika `getShowMeaning()` true |
-| **StudyScene card** | Explanation selalu EN (`explanationIdn` tidak diisi!) |
-| **ExamScene choices** | Vocab distractors pakai `M()` (EN atau IDN) |
-| **StoryScene cards** | Jika `getShowMeaning()` true |
-| **Semua label tombol** | Via `L()` — tergantung `uiLang` setting |
-
-### 2.5 Romaji
-
-**Romaji hanya ada di data, tidak pernah ditampilkan di UI game.**
-
-Field `romaji` di `VocabEntry` (`src/data/vocabulary.ts`) tersedia untuk semua 128 kata sebagai data statis, tapi tidak ada kode game yang membaca atau menampilkan `romaji`. Fungsinya murni referensi development.
-
-### 2.6 Menu Toggle UI
-
-Setting language & kana/meaning diubah melalui:
-- **LocalStorage langsung** (developer)
-- **Tidak ada in-game settings menu yang terlihat di codebase**
+| Lokasi | Kana | Romaji | Translate | Catatan |
+|--------|------|--------|-----------|---------|
+| **Dialogue Box** (NPC talk) | ✅ | ✅ **(baru)** | ✅ | Toggle per-sesi + setting permanen |
+| **StoryScene** | ✅ | ✅ **(baru)** | ✅ | Sama seperti dialogue box, plus vocab recap |
+| **SchoolScene vocab** | ✅ | ✅ **(baru)** | via `M()` | Dulu romaji tidak ditampilkan sama sekali |
+| **StudyScene card** | ✅ | — | ✅ (dwibahasa, dulu EN-only) | |
+| **CookScene steps** | ✅ | — | ✅ | |
+| **ReadScene passage** | ✅ | — | — | |
+| **ExamScene questions** | ✅ (selalu) | ✅ **(baru, opsional)** | via `M()` untuk distractor | |
+| **ShopScene shelf** | ✅ | — | — | |
 
 ---
 
 ## 3. ALUR XP → SKILL → JLPT LEVEL
 
-### 3.1 Diagram Alur
+### 3.1 Diagram Alur (Diperbarui)
 
 ```
 AKTIVITAS                     SKILL XP                  TOTAL XP          JLPT
 ─────────                     ────────                  ────────          ────
-StudyScene ──────────────▶ grammar XP ──┐
-SchoolScene ───┬──────────▶ vocab XP ───┤
+StudyScene ──(peek penalty)─▶ grammar XP ──┐
+SchoolScene ───┬──────────▶ vocab XP (SRS-aware) ─┤
                ├──────────▶ reading XP ─┤
                ├──────────▶ listening ──┤
                └──────────▶ kanji XP ───┤
 WorkScene ────┬───────────▶ vocab XP ───┤
               ├───────────▶ reading XP ─┤
               └───────────▶ kanji XP ───┤
-ReadScene ────┬───────────▶ reading XP ─┤
-              └───────────▶ kanji XP ───┤    sum()     ┌──────────────┐
-TrainScene ───┬───────────▶ reading XP ─┤───────────▶  │ totalXp()    │
-              ├───────────▶ listening ──┤              │              │
-              └───────────▶ kanji XP ───┤              │ >= threshold? │
-ShopScene ────┬───────────▶ vocab XP ───┤              │              │
-              └───────────▶ reading XP ─┤              └──────┬───────┘
-CookScene ────┬───────────▶ vocab XP ───┤                     │
-              └───────────▶ reading XP ─┤              ┌──────▼───────┐
-StoryScene ───▶ (dinamis)               │              │ examReady()  │
-ExamScene ────▶ grammar XP (jika gagal)─┘              └──────┬───────┘
-                                                              │
-                              ┌───────────────────────────────┘
-                              ▼
-                    ┌─────────────────┐
-                    │  ExamScene      │
-                    │  6 soal         │
-                    │  pass ≥ 4/6     │
-                    └────┬────────┬───┘
-                    pass  │        │ fail
-                          ▼        ▼
-                   passExam()  flags.examFailedDay = day
-                   jlpt = N4   +5 grammar XP (konsolasi)
-                   (atau N3)
+ReadScene (1×/hari) ─┬─────▶ reading XP ─┤    sum()     ┌──────────────┐
+                     └─────▶ kanji XP ───┤───────────▶  │ totalXp()    │
+TrainScene ───┬───────────▶ reading XP ─┤              │ >= threshold? │
+              ├───────────▶ listening ──┤              └──────┬───────┘
+              └───────────▶ kanji XP ───┤                     │
+ShopScene ────┬───────────▶ vocab XP ───┤              ┌──────▼───────┐
+              └───────────▶ reading XP ─┤              │ examReady()  │
+CookScene ────┬───────────▶ vocab XP ───┤              └──────┬───────┘
+              └───────────▶ reading XP ─┤                     │
+StoryScene ───▶ (dinamis, built-in + AI)│                     │
+ExamScene ────▶ grammar+reading (LULUS) atau grammar (GAGAL) ─┘
+                                                              ▼
+                                                    ┌─────────────────┐
+                                                    │  ExamScene      │
+                                                    │  6 soal         │
+                                                    │  pass ≥ 4/6     │
+                                                    └────┬────────┬───┘
+                                                    pass  │        │ fail
+                                                          ▼        ▼
+                                                   passExam()  flags.examFailedDay = day
+                                                   jlpt = N4   +5 grammar XP (konsolasi)
+                                                   +20 grammar +10 reading  (atau N3)
+                                                   (dulu: 0 XP saat lulus!)
 ```
+
+**[BARU]** HUD kanan-atas kini menampilkan progress real-time menuju level berikutnya, mis. `230/300 XP → N4`, bukan cuma level saat ini tanpa konteks jarak.
 
 ### 3.2 Threshold Level-Up
 
-| Current Level | XP Dibutuhkan (`totalXp()`) | Exam Unlock | Status Exam Content |
-|---------------|----------------------------|-------------|---------------------|
-| N5 | ≥ 300 | N4 | [IMPLEMENTED] |
-| N4 | ≥ 700 | N3 | [IMPLEMENTED] |
-| N3 | ≥ 1400 | N2 | [BLOCKED] — `next === "N2"` ditolak oleh `examReady()` |
-| N2 | (tidak ada threshold) | N1 | [BLOCKED] |
-| N1 | — | — | Max level |
+**Tidak berubah** — N5≥300, N4≥700, N3≥1400 (locked ke N2).
 
-```typescript
-// src/game/state/gameState.ts:136-140
-examReady: () => {
-  const s = get();
-  const need = LEVEL_XP[s.jlpt];
-  const next = NEXT_LEVEL[s.jlpt];
-  return need !== undefined && (next === "N4" || next === "N3") && s.totalXp() >= need;
-},
+### 3.3 Detail Exam System — Perubahan Utama
+
+| Aspek | Dulu | Sekarang |
+|-------|------|----------|
+| **Bonus saat lulus** | ❌ Tidak ada XP sama sekali | ✅ **+20 grammar, +10 reading** |
+| **Konsolasi saat gagal** | +5 grammar XP | +5 grammar XP (tidak berubah) |
+| **Soal vocab** | `「jp」（kana）` selalu | Kini opsional tampil **+ romaji** kalau toggle aktif |
+| **Retry gate** | 1×/hari via `flags.examFailedDay` | Tidak berubah |
+| **Soal & passing grade** | 6 soal (2 grammar, 3 vocab, 1 reading), pass ≥4/6 | Tidak berubah |
+
+> ✅ **[FIXED]** Gap lama "logika reward terbalik: lulus = 0 XP, gagal = +5 XP, membuat grinding-gagal lebih menguntungkan" **sudah diperbaiki sepenuhnya**. Lulus sekarang jelas lebih menguntungkan (+30 total XP) daripada gagal (+5 XP), sekaligus tetap memberi sedikit konsolasi supaya kegagalan tidak terasa sia-sia.
+
+---
+
+## 4. [FIXED] MEKANISME REVIEW / PENGULANGAN — SRS Leitner Box
+
+### 4.1 Status: Dari "Tidak Ada Sistem Review" → Leitner Box Aktif
+
+| Mekanisme | Dulu | Sekarang |
+|-----------|------|----------|
+| **Spaced Repetition (SRS)** | ❌ Tidak ada | ✅ **Leitner box 1–5** via `gameState.vocabReview` |
+| **Due-for-review logic** | ❌ Tidak ada | ✅ `SchoolScene` mengecek `today >= lastSeenDay + BOX_INTERVALS[box]` tiap sesi |
+| **Forgetting curve** | ❌ Tidak ada | ⚠️ Masih sederhana (fixed interval per box, bukan kurva adaptif penuh) |
+| **Grammar re-study gating** | ⚠️ Parsial (tidak berubah) | ⚠️ Sama — rotasi deterministik setelah semua "learned", tanpa interval SRS untuk grammar |
+
+### 4.2 Cara Kerja Leitner Box (`SchoolScene.ts`)
+
+```
+BOX_INTERVALS = [0, 1, 2, 4, 8, 16]  // index 1-5, index 0 tak dipakai
+
+Tiap sesi vocabulary di SchoolScene:
+1. Cari kata di `learnedVocab` yang box-nya jatuh tempo
+   (today >= lastSeenDay + BOX_INTERVALS[box]) → ambil maks 2, acak.
+2. Isi sisa slot (sampai 4 kata/sesi) dengan kata BARU yang belum pernah
+   dipelajari (sliding window per hari).
+3. Setelah pair-matching selesai:
+   - Kalau SEMPURNA (0 kesalahan) → box naik satu tingkat (maks box 5),
+     lastSeenDay = hari ini. Interval review berikutnya makin panjang.
+   - Kalau ADA kesalahan → box turun/reset ke 1, lastSeenDay = hari ini.
+     Kata ini akan muncul lagi besok (interval box 1 = 1 hari).
 ```
 
-### 3.3 Detail Exam System
+Ini adalah implementasi SRS klasik (mirip Anki/SM-2 sederhana) yang benar-benar **menutup gap 🔴 HIGH terbesar** dari revisi dokumen sebelumnya: *"learnedVocab ditulis tapi tidak pernah dibaca... 128 vocabulary entries with full tracking infrastructure that goes completely unused."*
 
-| Aspek | Detail |
-|-------|--------|
-| **File** | `src/game/scenes/activities/ExamScene.ts` |
-| **Soal** | 6 total: 2 grammar fill, 3 vocab meaning, 1 reading comprehension |
-| **Sumber soal grammar** | `grammarByLevel(curJlpt)` → filter exercise `kind === "fill"` → shuffle → take 2 |
-| **Sumber soal vocab** | `vocabByLevel(curJlpt)` → shuffle → take 3. Tiap soal: `「jp」（kana）` + 2 distractor random dari pool yang sama |
-| **Sumber reading** | `READINGS.filter(r => r.level === curJlpt)[0]` → fallback ke `READINGS[0]` (N5) |
-| **Pass** | ≥ 4/6 benar → `passExam()` |
-| **Fail** | < 4/6 → `flags.examFailedDay = day`, +5 grammar XP |
-| **Bonus pass** | **TIDAK ADA XP** — `passExam()` hanya advance level tanpa memberi XP. Hanya fail yang dapat XP |
-| **Retry gate** | Hanya bisa 1× per hari. Dicek via `if (s.flags["examFailedDay"] === s.day)` di `MapScene.ts:294` |
-| **Time cost** | 90 menit |
-| **Energy cost** | 15 |
-| **Exam tests CURRENT level content** | N5 exam pakai N5 vocabulary/grammar/reading. Bukan tes penempatan ke level berikutnya |
+### 4.3 Apa yang Terjadi dengan Konten "Lama" Sekarang
 
----
+| Konten | Dulu | Sekarang |
+|--------|------|----------|
+| **Grammar** | Rotasi ulang SEMUA setelah semua "learned", tanpa tracking mastery | Tidak berubah — masih rotasi deterministik, **belum** pakai Leitner box seperti vocabulary |
+| **Vocabulary** | `learnedVocab` dead data, selalu sliding-window murni | ✅ **Leitner box aktif** — kata lama diprioritaskan ulang sesuai jadwal review, bukan sekadar diabaikan |
+| **Kanji** | Tidak ada tracking, selalu random 3 kata | Tidak berubah — ReadScene Kanji Corner masih random per hari, belum terhubung ke sistem SRS yang sama seperti vocabulary |
 
-## 4. MEKANISME REVIEW / PENGULANGAN
+### 4.4 Peek Mechanic — Bentuk "Bantuan Terkontrol" Baru (Fase 2 + sesi ini)
 
-### 4.1 Status: [TIDAK ADA SISTEM REVIEW]
+Selain SRS, ada dua sistem "bantuan dengan biaya kecil" yang saling melengkapi:
 
-Setelah investigasi menyeluruh:
+| Sistem | Lokasi | Biaya | Durasi |
+|--------|--------|-------|--------|
+| **👁 Peek button** | `ask()`/`order()` di `ActivityBase` — dipakai StudyScene, ExamScene | Penalti XP (`STUDY_PEEK_PENALTY = 0.2` × 5 per peek, khusus StudyScene) | Tampil 7 detik lalu hilang otomatis |
+| **Toggle furigana/romaji/translate** | `UIScene` dialogue box, `StoryScene` | 2 XP vocabulary, sekali per toggle per sesi | Tetap menyala sampai dimatikan manual atau sesi berakhir |
 
-| Mekanisme | Status |
-|-----------|--------|
-| **Spaced Repetition (SRS)** | ❌ Tidak ada |
-| **Leitner Box / SM-2** | ❌ Tidak ada |
-| **Flashcard / Quiz review** | ❌ Tidak ada |
-| **Due-for-review indicator** | ❌ Tidak ada |
-| **Forgetting curve** | ❌ Tidak ada |
-| **Grammar re-study gating** | ⚠️ Parsial — `learnedGrammar` dipakai StudyScene untuk memprioritaskan grammar baru, tapi setelah semua "learned", rotasi deterministik tanpa review mechanism |
-
-### 4.2 Apa yang Sebenarnya Terjadi dengan Konten "Lama"
-
-| Konten | Setelah "Learned" |
-|--------|-------------------|
-| **Grammar** | StudyScene akan merotasi ulang SEMUA grammar (termasuk yang sudah dipelajari) via `(day-1) % pool.length` setelah semua point di level tersebut "learned". Tidak ada tracking seberapa baik pemain menguasainya |
-| **Vocabulary** | Tidak ada mekanisme. `learnedVocab` disimpan ke state tapi tidak pernah dibaca. SchoolScene selalu sliding-window next 4 kata tanpa memandang mana yang sudah/belum dipelajari |
-| **Kanji** | Tidak ada tracking. ReadScene kanji corner selalu random 3 kata dari vocab pool |
-
-### 4.3 Satu-satunya Bentuk "Pengulangan" yang Ada
-
-1. **Daily quest** kadang meminta aktivitas yang sudah pernah dilakukan (study, talk, eat) — tapi ini pengulangan aktivitas, bukan pengulangan konten pembelajaran
-2. **ReadScene** bisa diulang berkali-kali dalam sehari — tapi passage yang sama akan muncul lagi (cycle by day+minute)
-3. **Grammar rotation** setelah semua grammar dipelajari — pemain akan melihat grammar yang sama setiap ~10 hari (N5=10 grammar, 1/hari)
+Keduanya dirancang dengan filosofi sama: pemain baru tidak pernah benar-benar terjebak buntu, tapi tetap ada insentif kecil untuk mencoba tanpa bantuan dulu.
 
 ---
 
-## 5. GAP DALAM ALUR PEMBELAJARAN
+## 5. GAP DALAM ALUR PEMBELAJARAN — STATUS TERKINI
 
-### 🔴 HIGH — Tidak Ada Review System
+| Gap (revisi 2026-07-14) | Status Sekarang |
+|-----|-----------------|
+| 🔴 Tidak Ada Review System | ✅ **FIXED (untuk vocabulary)** — Leitner box SRS aktif; grammar & kanji masih belum punya SRS setara |
+| 🔴 learnedVocab Data Mati | ✅ **FIXED** — kini jadi tulang punggung sistem SRS |
+| 🟡 Tidak Ada Pengajaran Kanji Terstruktur | ⚠️ **SEBAGIAN** — data (306 entri) sudah lengkap, tapi UI/scene pengajaran khusus kanji (stroke order, on/kun quiz) masih belum ada |
+| 🟡 Grammar "Learned" Tanpa Mastery Check | ⚠️ **SEBAGIAN FIXED** — kini butuh minimal 1 exercise benar (dulu 0/3 pun tetap "learned"), tapi belum ada threshold performa penuh |
+| 🟡 Exam Tidak Memberi XP Saat Lulus | ✅ **FIXED** — +20 grammar +10 reading saat lulus |
+| 🟠 Tidak Ada Progression Content di N3 | ✅ **MEMBAIK BESAR** — reading/listening N3 dari 0 jadi 5+5; vocab N3 tetap 40 (tidak bertambah); masih belum ada N2 |
+| 🟠 Tidak Ada In-Game Settings UI | ✅ **FIXED** — tab ⚙ Settings di Menu, plus toggle cepat per-dialog |
+| 🟠 ReadScene Tidak Terbatas Harian | ✅ **FIXED** — kini `markActivity("reading")` dipanggil, dibatasi 1×/hari seperti aktivitas lain |
 
-Pemain belajar grammar/vocab SEKALI lalu tidak pernah di-test lagi sampai ketemu secara kebetulan. Tidak ada retention mechanism. Setelah 128 kata + 30 grammar "dipelajari", tidak ada cara sistematis untuk memastikan pemain benar-benar ingat.
+### Gap yang Masih Terbuka
 
-### 🔴 HIGH — learnedVocab Data Mati
-
-`learnedVocab` ditulis tapi tidak pernah dibaca. 128 vocabulary entries with full tracking infrastructure that goes completely unused. Ini buang-buang potensi untuk spaced repetition, progress tracking, atau personalized review.
-
-### 🟡 MEDIUM — Tidak Ada Pengajaran Kanji Terstruktur
-
-Kanji hanya muncul sebagai "bonus" di ReadScene dan sebagai tampilan pasif di teks. Pemain tidak pernah diajari: stroke order, radical, on-yomi vs kun-yomi, atau kanji composition. Padahal JLPT N5 saja butuh ~100 kanji.
-
-### 🟡 MEDIUM — Grammar "Learned" Tanpa Mastery Check
-
-`learnGrammarPoint(id)` dipanggil setelah sesi StudyScene SELESAI — tanpa memandang berapa banyak exercise yang benar. Pemain bisa gagal total (0/3) dan grammar tetap di-mark "learned". Tidak ada threshold minimal performa.
-
-### 🟡 MEDIUM — Exam Tidak Memberi XP Saat Lulus
-
-Logika reward terbalik: lulus ujian = 0 XP, gagal ujian = +5 grammar XP. Ini membuat grinding dengan sengaja gagal exam lebih menguntungkan untuk XP daripada lulus.
-
-### 🟠 LOW — Tidak Ada Progression Content di N3
-
-Begitu pemain mencapai N3, SchoolScene dan ReadScene kehabisan konten (0 N3 reading/listening). Yang tersedia hanya StudyScene (grammar) dan vocabulary pool (40 N3 kata). Exam N3→N2 diblokir total.
-
-### 🟠 LOW — Tidak Ada In-Game Settings UI
-
-Toggle kana/meaning/UI language hanya bisa diubah via localStorage. Pemain biasa tidak bisa mengubah preferensi tampilan tanpa bantuan developer.
-
-### 🟠 LOW — ReadScene Tidak Terbatas Harian
-
-ReadScene bisa diulang tanpa batas dalam sehari (tidak pakai `markActivity()`). Ini membuat grinding reading+kanji XP sangat mudah dengan modal makanan murah — tidak seimbang dengan aktivitas lain yang dibatasi 1×/hari.
+| Gap | Severity | Detail |
+|-----|----------|--------|
+| **Grammar belum punya SRS** | 🟡 MEDIUM | Vocabulary sudah punya Leitner box penuh; grammar masih rotasi deterministik sederhana tanpa interval berbasis performa |
+| **Kanji belum punya alur pengajaran khusus** | 🟡 MEDIUM | Data (onyomi/kunyomi/strokeCount) sudah siap dipakai, tinggal dibuatkan scene/widget yang benar-benar mengajarkannya (bukan cuma match kanji↔kana pasif) |
+| **Grammar mastery check belum penuh** | 🟠 LOW | Syarat "learned" masih longgar (≥1 exercise benar), belum ada threshold seperti "≥50% benar" |
+| **N2/N1 belum ada konten** | 🟠 LOW | Konsisten dengan ALUR_KURIKULUM.md — begitu ditambahkan, alur pembelajaran perlu diperluas ke level ini juga |
 
 ---
 
-## 6. RINGKASAN ALUR IDEAL vs AKTUAL
+## 6. RINGKASAN ALUR IDEAL vs AKTUAL — STATUS TERKINI
 
-| Tahap | Ideal | Aktual |
-|-------|-------|--------|
-| **Encounter** | Pemain bertemu kata/grammar baru dalam konteks | ✅ SchoolScene, StudyScene, konteks gameplay |
-| **Teach** | Penjelasan arti, cara pakai, contoh | ✅ Grammar card, vocab pairs |
-| **Practice** | Latihan interaktif | ✅ order/fill exercises, pair matching |
-| **Record** | Tracking apa yang sudah dipelajari | ⚠️ Grammar: iya. Vocab: dicatat tapi dead data |
-| **Review** | Pengulangan terjadwal (SRS) | ❌ Tidak ada |
-| **Master** | Ujian / production task | ⚠️ Exam hanya 1× per level, tidak menguji mastery per item |
-| **Apply** | Penggunaan dalam konteks baru | ✅ Work tasks, resep, dialogue — implicit application |
+| Tahap | Ideal | Aktual (dulu) | Aktual (sekarang) |
+|-------|-------|----------------|----------------------|
+| **Encounter** | Pemain bertemu kata/grammar baru dalam konteks | ✅ SchoolScene, StudyScene | ✅ Sama, plus toggle furigana/romaji/translate di semua dialog untuk membantu encounter pertama |
+| **Teach** | Penjelasan arti, cara pakai, contoh | ✅ Grammar card (EN-only) | ✅ **Grammar card kini dwibahasa (EN+IDN)** |
+| **Practice** | Latihan interaktif | ✅ order/fill, pair matching | ✅ Sama, plus peek-with-penalty di StudyScene/ExamScene |
+| **Record** | Tracking apa yang sudah dipelajari | ⚠️ Grammar: iya. Vocab: dead data | ✅ **Vocab kini benar-benar dipakai untuk SRS**; grammar tracking tidak berubah |
+| **Review** | Pengulangan terjadwal (SRS) | ❌ Tidak ada | ✅ **Leitner box untuk vocabulary** (grammar & kanji belum) |
+| **Master** | Ujian / production task | ⚠️ Exam 1×/level, reward XP terbalik | ✅ **Exam reward XP kini logis** (lulus > gagal); masih 1× per level, belum menguji mastery per-item |
+| **Apply** | Penggunaan dalam konteks baru | ✅ Work tasks, resep, dialogue | ✅ Sama, plus 7 built-in story + side quest baru per NPC yang memberi konteks aplikasi tambahan |

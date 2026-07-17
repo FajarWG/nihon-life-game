@@ -1,12 +1,16 @@
 # 📖 ALUR_CERITA.md — Narrative & Story Content Audit
 
-> **Reverse-engineered dari codebase `src/` — status per 2026-07-14**
+> **Reverse-engineered dari codebase `src/` — status per 2026-07-17 (revisi ke-2)**
 >
 > Format: `[IMPLEMENTED]` = kode & konten sudah ada | `[EMPTY]` = slot ada, konten kosong | `[NOT_IMPLEMENTED]` = tidak ada sama sekali
+>
+> Revisi sebelumnya (2026-07-14) mencatat rantai cerita berhenti di `main-3` dengan hanya 1 side quest dan tanpa intro/epilogue. **Semua itu sudah diperbaiki** pada Fase 4–5 — lihat perubahan di tiap bagian.
 
 ---
 
 ## 1. MAIN QUEST CHAIN
+
+Rantai sekarang mencakup **5 quest**, membawa pemain dari N5 sampai penutup arc N3 (MVP finale), bukan berhenti di 3 quest tutorial N5 seperti sebelumnya.
 
 ### [IMPLEMENTED] `main-1` — "A New Life Begins" / 「新しい生活」
 
@@ -14,264 +18,217 @@
 |-------|-------|
 | **File** | `src/data/quests.ts` |
 | **Type** | `main` |
-| **Trigger** | Auto-start via `ensureMainQuest()` di `src/game/systems/quests.ts:177` |
+| **Trigger** | Auto-start via `ensureMainQuest()` di `src/game/systems/quests.ts:107` |
 | **Objectives** | ① `study` via `activity` event → belajar grammar di meja (1×) ② `school` via `activity` event → ikut kelas di sekolah (1×) |
-| **Description (jp/en/idn)** | "新しい街での生活が始まりました。机で勉強して、学校の授業に出ましょう。" / "Settle into Sakura Town: study once at your desk and attend your first class." / "Mulai kehidupan baru di kota Sakura: belajar sekali di meja dan ikuti kelas pertama." |
 | **Reward** | ¥500, `{ grammar: 10 }` XP |
 | **Next** | `main-2` (auto-start on complete) |
-| **Status** | [IMPLEMENTED] — full trilingual, 2 objectives, chained |
 
 ### [IMPLEMENTED] `main-2` — "First Errands" / 「初めてのおつかい」
 
 | Field | Value |
 |-------|-------|
-| **File** | `src/data/quests.ts` |
-| **Type** | `main` |
-| **Trigger** | Auto-start dari `main-1.next` |
 | **Objectives** | ① `shopping` via `activity` event → beli sesuatu di toko (1×) ② `cooking` via `activity` event → masak di dapur (1×) |
-| **Description (jp/en/idn)** | "買い物をして、料理を作ってみましょう。" / "Buy ingredients at a shop and cook your first meal at home." / "Belilah bahan di toko dan masak makanan pertama di rumah." |
 | **Reward** | ¥500, `{ vocabulary: 10 }` XP |
-| **Next** | `main-3` (auto-start on complete) |
-| **Status** | [IMPLEMENTED] |
+| **Next** | `main-3` |
 
 ### [IMPLEMENTED] `main-3` — "The Interview" / 「面接」
 
 | Field | Value |
 |-------|-------|
-| **File** | `src/data/quests.ts` |
-| **Type** | `main` |
-| **Trigger** | Auto-start dari `main-2.next` |
 | **Objectives** | ① `train` via `activity` event → naik kereta (1×) ② `work` via `activity` event → selesaikan shift kerja IT (1×) |
-| **Description (jp/en/idn)** | "電車に乗ってIT会社に行き、初めての仕事をしましょう。" / "Take the train to the IT company and complete your first work shift." / "Naik kereta ke perusahaan IT dan selesaikan shift kerja pertama." |
 | **Reward** | ¥1,000, `{ reading: 10, kanji: 5 }` XP |
-| **Next** | `undefined` — **RANTAI BERHENTI DI SINI** |
-| **Status** | [IMPLEMENTED] — final story quest saat ini |
+| **Next** | `main-4` — **rantai berlanjut (dulu berhenti di sini)** |
 
-### [NOT_IMPLEMENTED] `main-4` dan seterusnya
+### [IMPLEMENTED] `main-4` — "Trust and Friends" / 「信頼と友情」 *(baru — Fase 5)*
+
+| Field | Value |
+|-------|-------|
+| **Level** | N4 |
+| **Desc (en)** | "Prove your reliability at work and build real connections. Complete another shift and get to know two people in town." |
+| **Desc (idn)** | "Buktikan keandalanmu di tempat kerja dan bangun hubungan yang nyata. Selesaikan satu shift lagi dan kenali dua orang di kota." |
+| **Objectives** | ① `work` via `activity` event → shift kerja IT lagi (1×) ② `talk` event → ngobrol dengan orang di kota (2×, siapa saja) |
+| **Reward** | ¥1,500, `{ reading: 15, listening: 15, grammar: 10 }` XP |
+| **Next** | `main-5` |
+
+### [IMPLEMENTED] `main-5` — "A Place to Call Home" / 「ここが私の居場所」 *(baru — Fase 5, penutup arc MVP)*
+
+| Field | Value |
+|-------|-------|
+| **Level** | N3 |
+| **Desc (en)** | "Cook a proper meal with your own hands, go shopping, and hit the books — you're not just surviving anymore, you're building a life here. (MVP arc finale.)" |
+| **Objectives** | ① `cooking` via `activity` event → masak di rumah (1×) ② `shopping` via `activity` event → belanja untuk rumah (1×) |
+| **Reward** | ¥2,500, `{ grammar: 20, vocabulary: 20, reading: 15, kanji: 10 }` XP |
+| **Next** | *(tidak ada — akhir arc utama saat ini, memicu epilog — lihat §6.2)* |
+
+### [NOT_IMPLEMENTED] `main-6` dan seterusnya (N2/N1)
 ```
-Slot TypeScript untuk N4/N3 main quest: TIDAK ADA.
-Tidak ada quest_def dengan type "main" selain main-1/2/3.
-Rantai cerita utama selesai setelah 3 quest tutorial N5.
+Belum ada slot quest main untuk N2/N1 — konsisten dengan belum adanya
+konten kurikulum N2/N1 di ALUR_KURIKULUM.md. Rantai utama berhenti secara
+sengaja di main-5 sebagai "MVP arc finale" (disebut eksplisit di deskripsi
+quest itu sendiri).
 ```
 
 ---
 
 ## 2. SIDE & RELATIONSHIP QUESTS
 
+Sebelumnya hanya Yuki yang punya side quest. Sekarang **keempat NPC** masing-masing punya 1 relationship quest sendiri (Fase 5), dipicu otomatis saat friendship NPC tersebut mencapai ≥ 3 (`adjustFriendship()` di `quests.ts:94`).
+
 ### [IMPLEMENTED] `side-yuki-1` — "Hanami Promise" / 「花見の約束」
 
 | Field | Value |
 |-------|-------|
-| **File** | `src/data/quests.ts` |
-| **Type** | `relationship` |
-| **Giver** | `yuki` (Yuki NPC) |
-| **Trigger** | Auto-start saat friendship Yuki ≥ 3 (`adjustFriendship()` di `quests.ts:100`) |
-| **Prereq** | Tidak ada |
-| **Objectives** | ① `gift yuki` via `gift` event → beri Yuki hadiah (1×) |
-| **Description (jp/en/idn)** | "ゆきは花見のために手作りおにぎりがほしいと言っています。おにぎりを作って持っていきましょう。" / "Yuki wants handmade onigiri for hanami. Cook onigiri and bring it to her." / "Yuki ingin onigiri buatan tangan untuk hanami. Masak onigiri dan bawakan untuknya." |
-| **Reward** | ¥0, `{ friendship: 2 }` (Yuki), `{ listening: 10 }` XP |
-| **Next** | `undefined` — **standalone, tidak ada lanjutan** |
-| **Status** | [IMPLEMENTED] — satu-satunya side quest |
+| **Giver** | `yuki` |
+| **Objective** | Beri Yuki hadiah (`gift` event, 1×) |
+| **Reward** | friendship+2 (Yuki), `{ listening: 10 }` XP |
 
-### [NOT_IMPLEMENTED] Side quest untuk NPC lain
-```
-Tanaka-sensei: questId = undefined → TIDAK ADA QUEST
-Yamada-san:   questId = undefined → TIDAK ADA QUEST
-Sato-san:     questId = undefined, hanya 1 tier dialogue → TIDAK ADA QUEST
-```
+### [IMPLEMENTED] `side-tanaka-1` — "Thank You, Sensei" / 「先生、ありがとう」 *(baru)*
+
+| Field | Value |
+|-------|-------|
+| **Giver** | `tanaka` |
+| **Desc** | "Tanaka-sensei has been guiding you since day one. Bring him his favorite melon bread as a small thank-you." |
+| **Objective** | Beri Tanaka-sensei hadiah (`gift` event, 1×) |
+| **Reward** | friendship+2 (Tanaka), `{ grammar: 10 }` XP |
+
+### [IMPLEMENTED] `side-yamada-1` — "Review Session" / 「コードレビュー会」 *(baru)*
+
+| Field | Value |
+|-------|-------|
+| **Giver** | `yamada` |
+| **Desc** | "Yamada-san stayed late to help with your bug fix. Bring him some coffee as thanks — he'll need it for the next sprint." |
+| **Objective** | Beri Yamada-san hadiah (`gift` event, 1×) |
+| **Reward** | friendship+2 (Yamada), `{ reading: 10 }` XP |
+
+### [IMPLEMENTED] `side-sato-1` — "The Regular Customer" / 「常連さんの話」 *(baru)*
+
+| Field | Value |
+|-------|-------|
+| **Giver** | `sato` |
+| **Desc** | "Sato-san is worried — Yuki, his favorite regular, hasn't stopped by the konbini in a while. He asks you to check on her." |
+| **Objective** | Ngobrol dengan Yuki atas nama Sato-san (`talk` event, target `yuki`, 1×) — satu-satunya side quest dengan objective silang-NPC |
+| **Reward** | friendship+2 (Sato), `{ vocabulary: 10 }` XP |
 
 ### [NOT_IMPLEMENTED] Quest type lain
 | Quest Type | Status |
 |------------|--------|
-| `festival` | Type ada di `core/types.ts` tapi **0 quest** |
-| `story` | Type ada di `core/types.ts` tapi **0 quest** |
-| `cooking` | Type ada di `core/types.ts` tapi **0 quest** |
-| `school` | Type ada — belum ada quest spesifik (hanya dipakai daily) |
-| `work` | Type ada — belum ada quest spesifik (hanya dipakai daily) |
+| `festival` | Type ada di `core/types.ts` — belum ada `QuestDef` bertipe ini, tapi konten naratif festival sudah ada lewat Story (`kind: "festival"`, lihat §5) |
+| `story` | Type ada — masih 0 `QuestDef`, meskipun Story scene sendiri sudah kaya konten |
+| `cooking` | Type ada — masih 0 `QuestDef` khusus (objective cooking dipakai lewat main-2/main-5 dengan type `main`) |
+| `school` / `work` | Type ada — masih dipakai lewat daily template, belum ada quest khusus bertipe ini |
 
 ---
 
 ## 3. DAILY QUESTS
 
+Tidak berubah dari revisi sebelumnya — masih 3 template rotasi.
+
 ### [IMPLEMENTED] 3 Template Rotasi Harian
 
 | Template | Objective | Reward |
 |----------|-----------|--------|
-| "Morning Routine" | Study at desk (1×) | ¥200, `{ grammar: 5 }` |
-| "Social Butterfly" | Talk to 2 people | ¥200, `{ listening: 5 }` |
-| "Balanced Diet" | Eat a food item (1×) | ¥150, `{ vocabulary: 5 }` |
+| "Morning Routine" / 朝の習慣 | Study at desk (1×) | ¥200, `{ grammar: 5 }` |
+| "Social Butterfly" / おしゃべり | Talk to 2 people | ¥200, `{ listening: 5 }` |
+| "Balanced Diet" / バランスのいい食事 | Eat a food item (1×) | ¥150, `{ vocabulary: 5 }` |
 
-**Mechanism:** `rollDailyQuest(day)` di `src/game/systems/quests.ts:166` — dipanggil tiap pagi saat `sleep()`. Quest daily sebelumnya yang belum selesai **dihapus** (tidak bisa diakumulasi). Rotasi menggunakan `day % 3`.
-
-**Status:** [IMPLEMENTED] — semua 3 template punya `descriptionJp`, `description`, `descriptionIdn` lengkap.
+**Mechanism:** `rollDailyQuest(day)` di `src/game/systems/quests.ts:34` — dipanggil tiap pagi saat `sleep()`. Quest daily sebelumnya yang belum selesai dihapus (tidak bisa diakumulasi). Rotasi menggunakan `(day - 1) % 3`.
 
 ---
 
 ## 4. NPC DIALOGUE & ARC CERITA
 
+**Perubahan besar sejak revisi sebelumnya:** setiap NPC sekarang punya **5 dialogue tier** (f0/f3/f6/f8/f10), bukan cuma 2 (f0/f3). Tier f6/f8/f10 memberi arc personal yang lebih dalam untuk tiap karakter (ditambahkan di Fase 5).
+
 ### 4.1 Tanaka-sensei (田中先生)
 
 | Field | Value |
 |-------|-------|
-| **File** | `src/data/npcs.ts` |
-| **Sprite** | `npc-tanaka` |
 | **Bio** | "Warm but strict teacher at the language school. Loves melon bread." |
 | **Schedule** | Sekolah (8–17) tile (7,2), Town (17–20) tile (5,17) |
 | **Favorites** | `melonpan`, `greentea` |
+| **Quest** | `side-tanaka-1` *(baru)* |
 
-#### Dialogue Sets
-
-**`tanaka-0` (minFriendship 0)** — [IMPLEMENTED]
-
-| Line | Speaker | JP | EN | IDN |
-|------|---------|-----|----|-----|
-| 1 | tanaka | おはようございます！今日も日本語を頑張りましょう。 | Good morning! Let's work hard on Japanese today. | Selamat pagi! Ayo semangat belajar bahasa Jepang hari ini. |
-| 2 | tanaka | わからないことがあったら、いつでも聞いてくださいね。 | If there's anything you don't understand, please ask anytime. | Kalau ada yang tidak dimengerti, tanya saja kapan pun. |
-
-**`tanaka-3` (minFriendship 3)** — [IMPLEMENTED]
-
-| Line | Speaker | JP | EN | IDN |
-|------|---------|-----|----|-----|
-| 1 | tanaka | 日本語がだんだん上手になってきましたね。 | Your Japanese has been getting better and better. | Bahasa Jepangmu semakin lama semakin bagus. |
-| 2 | tanaka | この調子で続ければ、エンジニアになる夢もきっと叶いますよ。 | If you keep this up, your dream of becoming an engineer will surely come true. | Kalau terus seperti ini, mimpimu menjadi engineer pasti akan tercapai. |
-
-**Status:** [IMPLEMENTED] — 2 dialogue tiers, 4 lines total, full kana+idn. **Tidak ada quest** (questId = undefined). **Tidak ada tier di atas f3** (f6, f8, f10).
+**Arc naratif (f0→f10):** guru yang hangat & tegas → memuji progres bahasa Jepang pemain (f3) → mengaku dulu ingin jadi engineer juga tapi lebih suka mengajar (f6) → bercanda kalau tanpa melonpan mungkin sudah berhenti mengajar (f8) → menyatakan bangga sebagai muridnya yang paling ia banggakan (f10). Total **10 baris** dialogue terstruktur (2 baris × 5 tier).
 
 ### 4.2 Yuki (ゆき)
 
 | Field | Value |
 |-------|-------|
-| **File** | `src/data/npcs.ts` |
-| **Sprite** | `npc-yuki` |
 | **Bio** | "Cheerful classmate from Korea. Dreams of opening a cafe in Osaka." |
 | **Schedule** | Sekolah (8–13) tile (4,6), Town (13–18) tile (33,20) |
 | **Favorites** | `pocky`, `flowers` |
 | **Quest** | `side-yuki-1` |
 
-#### Dialogue Sets
-
-**`yuki-0` (minFriendship 0)** — [IMPLEMENTED]
-
-| Line | Speaker | JP | EN | IDN |
-|------|---------|-----|----|-----|
-| 1 | yuki | あ、おはよう！今日も一緒に勉強しようね。 | Oh, good morning! Let's study together today too. | Oh, selamat pagi! Ayo belajar bareng lagi hari ini. |
-| 2 | yuki | 宿題おわった？むずかしかったら教えるよ。 | Did you finish the homework? I'll help if it was hard. | PR-nya sudah selesai? Nanti kubantu kalau susah. |
-
-**`yuki-3` (minFriendship 3)** — [IMPLEMENTED]
-
-| Line | Speaker | JP | EN | IDN |
-|------|---------|-----|----|-----|
-| 1 | yuki | ねえねえ、来週お花見に行かない？ | Hey hey, want to go see the cherry blossoms next week? | Eh eh, minggu depan mau pergi lihat bunga sakura nggak? |
-| 2 | yuki | 私おにぎり作っていくから、何か持ってきてくれるとうれしいな！ | I'll bring onigiri, so I'd be happy if you brought something too! | Aku bawa onigiri, jadi senang deh kalau kamu bawa sesuatu juga! |
-
-**Status:** [IMPLEMENTED] — 2 dialogue tiers, 4 lines. Dialogue tier-3 terhubung naratif ke quest `side-yuki-1`. **Tidak ada tier di atas f3**.
+**Arc naratif (f0→f10):** teman sekelas ceria yang ajak belajar bareng → ajak hanami + minta onigiri (f3, memicu quest) → cerita soal belajar masak dari teman-teman Korea, mimpi buka kafe (f6) → janji pemain jadi pelanggan pertama di Osaka (f8) → penutup emosional "親友" (sahabat), bersyukur bertemu pemain (f10). Total **10 baris**.
 
 ### 4.3 Yamada-san (山田さん)
 
 | Field | Value |
 |-------|-------|
-| **File** | `src/data/npcs.ts` |
-| **Sprite** | `npc-yamada` |
 | **Bio** | "Senior frontend engineer. Mentors at the IT company. Reviews code kindly but thoroughly." |
 | **Schedule** | Company (10–19) tile (10,5) |
 | **Favorites** | `coffee`, `techbook` |
+| **Quest** | `side-yamada-1` *(baru)* |
 
-#### Dialogue Sets
-
-**`yamada-0` (minFriendship 0)** — [IMPLEMENTED]
-
-| Line | Speaker | JP | EN | IDN |
-|------|---------|-----|----|-----|
-| 1 | yamada | お疲れ様です。今日のタスク、確認しましたか？ | Good work today. Have you checked today's tasks? | Selamat bekerja. Sudah cek tugas hari ini? |
-| 2 | yamada | わからないところがあったら、いつでも聞いてください。 | If there's something you don't understand, please ask anytime. | Kalau ada yang kurang jelas, tanya saja kapan pun. |
-
-**`yamada-3` (minFriendship 3)** — [IMPLEMENTED]
-
-| Line | Speaker | JP | EN | IDN |
-|------|---------|-----|----|-----|
-| 1 | yamada | 最近、コードがだいぶきれいになってきましたね。 | Lately your code has gotten quite clean. | Akhir-akhir ini kodinganmu sudah cukup rapi ya. |
-| 2 | yamada | この調子なら、正社員も夢じゃないですよ。 | At this pace, a full-time position isn't just a dream. | Kalau terus begini, jadi karyawan tetap bukan cuma mimpi lho. |
-
-**Status:** [IMPLEMENTED] — 2 dialogue tiers, 4 lines. **Tidak ada quest** (questId = undefined). **Tidak ada tier di atas f3**.
+**Arc naratif (f0→f10):** mentor yang mengecek progres tugas → memuji kode yang makin rapi (f3) → cerita dulu ia juga tidak bisa coding sama sekali (f6) → bercanda soal "deploy Friday" dan lembur bareng (f8) → mengakui berkat pemain seluruh tim jadi lebih kuat, ajak terus membangun produk bersama (f10). Total **10 baris**.
 
 ### 4.4 Sato-san (佐藤さん)
 
 | Field | Value |
 |-------|-------|
-| **File** | `src/data/npcs.ts` |
-| **Sprite** | `npc-sato` |
-| **Bio** | "Konbini clerk for 20 years. Knows everyone in town." |
+| **Bio** | "Has worked at the konbini for 20 years. Knows everyone in town." |
 | **Schedule** | Konbini (7–22) tile (6,3) |
 | **Favorites** | `greentea` |
+| **Quest** | `side-sato-1` *(baru)* |
 
-#### Dialogue Sets
-
-**`sato-0` (minFriendship 0)** — [IMPLEMENTED]
-
-| Line | Speaker | JP | EN | IDN |
-|------|---------|-----|----|-----|
-| 1 | sato | いらっしゃい！今日もいい天気だね。 | Welcome! Nice weather again today, huh. | Selamat datang! Cuacanya cerah lagi ya hari ini. |
-| 2 | sato | 新しいおにぎりが入ったよ。よかったら見ていって。 | We got new onigiri in. Take a look if you like. | Ada onigiri baru masuk lho. Lihat-lihat saja kalau mau. |
-
-**Status:** [IMPLEMENTED] — **HANYA 1 dialogue tier** (tidak ada tier f3, f6, f8, f10). Sato-san adalah NPC dengan konten naratif paling sedikit.
-
----
+**Arc naratif (f0→f10):** dulunya hanya 1 tier dialogue (NPC dengan konten paling sedikit) — sekarang punya arc penuh: sapaan ramah → mengucap terima kasih sudah jadi pelanggan tetap, menyebut Tanaka-sensei juga pelanggan (f3) → refleksi 20 tahun bekerja di konbini melihat kehidupan warga kota, termasuk pemain yang dulu gugup (f6) → bercanda sudah hafal pesanan pemain (f8) → penutup hangat, menyebut akan terus mengawasi "kisah perjalanan" pemain dari balik konter (f10). Total **10 baris**.
 
 ### Ringkasan NPC Dialogue
 
 | NPC | Dialogue Tiers | Total Lines | Quest | Arc Naratif |
 |-----|---------------|-------------|-------|-------------|
-| Tanaka-sensei | f0, f3 | 4 | ❌ | Tidak ada arc |
-| Yuki | f0, f3 | 4 | ✅ side-yuki-1 | Hanami invitation → gift quest |
-| Yamada-san | f0, f3 | 4 | ❌ | Tidak ada arc |
-| Sato-san | f0 | 2 | ❌ | Tidak ada arc |
-| **TOTAL** | | **14 lines** | **1 quest** | |
+| Tanaka-sensei | f0, f3, f6, f8, f10 | 10 | ✅ side-tanaka-1 | Guru → pengakuan personal → kebanggaan pada murid |
+| Yuki | f0, f3, f6, f8, f10 | 10 | ✅ side-yuki-1 | Hanami invitation → mimpi kafe → sahabat |
+| Yamada-san | f0, f3, f6, f8, f10 | 10 | ✅ side-yamada-1 | Mentor kerja → cerita masa lalu → rekan setara |
+| Sato-san | f0, f3, f6, f8, f10 | 10 | ✅ side-sato-1 | Pelayan ramah → saksi kehidupan kota → figure keakraban |
+| **TOTAL** | | **40 lines** | **4 quest** | Semua NPC kini punya arc lengkap |
 
 ---
 
-## 5. STORY SCENE (AI-Generated Narrative)
+## 5. STORY SCENE (Narasi Bawaan + AI-Generated)
+
+**Perubahan besar:** dulu StoryScene 100% bergantung API eksternal (Groq/Gemini) tanpa fallback offline. Sekarang ada **7 cerita bawaan** (`src/data/stories.ts`) yang selalu bisa dimainkan tanpa API key, sementara AI generation tetap tersedia sebagai tambahan opsional.
 
 ### [IMPLEMENTED] Full Pipeline
 
 | Layer | File | Status |
 |-------|------|--------|
-| **Scene** | `src/game/scenes/activities/StoryScene.ts` | [IMPLEMENTED] — Full card-by-card playback, choice handling, vocab recap |
-| **Orchestrator** | `src/game/features/story/StoryGenerator.ts` | [IMPLEMENTED] — Provider chain (Groq → Gemini fallback) |
-| **Groq Provider** | `src/game/features/story/GroqProvider.ts` | [IMPLEMENTED] — `llama-3.3-70b-versatile`, JSON mode, 25s timeout |
-| **Gemini Provider** | `src/game/features/story/GeminiProvider.ts` | [IMPLEMENTED] — `gemini-2.5-flash`, 25s timeout, fallback |
-| **Validation** | `src/game/features/story/validate.ts` | [IMPLEMENTED] — Strict parsing + field validation |
-| **Prompt Template** | `src/game/features/story/StoryProvider.ts` | [IMPLEMENTED] — English prompt, slice-of-life tone, 6–9 lines, 3–5 vocab |
-| **API Route** | `src/app/api/story/route.ts` | [IMPLEMENTED] — POST `/api/story` |
-| **Persistence** | `src/core/db.ts` (Dexie stories table) | [IMPLEMENTED] — Store + playback + mark played |
-| **Prefetch** | `SleepScene.endDay()` → `/api/story` overnight | [IMPLEMENTED] — Generates 1 new story per night if none pending |
+| **Scene** | `src/game/scenes/activities/StoryScene.ts` | Card-by-card playback, choice handling, vocab recap, **plus toggle furigana/romaji/translate per baris (baru)** |
+| **Built-in Pool** | `src/data/stories.ts` | **[BARU]** 7 `StoryEvent` siap pakai, tidak butuh API |
+| **Orchestrator** | `src/features/story/StoryGenerator.ts` | Provider chain (Groq → Gemini fallback), dipakai kalau pemain memilih generate cerita baru |
+| **Prefetch** | `SleepScene` overnight | Generate 1 cerita AI baru per malam **jika** API key dikonfigurasi; kalau tidak, pool bawaan tetap mengisi kebutuhan cerita |
 
-### [EMPTY] Offline Fallback
-```
-TIDAK ADA cerita offline/built-in. Jika GROQ_API_KEY dan GEMINI_API_KEY
-tidak dikonfigurasi di server, StoryScene hanya menampilkan pesan:
-"API key required" dan tidak ada konten cerita yang bisa dimainkan.
-```
+### [IMPLEMENTED] Daftar 7 Cerita Bawaan
 
-### [IMPLEMENTED] Story Event Shape (`StoryEvent`)
+| ID | Judul | Level | Kind | Grammar Focus |
+|----|-------|-------|------|----------------|
+| `story-builtin-morning` | 朝の通勤 (Morning Commute) | N5 | daily | ます form — polite verbs |
+| `story-builtin-konbini` | コンビニの店員さん (The Helpful Clerk) | N5 | encounter | 〜はありますか / 〜をください |
+| `story-builtin-meeting` | 月曜日の会議 (The Monday Meeting) | N4 | daily | 〜てください / 〜までに |
+| `story-builtin-rain` | 夕立 (Sudden Rain) | N4 | encounter | 〜ましょうか |
+| `story-builtin-overtime` | 残業の夜 (Overtime Night) | N3 | daily | 〜ないと / 〜ようです |
+| `story-builtin-matsuri` | 夏祭り (Summer Festival) | N5 | **festival** | 〜たい |
+| `story-builtin-delay` | 電車の遅延 (Train Delay) | N3 | encounter | 〜そうです / 〜なければいけません |
 
-| Field | Description |
-|-------|-------------|
-| `title.jp` / `title.en` | Judul cerita bilingual |
-| `setting` | Lokasi cerita |
-| `grammarFocus` | Grammar point yang difokuskan |
-| `level` | JLPT level target |
-| `lines[]` | 3–15 baris dialog (speaker, jp, kana?, en, idn?) |
-| `choice?` | Pilihan interaktif (2–3 opsi) + NPC reply |
-| `vocabulary[]` | 1–8 kata baru dari cerita |
-| `reward?` | `{ money?: 0–500, xp?: Partial<Record<SkillId, 1–10>> }` |
+Semua punya `choice` interaktif (kecuali morning & delay), `vocabulary[]` recap (4–5 kata), dan `reward.xp` (vocabulary/grammar/reading campuran).
 
-### Story Kind Variants (dipilih berdasarkan hari)
+### [IMPLEMENTED] Story Kind Variants (dipilih berdasarkan hari)
 
 | Day Condition | `kind` | Keterangan |
 |---------------|--------|------------|
-| `day % 28 === 14` | `"festival"` | Cerita festival tengah musim |
-| `day % 7 === 0` | `"encounter"` | Pertemuan random |
-| Default | `"daily"` | Kehidupan sehari-hari |
+| `day % 28 === 14` | `"festival"` | Cerita festival tengah musim — kini sudah ada 1 built-in (`story-builtin-matsuri`) |
+| `day % 7 === 0` | `"encounter"` | Pertemuan random — 3 built-in tersedia |
+| Default | `"daily"` | Kehidupan sehari-hari — 3 built-in tersedia |
 
 ---
 
@@ -279,76 +236,96 @@ tidak dikonfigurasi di server, StoryScene hanya menampilkan pesan:
 
 ### [IMPLEMENTED] Board Notices (Papan Pengumuman Kantor)
 
-**File:** `src/game/scenes/MapScene.ts` (konstanta `BOARD_NOTICES`)
-
-| # | JP | EN | IDN |
-|---|-----|----|-----|
-| 1 | 金曜日の15時からデザインレビューがあります。 | There's a design review Friday from 3 PM. | Ada design review hari Jumat mulai pukul 15.00. |
-| 2 | 来週、新しいメンバーが入ります。よろしくお願いします。 | A new member joins next week. Please welcome them. | Minggu depan ada anggota baru. Mohon sambutannya. |
-| 3 | エアコンの温度は26度にしてください。 | Please keep the AC at 26 degrees. | Tolong atur suhu AC di 26 derajat. |
-
-**Mechanism:** Rotasi per hari via `BOARD_NOTICES[(day - 1) % 3]`. Ditampilkan sebagai dialog narrator 1 kartu saat interact `"meeting-board"` di kantor.
+Tidak berubah — 3 notice rotasi via `BOARD_NOTICES[(day - 1) % 3]` di `MapScene.ts`.
 
 ### [IMPLEMENTED] Sleep Confirm Dialogue
 
-**File:** `src/game/scenes/MapScene.ts:336`
+Tidak berubah secara naratif, tapi sekarang digated jam (`s.minutes < 1200` → toast "It's too early to sleep…" alih-alih langsung membuka dialog konfirmasi tidur).
+
+### [IMPLEMENTED] Intro / Opening Narrative *(baru — Fase 5)*
 
 ```
-Speaker: narrator
-JP: もう寝ますか。
-Kana: もうねますか。
-EN: Sleep and end the day?
-IDN: Tidur dan akhiri hari ini?
+File: MapScene.ts create(), dicek via flags.introPlayed === false.
 
-Choices:
-  1. 寝る (Sleep / Tidur) → launch SleepScene
-  2. まだ起きてる (Not yet / Nanti dulu) → close
-```
+Trigger otomatis sekali di awal permainan baru (delay 400ms setelah scene
+Map pertama kali render), memutar 3 baris narrator:
 
-### [EMPTY] Intro / Cutscene / Opening Narrative
-```
-TIDAK ADA. Game langsung start di apartemen hari 1, spring, jam 06:30.
-Quest main-1 langsung aktif. Tidak ada intro cerita, tidak ada narrator
-opening, tidak ada cutscene pembuka.
+1. ようこそ、桜町へ。(Welcome to Sakura Town.)
+2. 新しい仕事と新しい生活が、ここで始まります。
+   (A new job and a new life begin here.)
+3. 日本語を学びながら、自分の物語を紡いでいきましょう。
+   (Learn Japanese as you weave your own story.)
+
+Setelah diputar sekali, flags.introPlayed = true — tidak diulang lagi.
+Ini menutup gap lama "game langsung mulai tanpa konteks naratif".
 ```
 
-### [EMPTY] Ending / Epilogue
+### [IMPLEMENTED] Ending / Epilogue *(baru — Fase 5)*
+
 ```
-TIDAK ADA. Tidak ada kondisi "game complete". Rantai main quest
-berhenti setelah main-3. Setelah itu game menjadi sandbox tanpa
-naratif terstruktur.
+File: UIScene.ts, listener Bus.on("quest-completed", ...).
+
+Trigger otomatis saat questId === "main-5" selesai (dan belum pernah
+diputar — dicek via flags.epiloguePlayed), memutar 6 baris:
+
+1. narrator: あれから…たくさんの日々が過ぎました。
+   (Since then… so many days have passed.)
+2. narrator: 知らない街だったのに、今ではここが「日常」です。
+   (A city that was once unknown — now it's simply everyday life.)
+3. tanaka: 君の日本語、本当にすごい成長だよ。
+   (Your Japanese has really come a long way.)
+4. yuki: 友達になってくれてありがとう！また遊ぼうね。
+   (Thanks for being my friend! Let's hang out again.)
+5. narrator: 桜町での生活は、まだまだこれからです。
+   (Your life in Sakura Town — there's still so much ahead.)
+6. narrator: 物語は続きます。自分のペースで、一歩ずつ。
+   (The story continues. At your own pace, one step at a time.)
+
+Game TIDAK berhenti/"complete" setelah ini — tetap sandbox terbuka
+(disebut eksplisit di baris terakhir: "cerita terus berlanjut"), tapi
+kini ada penutup naratif yang jelas untuk arc utama alih-alih tiba-tiba
+menjadi sandbox tanpa penjelasan.
 ```
 
 ---
 
 ## 7. QUEST EVENT SYSTEM
 
+Tidak berubah struktur dari revisi sebelumnya, tapi cakupan pemakaian bertambah karena side quest baru:
+
 ### [IMPLEMENTED] Semua Quest Event Kind
 
 | Event Kind | Dipicu Oleh | Contoh Quest yang Menggunakan |
 |------------|-------------|-------------------------------|
-| `talk` | `UIScene.talkToNpc()` → `Bus.emit("quest-event", "talk", npcId)` | daily "Social Butterfly" (talk ×2) |
-| `gift` | `UIScene.giveGift()` → `Bus.emit("quest-event", "gift", npcId)` | side-yuki-1 (gift yuki ×1) |
-| `buy` | `ShopScene.checkout()` / `buyInstant()` → `Bus.emit("quest-event", "buy", id)` | (belum ada quest yang pakai) |
-| `cook` | `CookScene` → `Bus.emit("quest-event", "cook", recipeId)` | (belum ada quest yang pakai) |
-| `eat` | `G().eatItem()` → `Bus.emit("quest-event", "eat", id)` | daily "Balanced Diet" (eat ×1) |
-| `activity` | `G().markActivity()` → `Bus.emit("quest-event", "activity", id)` | main-1/2/3, daily "Morning Routine" |
-| `skill` | (tersedia di type, BELUM ADA yang emit) | (belum ada quest yang pakai) |
-| `reach-level` | (tersedia di type, BELUM ADA yang emit) | (belum ada quest yang pakai) |
-| `visit` | (tersedia di type, BELUM ADA yang emit) | (belum ada quest yang pakai) |
+| `talk` | `UIScene.talkToNpc()` → `Bus.emit("quest-event", "talk", npcId)` | daily "Social Butterfly", `main-4` (talk ×2), `side-sato-1` (talk yuki ×1) |
+| `gift` | `UIScene.giveGift()` → `Bus.emit("quest-event", "gift", npcId)` | `side-yuki-1`, `side-tanaka-1`, `side-yamada-1` (semua NPC kini pakai event ini) |
+| `buy` | `ShopScene.checkout()` / `buyInstant()` | (belum ada quest yang pakai langsung — tetap tercatat) |
+| `cook` | `CookScene` | (belum ada quest yang pakai langsung) |
+| `eat` | `G().eatItem()` | daily "Balanced Diet" |
+| `activity` | `G().markActivity()` | `main-1`–`main-5`, daily "Morning Routine" |
+| `skill` / `reach-level` / `visit` | (tersedia di type, masih belum ada yang emit) | — |
 
 ---
 
-## 8. KESIMPULAN: GAP NARATIF
+## 8. KESIMPULAN: GAP NARATIF — STATUS TERKINI
+
+| Gap (revisi 2026-07-14) | Status Sekarang |
+|-----|-----------------|
+| 🔴 Cerita utama berhenti setelah 3 quest tutorial | ✅ **FIXED** — 5 main quest (N5→N4→N3), penutup arc jelas di `main-5` |
+| 🔴 Hanya 1 side quest | ✅ **FIXED** — 4 side quest, 1 per NPC |
+| 🟡 Tidak ada intro/opening | ✅ **FIXED** — 3-baris intro narrator di awal game baru |
+| 🟡 Tidak ada ending/epilogue | ✅ **FIXED** — 6-baris epilog saat `main-5` selesai (game tetap lanjut sebagai sandbox setelahnya, sesuai desain) |
+| 🟡 AI Story bergantung API key | ✅ **FIXED** — 7 cerita bawaan offline-ready, AI generation jadi tambahan opsional |
+| 🟡 Sato-san hanya 1 dialogue tier | ✅ **FIXED** — sekarang 5 tier seperti NPC lain |
+| 🟠 Tidak ada dialogue tier di atas f3 | ✅ **FIXED** — semua NPC punya f6/f8/f10 |
+| 🟠 Quest type festival/story/cooking tidak digunakan | ⚠️ **SEBAGIAN** — konten festival sudah ada lewat Story `kind`, tapi belum ada `QuestDef` bertipe `festival`/`story`/`cooking` murni |
+| 🟠 Tidak ada seasonal event naratif | ⚠️ **SEBAGIAN** — `story-builtin-matsuri` mengisi slot festival tengah musim, tapi baru 1 event, belum bervariasi per musim (spring/summer/autumn/winter beda cerita) |
+
+### Gap yang Masih Terbuka
 
 | Gap | Severity | Detail |
 |-----|----------|--------|
-| **Cerita utama berhenti setelah 3 quest tutorial** | 🔴 HIGH | Tidak ada main quest N4/N3. Player kehilangan arah naratif setelah N5 |
-| **Hanya 1 side quest** | 🔴 HIGH | 4 NPC tapi hanya Yuki yang punya quest. Tidak ada quest untuk guru, mentor, atau pegawai konbini |
-| **Tidak ada intro/opening** | 🟡 MEDIUM | Game mulai tanpa konteks naratif. Player tidak tahu kenapa karakter di Jepang |
-| **Tidak ada ending/epilogue** | 🟡 MEDIUM | Game menjadi endless sandbox tanpa penutup naratif |
-| **AI Story bergantung API key** | 🟡 MEDIUM | Tanpa API Groq/Gemini, StoryScene tidak bisa dimainkan. Tidak ada fallback cerita offline |
-| **Sato-san hanya 1 dialogue tier** | 🟡 MEDIUM | NPC paling sedikit konten naratif. Tidak ada perkembangan hubungan |
-| **Tidak ada dialogue tier di atas f3** | 🟠 LOW | Hubungan NPC tidak punya tahap "dekat" atau "sahabat" |
-| **Quest type festival/story/cooking tidak digunakan** | 🟠 LOW | Type system sudah siap, tinggal isi konten |
-| **Tidak ada seasonal event naratif** | 🟠 LOW | Tiap musim 28 hari tapi tidak ada event spesial (festival musim semi, matsuri musim panas, dll) |
+| **Belum ada arc N2/N1** | 🟡 MEDIUM | Konsisten dengan kurikulum — begitu konten N2/N1 ditambahkan, quest chain perlu diperpanjang lagi |
+| **Festival event masih tunggal** | 🟠 LOW | Hanya 1 built-in story `kind: "festival"` — idealnya tiap musim (spring/summer/autumn/winter) punya event festival berbeda |
+| **Quest type festival/story/cooking belum dipakai murni** | 🟠 LOW | Type system sudah siap, `QuestDef` khusus belum dibuat |
+| **Cross-NPC storytelling masih minim** | 🟢 INFO | Baru `side-sato-1` yang melibatkan 2 NPC (Sato meminta cek Yuki) — pola ini bisa diperluas untuk arc antar-NPC yang lebih kaya |
