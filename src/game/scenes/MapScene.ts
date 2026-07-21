@@ -178,6 +178,11 @@ export class MapScene extends Phaser.Scene {
 
     // NPC wander heartbeat
     this.time.addEvent({ delay: 1600, loop: true, callback: () => this.wanderNpcs() });
+    // random encounter heartbeat — occasionally surfaces a queued "encounter"
+    // story while the player is out walking, instead of only at the table
+    if (this.map.def.outdoor) {
+      this.time.addEvent({ delay: 5000, loop: true, callback: () => this.maybeTriggerEncounter() });
+    }
 
     this.unsubs = [
       Bus.on("time", (() => this.onTimeChanged()) as never),
@@ -277,6 +282,23 @@ export class MapScene extends Phaser.Scene {
         break;
       }
     }
+  }
+
+  /** Occasionally surfaces a queued "encounter"-kind story while walking outdoors. */
+  private async maybeTriggerEncounter() {
+    if (G().paused || this.transitioning || !this.scene.isActive()) return;
+    if ((G().flags["encounterOfferedDay"] as number) === G().day) return;
+    if (Math.random() > 0.15) return;
+    try {
+      const { unplayedStory } = await import("@/core/db");
+      const story = await unplayedStory();
+      if (!story || story.kind !== "encounter") return;
+      if (G().paused || this.transitioning || !this.scene.isActive()) return;
+      gameStore.setState(s => ({ flags: { ...s.flags, encounterOfferedDay: G().day } }));
+      const ui = this.scene.get("UI") as UIScene;
+      ui.toast(L("すれ違った… (Someone stops you on the street…)", "Someone stops you on the street…", "Seseorang menghentikanmu di jalan…"), "quest");
+      this.launchActivity("Story");
+    } catch { /* offline is fine — no story pool available */ }
   }
 
   /* ── weather ─────────────────────────────────────────────────────────── */

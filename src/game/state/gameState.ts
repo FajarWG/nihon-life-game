@@ -9,6 +9,10 @@ export const DAY_END = 24 * 60;       // forced sleep at midnight
 
 export const MAX_ENERGY = 100;
 
+/** Routine expense: apartment rent, charged every RENT_INTERVAL_DAYS on waking. */
+export const RENT_AMOUNT = 500;
+export const RENT_INTERVAL_DAYS = 7;
+
 /** Total skill XP needed before the next JLPT exam unlocks. */
 export const LEVEL_XP: Partial<Record<JlptLevel, number>> = {
   N5: 300,  // to unlock N4 exam
@@ -21,7 +25,7 @@ export interface GameState extends SaveData {
 
   // time & day
   advanceMinutes: (m: number) => void;
-  sleep: (forced?: boolean) => { xpGained: number; forced: boolean };
+  sleep: (forced?: boolean) => { xpGained: number; forced: boolean; rent: number };
 
   // economy & body
   addMoney: (n: number) => void;
@@ -105,18 +109,22 @@ export const gameStore = createStore<GameState>()((set, get) => ({
     const s = get();
     const xpGained = (s.flags["xpToday"] as number) ?? 0;
     const day = s.day + 1;
+    const rentDue = day > 1 && (day - 1) % RENT_INTERVAL_DAYS === 0;
+    const rent = rentDue ? Math.min(RENT_AMOUNT, s.money) : 0;
     set({
       day,
       minutes: DAY_START,
       season: seasonForDay(day),
       weather: rollWeather(seasonForDay(day)),
+      money: s.money - rent,
       energy: forced ? Math.round(MAX_ENERGY * 0.6) : MAX_ENERGY,
       activitiesDone: [],
       npcs: Object.fromEntries(Object.entries(s.npcs).map(([id, n]) => [id, { ...n, talkedToday: false, giftedToday: false }])),
       flags: { ...s.flags, xpToday: 0 },
     });
     Bus.emit("new-day", day);
-    return { xpGained, forced };
+    if (rent) Bus.emit("money", get().money);
+    return { xpGained, forced, rent };
   },
 
   addMoney: (n) => {

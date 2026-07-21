@@ -42,6 +42,9 @@ export class ShopScene extends ActivityBase {
   private checkoutBtn!: PixelButton;
   private prevBtn!: PixelButton;
   private nextBtn!: PixelButton;
+  /** Restaurant only: eat on the spot (instant energy) vs. pack it for later (inventory). */
+  private eatHere = true;
+  private eatHereBtn?: PixelButton;
 
   constructor() { super("Shop"); }
 
@@ -93,16 +96,28 @@ export class ShopScene extends ActivityBase {
     if (pages <= 1) { this.prevBtn.setVisible(false); this.nextBtn.setVisible(false); this.pageText.setVisible(false); }
 
     if (this.shop === "restaurant") {
-      // restaurant: instant buy, no cart
+      // restaurant: instant buy, no cart — but let the player choose whether
+      // to eat on the spot (energy now) or take the meal away (goes to inventory).
       this.cartPanel.setVisible(false);
       this.cartTotalText.setVisible(false);
       this.cartListText.setVisible(false);
       this.checkoutBtn.setVisible(false);
+      this.eatHereBtn = new PixelButton(this, PX + 16, PY + 44, "", () => {
+        this.eatHere = !this.eatHere;
+        this.updateEatHereBtn();
+      }, { w: 246, h: 30, size: 12 });
+      this.updateEatHereBtn();
     }
 
     this.renderShelf();
     this.renderCart();
     this.refresh();
+  }
+
+  private updateEatHereBtn() {
+    this.eatHereBtn?.setText(this.eatHere
+      ? L("🍽 ここで食べる", "Eat here", "Makan di sini")
+      : L("🥡 持ち帰り", "Take away", "Bawa pulang"));
   }
 
   private pages() { return Math.max(1, Math.ceil(this.stock.length / PAGE_SIZE)); }
@@ -244,10 +259,15 @@ export class ShopScene extends ActivityBase {
       return;
     }
     sfx("coin");
-    g.addEnergy(def.energy ?? 10);
-    Bus.emit("quest-event", "eat", id);
-    Bus.emit("toast", `${def.nameJp}を食べました！(+${def.energy ?? 10} energy)`, "success");
     Bus.emit("quest-event", "buy", id);
+    if (this.eatHere) {
+      g.addEnergy(def.energy ?? 10);
+      Bus.emit("quest-event", "eat", id);
+      Bus.emit("toast", `${def.nameJp}を食べました！(+${def.energy ?? 10} energy)`, "success");
+    } else {
+      g.addItem(id);
+      Bus.emit("toast", `${def.nameJp}を持ち帰りました。(${meaning("Packed for later", "Dibawa pulang untuk nanti")})`, "success");
+    }
     this.refresh();
   }
 

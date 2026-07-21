@@ -57,13 +57,14 @@ export class SleepScene extends Phaser.Scene {
 
   private async endDay() {
     const g = G();
-    const { xpGained, forced } = g.sleep(this.forced);
+    const { xpGained, forced, rent } = g.sleep(this.forced);
     rollDailyQuest(g.day);
     await autoSave();
     this.prefetchStory();
 
     const s = G();
-    flatPanel(this, W / 2 - 220, H / 2 - 150, 440, 300);
+    const panelH = rent ? 340 : 300;
+    flatPanel(this, W / 2 - 220, H / 2 - 150, 440, panelH);
     this.add.text(W / 2, H / 2 - 118, `Day ${s.day - 1} → Day ${s.day}`, style(18, COLOR.accent)).setOrigin(0.5);
     const lines = [
       `今日のXP (XP today): ${xpGained}`,
@@ -72,9 +73,10 @@ export class SleepScene extends Phaser.Scene {
       forced ? meaning("You collapsed into bed — low energy this morning.", "Kamu ambruk ke kasur — energi pagi ini rendah.") : meaning("You slept well. Energy restored!", "Tidurmu nyenyak. Energi pulih!"),
       s.weather === "rain" ? "☔ It's raining today." : s.weather === "snow" ? "❄ It's snowing today." : s.weather === "cloudy" ? "☁ Cloudy skies today." : "☀ A beautiful morning.",
     ];
-    lines.forEach((l, i) => this.add.text(W / 2, H / 2 - 70 + i * 30, l, style(12)).setOrigin(0.5));
+    if (rent) lines.push(`🏠 ${meaning("Rent due", "Sewa jatuh tempo")}: -¥${rent.toLocaleString()}`);
+    lines.forEach((l, i) => this.add.text(W / 2, H / 2 - 70 + i * 30, l, style(12, rent && l.startsWith("🏠") ? COLOR.bad : undefined)).setOrigin(0.5));
 
-    new PixelButton(this, W / 2 - 110, H / 2 + 92, "おはよう！ (Good morning!)", () => {
+    new PixelButton(this, W / 2 - 110, H / 2 + 92 + (rent ? 20 : 0), "おはよう！ (Good morning!)", () => {
       this.scene.stop();
       const map = this.scene.get("Map");
       G().setLocation("apartment", 2, 2);
