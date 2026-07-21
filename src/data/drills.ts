@@ -14,6 +14,39 @@ export const READINGS: ReadingPassage[] = [
     answer: "Shops at the konbini",
   },
   {
+    id: "read-n5-2", level: "N5", title: "私の週末",
+    text: [
+      { jp: "週末はいつも公園に行きます。", kana: "しゅうまつはいつもこうえんにいきます。", en: "I always go to the park on weekends.", idn: "Setiap akhir pekan aku selalu pergi ke taman." },
+      { jp: "公園で友達と話します。とても楽しいです。", kana: "こうえんでともだちとはなします。とてもたのしいです。", en: "I talk with friends at the park. It's a lot of fun.", idn: "Aku ngobrol dengan teman di taman. Sangat menyenangkan." },
+      { jp: "帰る前に、スーパーで買い物をします。", kana: "かえるまえに、すーぱーでかいものをします。", en: "Before going home, I shop at the supermarket.", idn: "Sebelum pulang, aku belanja di supermarket." },
+    ],
+    question: "Where does the writer go before heading home?",
+    options: ["The supermarket", "The library", "The station"],
+    answer: "The supermarket",
+  },
+  {
+    id: "read-n5-3", level: "N5", title: "駅で",
+    text: [
+      { jp: "朝、駅はとても忙しいです。", kana: "あさ、えきはとてもいそがしいです。", en: "In the morning, the station is very busy.", idn: "Pagi hari, stasiun sangat sibuk." },
+      { jp: "切符を買って、ホームで電車を待ちます。", kana: "きっぷをかって、ほーむででんしゃをまちます。", en: "I buy a ticket and wait for the train on the platform.", idn: "Aku beli tiket dan menunggu kereta di peron." },
+      { jp: "電車は八時に来ます。会社まで三十分です。", kana: "でんしゃははちじにきます。かいしゃまでさんじゅっぷんです。", en: "The train comes at 8. It's 30 minutes to the company.", idn: "Keretanya datang jam 8. Ke kantor butuh 30 menit." },
+    ],
+    question: "What time does the train come?",
+    options: ["8 o'clock", "7 o'clock", "9 o'clock"],
+    answer: "8 o'clock",
+  },
+  {
+    id: "read-n5-4", level: "N5", title: "コンビニのお弁当",
+    text: [
+      { jp: "仕事の後、コンビニでお弁当を買います。", kana: "しごとのあと、こんびにでおべんとうをかいます。", en: "After work, I buy a bento at the konbini.", idn: "Setelah kerja, aku beli bento di konbini." },
+      { jp: "今日は新しいお弁当がありました。とても安かったです。", kana: "きょうはあたらしいおべんとうがありました。とてもやすかったです。", en: "Today there was a new bento. It was very cheap.", idn: "Hari ini ada bento baru. Harganya sangat murah." },
+      { jp: "家で温かいお茶と一緒に食べました。おいしかったです。", kana: "いえであたたかいおちゃといっしょにたべました。おいしかったです。", en: "I ate it at home together with warm tea. It was delicious.", idn: "Aku makan di rumah bersama teh hangat. Rasanya enak." },
+    ],
+    question: "What did the writer buy at the konbini?",
+    options: ["A bento", "A book", "An umbrella"],
+    answer: "A bento",
+  },
+  {
     id: "read-n4-1", level: "N4", title: "アルバイトの初日",
     text: [
       { jp: "今日からIT会社でアルバイトを始めました。", kana: "きょうからITがいしゃであるばいとをはじめました。", en: "Starting today, I began a part-time job at an IT company.", idn: "Mulai hari ini aku kerja paruh waktu di perusahaan IT." },
@@ -23,6 +56,39 @@ export const READINGS: ReadingPassage[] = [
     question: "How was the senpai?",
     options: ["Kind and helpful", "Busy and strict", "Absent today"],
     answer: "Kind and helpful",
+  },
+  {
+    id: "read-n4-2", level: "N4", title: "初めての一人暮らし",
+    text: [
+      { jp: "先月、初めて一人暮らしを始めました。", kana: "せんげつ、はじめてひとりぐらしをはじめました。", en: "Last month, I started living alone for the first time.", idn: "Bulan lalu, aku mulai tinggal sendiri untuk pertama kalinya." },
+      { jp: "掃除も洗濯も自分でしなければなりません。最初は大変でした。", kana: "そうじもせんたくもじぶんでしなければなりません。さいしょはたいへんでした。", en: "I have to do cleaning and laundry myself. It was tough at first.", idn: "Aku harus membersihkan dan mencuci sendiri. Awalnya berat." },
+      { jp: "でも、少しずつ慣れてきました。今は毎日の生活が楽しいです。", kana: "でも、すこしずつなれてきました。いまはまいにちのせいかつがたのしいです。", en: "But I've gradually gotten used to it. Now daily life is fun.", idn: "Tapi aku pelan-pelan sudah terbiasa. Sekarang kehidupan sehari-hari terasa menyenangkan." },
+    ],
+    question: "What did the writer have to start doing themselves?",
+    options: ["Cleaning and laundry", "Cooking classes", "Work meetings"],
+    answer: "Cleaning and laundry",
+  },
+  {
+    id: "read-n4-3", level: "N4", title: "会社の休憩時間",
+    text: [
+      { jp: "会社の休憩時間はいつも十二時からです。", kana: "かいしゃのきゅうけいじかんはいつもじゅうにじからです。", en: "The company's break time is always from 12 o'clock.", idn: "Waktu istirahat kantor selalu mulai jam 12." },
+      { jp: "休憩室でコーヒーを飲みながら、同僚と話します。", kana: "きゅうけいしつでこーひーをのみながら、どうりょうとはなします。", en: "I talk with colleagues in the break room while drinking coffee.", idn: "Aku ngobrol dengan rekan kerja sambil minum kopi di ruang istirahat." },
+      { jp: "休憩の後は、気分がすっきりして、また仕事が頑張れます。", kana: "きゅうけいのあとは、きぶんがすっきりして、またしごとががんばれます。", en: "After the break, I feel refreshed and can work hard again.", idn: "Setelah istirahat, perasaan jadi segar dan bisa kerja dengan semangat lagi." },
+    ],
+    question: "What time does the break start?",
+    options: ["12 o'clock", "10 o'clock", "3 o'clock"],
+    answer: "12 o'clock",
+  },
+  {
+    id: "read-n4-4", level: "N4", title: "友達を誘う",
+    text: [
+      { jp: "週末、友達を映画に誘いました。", kana: "しゅうまつ、ともだちをえいがにさそいました。", en: "This weekend, I invited a friend to a movie.", idn: "Akhir pekan ini, aku mengajak teman menonton film." },
+      { jp: "友達は忙しそうでしたが、「行きたい」と言ってくれました。", kana: "ともだちはいそがしそうでしたが、「いきたい」といってくれました。", en: "My friend seemed busy, but said, \"I want to go.\"", idn: "Temanku kelihatan sibuk, tapi bilang, \"aku mau ikut.\"" },
+      { jp: "一緒に見る映画を選ぶのは、とても楽しかったです。", kana: "いっしょにみるえいがをえらぶのは、とてもたのしかったです。", en: "Choosing a movie to watch together was a lot of fun.", idn: "Memilih film untuk ditonton bersama sangat menyenangkan." },
+    ],
+    question: "What did the writer invite their friend to?",
+    options: ["A movie", "A meeting", "A festival"],
+    answer: "A movie",
   },
   {
     id: "read-n3-1", level: "N3", title: "友達の引っ越し",
@@ -91,11 +157,53 @@ export const LISTENINGS: ListeningDrill[] = [
     answer: "Sakuramachi",
   },
   {
+    id: "lis-n5-2", level: "N5",
+    audioJp: "きょうは、あめです。かさをわすれないでください。",
+    question: "What's the weather like today?",
+    options: ["Rainy", "Sunny", "Snowy"],
+    answer: "Rainy",
+  },
+  {
+    id: "lis-n5-3", level: "N5",
+    audioJp: "こーひーは、ひゃくさんじゅうえんです。おちゃは、ひゃくじゅうえんです。",
+    question: "How much is the coffee?",
+    options: ["130 yen", "110 yen", "150 yen"],
+    answer: "130 yen",
+  },
+  {
+    id: "lis-n5-4", level: "N5",
+    audioJp: "がっこうは、はちじに、はじまります。",
+    question: "What time does school start?",
+    options: ["8 o'clock", "9 o'clock", "7 o'clock"],
+    answer: "8 o'clock",
+  },
+  {
     id: "lis-n4-1", level: "N4",
     audioJp: "きゅうこうでんしゃは、にばんせんから、しゅっぱつします。",
     question: "Which platform does the express leave from?",
     options: ["Platform 2", "Platform 1", "Platform 4"],
     answer: "Platform 2",
+  },
+  {
+    id: "lis-n4-2", level: "N4",
+    audioJp: "つぎのかいぎは、もくようびのごごさんじからです。",
+    question: "When is the next meeting?",
+    options: ["Thursday 3 PM", "Thursday 3 AM", "Friday 3 PM"],
+    answer: "Thursday 3 PM",
+  },
+  {
+    id: "lis-n4-3", level: "N4",
+    audioJp: "でんしゃがこんでいるので、つぎのでんしゃをまちましょう。",
+    question: "What should you do?",
+    options: ["Wait for the next train", "Get on now", "Buy a ticket"],
+    answer: "Wait for the next train",
+  },
+  {
+    id: "lis-n4-4", level: "N4",
+    audioJp: "しゅくだいをわすれないで、あしたもってきてください。",
+    question: "What should you bring tomorrow?",
+    options: ["Homework", "An umbrella", "A textbook"],
+    answer: "Homework",
   },
   {
     id: "lis-n3-1", level: "N3",

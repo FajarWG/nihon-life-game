@@ -98,6 +98,26 @@ export const QUESTS: QuestDef[] = [
     ],
     reward: { money: 0, friendship: { npc: "sato", amount: 2 }, xp: { vocabulary: 10 } },
   },
+  {
+    id: "side-hana-1", type: "relationship", title: "A Story Worth Reading", titleJp: "読む価値がある物語",
+    desc: "Hana has been kind to you at the library. Bring her a small gift to show your thanks.",
+    descIdn: "Hana selalu baik padamu di perpustakaan. Bawakan hadiah kecil sebagai tanda terima kasih.",
+    giver: "hana", prereq: [],
+    objectives: [
+      { id: "gift", desc: "Give Hana a gift", event: "gift", target: "hana", count: 1 },
+    ],
+    reward: { money: 0, friendship: { npc: "hana", amount: 2 }, xp: { reading: 10 } },
+  },
+  {
+    id: "side-suzuki-1", type: "relationship", title: "Good Tenant", titleJp: "いい店子",
+    desc: "Suzuki-san has looked after you since you moved in. Bring her a small gift to thank her.",
+    descIdn: "Suzuki-san sudah menjagamu sejak kamu pindah ke sini. Bawakan hadiah kecil sebagai ucapan terima kasih.",
+    giver: "suzuki", prereq: [],
+    objectives: [
+      { id: "gift", desc: "Give Suzuki-san a gift", event: "gift", target: "suzuki", count: 1 },
+    ],
+    reward: { money: 0, friendship: { npc: "suzuki", amount: 2 }, xp: { vocabulary: 10 } },
+  },
 ];
 
 /** Daily quest templates — one is picked each morning. */
@@ -118,6 +138,30 @@ export const DAILY_TEMPLATES: Omit<QuestDef, "id">[] = [
     type: "daily", title: "Balanced Diet", titleJp: "バランスのいい食事",
     desc: "Eat something today.", descIdn: "Makan sesuatu hari ini.",
     objectives: [{ id: "d1", desc: "Eat a food item", event: "eat", count: 1 }],
+    reward: { money: 150, xp: { vocabulary: 5 } },
+  },
+  {
+    type: "daily", title: "Reading Time", titleJp: "読書の時間",
+    desc: "Visit the library and practice reading today.", descIdn: "Kunjungi perpustakaan dan latihan membaca hari ini.",
+    objectives: [{ id: "d1", desc: "Do a reading activity", event: "activity", target: "reading", count: 1 }],
+    reward: { money: 180, xp: { reading: 5 } },
+  },
+  {
+    type: "daily", title: "Ride the Rails", titleJp: "電車に乗ろう",
+    desc: "Take the train today.", descIdn: "Naik kereta hari ini.",
+    objectives: [{ id: "d1", desc: "Take the train", event: "activity", target: "train", count: 1 }],
+    reward: { money: 180, xp: { listening: 5 } },
+  },
+  {
+    type: "daily", title: "Home Cooking", titleJp: "家庭料理",
+    desc: "Cook a meal today.", descIdn: "Masak makanan hari ini.",
+    objectives: [{ id: "d1", desc: "Cook a meal", event: "activity", target: "cooking", count: 1 }],
+    reward: { money: 180, xp: { vocabulary: 5 } },
+  },
+  {
+    type: "daily", title: "Window Shopping", titleJp: "ウィンドウショッピング",
+    desc: "Buy something at a shop today.", descIdn: "Beli sesuatu di toko hari ini.",
+    objectives: [{ id: "d1", desc: "Buy something at a shop", event: "activity", target: "shopping", count: 1 }],
     reward: { money: 150, xp: { vocabulary: 5 } },
   },
 ];

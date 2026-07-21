@@ -68,6 +68,63 @@ export const WORK_TASKS: WorkTask[] = [
     answer: "Thursday 15:00, Room B",
     pay: 800,
   },
+  {
+    id: "w-js-onclick", kind: "bug-js", level: "N3",
+    title: "onClickが動きません", titleEn: "onClick isn't working",
+    body: [
+      { jp: "ボタンを押しても、onClickが実行されません。", en: "Even when I press the button, onClick doesn't execute.", idn: "Meski tombol ditekan, onClick tidak jalan." },
+      { jp: "山田さん：「関数の呼び出し方を確認してください。」", en: "Yamada: \"Please check how the function is being called.\"", idn: "Yamada: \"Tolong periksa cara pemanggilan fungsinya.\"" },
+    ],
+    question: "Which code correctly calls the function on click?",
+    options: [
+      "<button onClick={handleClick}>送信</button>",
+      "<button onClick={handleClick()}>送信</button>",
+      "<button onclick=\"handleClick\">送信</button>",
+    ],
+    answer: "<button onClick={handleClick}>送信</button>",
+    pay: 1100,
+  },
+  {
+    id: "w-review-loop", kind: "code-review", level: "N3",
+    title: "コードレビューのコメント", titleEn: "Code review comment",
+    body: [
+      { jp: "先輩がコードをレビューしました。", en: "My senpai reviewed the code.", idn: "Senior saya me-review kode ini." },
+      { jp: "「このループの中でAPIを呼び出すのは良くないです。ループの外に出してください。」", en: "\"Calling the API inside this loop isn't good. Please move it outside the loop.\"", idn: "\"Memanggil API di dalam loop ini kurang baik. Tolong pindahkan ke luar loop.\"" },
+    ],
+    question: "Which line should be moved outside the loop, according to the review?",
+    options: [
+      "API を呼び出す行 (fetch(...))",
+      "変数を宣言する行 (let i = 0)",
+      "ループの終了条件 (i < items.length)",
+    ],
+    answer: "API を呼び出す行 (fetch(...))",
+    pay: 1200,
+  },
+  {
+    id: "w-docs-auth", kind: "docs", level: "N3",
+    title: "APIドキュメントを読む", titleEn: "Read the API documentation",
+    body: [
+      { jp: "新しいAPIのドキュメントです。", en: "This is the documentation for the new API.", idn: "Ini dokumentasi API baru." },
+      { jp: "「このエンドポイントは、認証トークンが必要です。トークンがない場合、401エラーが返されます。」", en: "\"This endpoint requires an auth token. Without a token, a 401 error is returned.\"", idn: "\"Endpoint ini butuh token autentikasi. Tanpa token, akan dikembalikan error 401.\"" },
+    ],
+    question: "What happens if there's no auth token?",
+    options: ["A 401 error is returned", "The request succeeds anyway", "The server restarts"],
+    answer: "A 401 error is returned",
+    pay: 900,
+  },
+  {
+    id: "w-meeting-release", kind: "meeting", level: "N3",
+    title: "リリース前の確認", titleEn: "Pre-release check-in",
+    body: [
+      { jp: "お疲れ様です。", en: "Good work, everyone.", idn: "Terima kasih kerja kerasnya, semuanya." },
+      { jp: "明日の朝、本番環境にリリースします。", en: "Tomorrow morning, we'll release to production.", idn: "Besok pagi, kita akan rilis ke lingkungan produksi." },
+      { jp: "何か問題があれば、今日中に報告してください。", en: "If there are any issues, please report them by end of today.", idn: "Kalau ada masalah, tolong laporkan sebelum hari ini berakhir." },
+    ],
+    question: "By when should issues be reported?",
+    options: ["By end of today", "By next week", "After the release"],
+    answer: "By end of today",
+    pay: 1000,
+  },
 ];
 
 export const tasksForLevel = (level: string) => WORK_TASKS.filter(t => t.level === level || level !== "N5" && t.level === "N5");

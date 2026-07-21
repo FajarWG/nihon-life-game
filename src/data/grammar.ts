@@ -139,6 +139,71 @@ export const GRAMMAR: GrammarPoint[] = [
     ],
   },
 
+  {
+    id: "g5-kara", level: "N5", title: "〜から", meaning: "because (reason)", meaningIdn: "karena (alasan)",
+    explanation: "Attach から after a plain or polite sentence to give a reason: 忙しいから、行けません (Because I'm busy, I can't go).",
+    explanationIdn: "Tempelkan から setelah kalimat biasa atau sopan untuk memberi alasan: 忙しいから、行けません (Karena sibuk, saya tidak bisa pergi).",
+    examples: [
+      { jp: "時間がないから、急ぎます。", kana: "じかんがないから、いそぎます。", en: "Because I don't have time, I'll hurry." },
+      { jp: "雨だから、傘を持って行きます。", kana: "あめだから、かさをもっていきます。", en: "Because it's raining, I'll bring an umbrella." },
+    ],
+    exercises: [
+      { kind: "fill", prompt: "Give a reason.", sentence: "今日は雨___、公園に行きません。", options: ["だから", "だのに", "だとき"], answer: "だから", translation: "Because it's raining today, I won't go to the park." },
+      { kind: "order", prompt: "Because I'm tired, I'll sleep early.", tiles: ["疲れた", "から", "早く", "寝ます"], translation: "疲れたから早く寝ます。" },
+    ],
+  },
+  {
+    id: "g5-masenka", level: "N5", title: "〜ませんか", meaning: "won't you…? (invitation)", meaningIdn: "maukah…? (ajakan)",
+    explanation: "Add ませんか to a verb stem to invite someone politely: 一緒に行きませんか (Won't you go together?).",
+    explanationIdn: "Tambahkan ませんか ke bentuk dasar kata kerja untuk mengajak seseorang dengan sopan: 一緒に行きませんか (Maukah pergi bersama?).",
+    examples: [
+      { jp: "週末、映画を見ませんか。", kana: "しゅうまつ、えいがをみませんか。", en: "Won't you watch a movie this weekend?" },
+      { jp: "お茶を飲みませんか。", kana: "おちゃをのみませんか。", en: "Won't you have some tea?" },
+    ],
+    exercises: [
+      { kind: "fill", prompt: "Invite politely.", sentence: "一緒に昼ご飯を___か。", options: ["食べません", "食べます", "食べたい"], answer: "食べません", translation: "Won't you have lunch together?" },
+      { kind: "order", prompt: "Won't you come to the festival?", tiles: ["お祭り", "に", "来ません", "か"], translation: "お祭りに来ませんか。" },
+    ],
+  },
+  {
+    id: "g5-tekara", level: "N5", title: "〜てから", meaning: "after doing", meaningIdn: "setelah melakukan",
+    explanation: "Te-form + から: do one thing, then another: 宿題をしてから、遊びます (After doing homework, I'll play).",
+    explanationIdn: "Bentuk -te + から: melakukan satu hal, lalu yang lain: 宿題をしてから、遊びます (Setelah mengerjakan PR, saya bermain).",
+    examples: [
+      { jp: "手を洗ってから、食べます。", kana: "てをあらってから、たべます。", en: "I wash my hands, then eat." },
+      { jp: "仕事が終わってから、電話します。", kana: "しごとがおわってから、でんわします。", en: "After work ends, I'll call." },
+    ],
+    exercises: [
+      { kind: "fill", prompt: "Sequence of actions.", sentence: "シャワーを___、寝ます。", options: ["浴びてから", "浴びる前に", "浴びながら"], answer: "浴びてから", translation: "After taking a shower, I'll sleep." },
+      { kind: "order", prompt: "After studying, I'll watch TV.", tiles: ["勉強して", "から", "テレビを", "見ます"], translation: "勉強してからテレビを見ます。" },
+    ],
+  },
+  {
+    id: "g5-naidekudasai", level: "N5", title: "〜ないでください", meaning: "please don't do", meaningIdn: "tolong jangan lakukan",
+    explanation: "Negative stem + でください: politely ask someone not to do something: 遅れないでください (please don't be late).",
+    explanationIdn: "Bentuk negatif + でください: meminta seseorang untuk tidak melakukan sesuatu: 遅れないでください (tolong jangan terlambat).",
+    examples: [
+      { jp: "ここで写真を撮らないでください。", kana: "ここでしゃしんをとらないでください。", en: "Please don't take photos here." },
+      { jp: "心配しないでください。", kana: "しんぱいしないでください。", en: "Please don't worry." },
+    ],
+    exercises: [
+      { kind: "fill", prompt: "A train rule.", sentence: "電車の中で電話___ください。", options: ["しないで", "しては", "してから"], answer: "しないで", translation: "Please don't make phone calls on the train." },
+      { kind: "order", prompt: "Please don't forget your homework.", tiles: ["宿題を", "忘れないで", "ください"], translation: "宿題を忘れないでください。" },
+    ],
+  },
+  {
+    id: "g5-deshou", level: "N5", title: "〜でしょう", meaning: "probably / right?", meaningIdn: "mungkin / kan?",
+    explanation: "でしょう softens a guess or seeks agreement: 明日は晴れでしょう (It will probably be sunny tomorrow).",
+    explanationIdn: "でしょう melunakkan dugaan atau meminta persetujuan: 明日は晴れでしょう (Besok mungkin cerah).",
+    examples: [
+      { jp: "田中さんはもう来るでしょう。", kana: "たなかさんはもうくるでしょう。", en: "Tanaka-san will probably come soon." },
+      { jp: "これでいいでしょう？", kana: "これでいいでしょう？", en: "This is fine, right?" },
+    ],
+    exercises: [
+      { kind: "fill", prompt: "Make a soft guess.", sentence: "明日は雨___。", options: ["でしょう", "ですから", "でした"], answer: "でしょう", translation: "It will probably rain tomorrow." },
+    ],
+  },
+
   // ═══ N4 ═══════════════════════════════════════════════════════════════
   {
     id: "g4-potential", level: "N4", title: "可能形 〜られる/〜える", meaning: "potential form (can do)", meaningIdn: "bentuk potensial (bisa)",
@@ -271,6 +336,71 @@ export const GRAMMAR: GrammarPoint[] = [
     ],
   },
 
+  {
+    id: "g4-node", level: "N4", title: "〜ので", meaning: "because (softer, objective reason)", meaningIdn: "karena (alasan lebih halus)",
+    explanation: "Plain form + ので gives a reason more softly/objectively than から — common in polite or formal contexts: 電車が遅れたので、遅刻しました (Because the train was delayed, I was late).",
+    explanationIdn: "Bentuk biasa + ので memberi alasan lebih halus/objektif daripada から — umum dipakai dalam konteks sopan/formal: 電車が遅れたので、遅刻しました (Karena kereta terlambat, saya jadi telat).",
+    examples: [
+      { jp: "天気がいいので、散歩します。", kana: "てんきがいいので、さんぽします。", en: "Because the weather is nice, I'll take a walk." },
+      { jp: "忙しいので、行けません。", kana: "いそがしいので、いけません。", en: "Because I'm busy, I can't go." },
+    ],
+    exercises: [
+      { kind: "fill", prompt: "A softer reason.", sentence: "頭が痛い___、早く帰ります。", options: ["ので", "でも", "のに"], answer: "ので", translation: "Because my head hurts, I'll go home early." },
+      { kind: "order", prompt: "Because it's a holiday, the shop is closed.", tiles: ["休みな", "ので", "店は", "閉まっています"], translation: "休みなので、店は閉まっています。" },
+    ],
+  },
+  {
+    id: "g4-toki", level: "N4", title: "〜とき", meaning: "when ~", meaningIdn: "ketika ~",
+    explanation: "Clause + とき marks 'when': 日本に来たとき、緊張しました (When I came to Japan, I was nervous). The clause before とき is in plain form, modifying とき like a noun.",
+    explanationIdn: "Klausa + とき menandai 'ketika': 日本に来たとき、緊張しました (Ketika saya datang ke Jepang, saya gugup). Klausa sebelum とき pakai bentuk biasa, seperti menerangkan kata benda.",
+    examples: [
+      { jp: "暇なとき、映画を見ます。", kana: "ひまなとき、えいがをみます。", en: "When I'm free, I watch movies." },
+      { jp: "子供のとき、よく公園で遊びました。", kana: "こどものとき、よくこうえんであそびました。", en: "When I was a kid, I often played in the park." },
+    ],
+    exercises: [
+      { kind: "fill", prompt: "When something happens.", sentence: "分からない___、先輩に聞きます。", options: ["とき", "ながら", "そう"], answer: "とき", translation: "When I don't understand, I ask my senpai." },
+      { kind: "order", prompt: "When I arrived at the office, no one was there.", tiles: ["会社に", "着いた", "とき", "誰も", "いませんでした"], translation: "会社に着いたとき、誰もいませんでした。" },
+    ],
+  },
+  {
+    id: "g4-sugiru", level: "N4", title: "〜すぎる", meaning: "too much / excessively", meaningIdn: "terlalu",
+    explanation: "Verb stem or adjective stem + すぎる: 食べ過ぎる (eat too much), 高すぎる (too expensive).",
+    explanationIdn: "Bentuk dasar kata kerja/kata sifat + すぎる: 食べ過ぎる (makan terlalu banyak), 高すぎる (terlalu mahal).",
+    examples: [
+      { jp: "このラーメンは辛すぎます。", kana: "このらーめんはからすぎます。", en: "This ramen is too spicy." },
+      { jp: "昨日、働きすぎました。", kana: "きのう、はたらきすぎました。", en: "Yesterday I worked too much." },
+    ],
+    exercises: [
+      { kind: "fill", prompt: "Too expensive!", sentence: "このパソコンは高___ます。", options: ["すぎ", "そう", "やすい"], answer: "すぎ", translation: "This computer is too expensive." },
+      { kind: "order", prompt: "I ate too much last night.", tiles: ["昨日の夜", "食べ", "すぎました"], translation: "昨日の夜、食べすぎました。" },
+    ],
+  },
+  {
+    id: "g4-yasuinikui", level: "N4", title: "〜やすい・〜にくい", meaning: "easy to / hard to do", meaningIdn: "mudah / sulit dilakukan",
+    explanation: "Verb stem + やすい (easy to do) or にくい (hard to do): 読みやすい (easy to read), 分かりにくい (hard to understand).",
+    explanationIdn: "Bentuk dasar kata kerja + やすい (mudah dilakukan) atau にくい (sulit dilakukan): 読みやすい (mudah dibaca), 分かりにくい (sulit dimengerti).",
+    examples: [
+      { jp: "この本は読みやすいです。", kana: "このほんはよみやすいです。", en: "This book is easy to read." },
+      { jp: "この漢字は書きにくいです。", kana: "このかんじはかきにくいです。", en: "This kanji is hard to write." },
+    ],
+    exercises: [
+      { kind: "fill", prompt: "Easy to understand.", sentence: "先輩の説明は分かり___です。", options: ["やすい", "すぎる", "そう"], answer: "やすい", translation: "My senpai's explanation is easy to understand." },
+      { kind: "order", prompt: "This shoe is hard to walk in.", tiles: ["この靴", "は", "歩き", "にくいです"], translation: "この靴は歩きにくいです。" },
+    ],
+  },
+  {
+    id: "g4-teoku", level: "N4", title: "〜ておく", meaning: "do in advance / leave as is", meaningIdn: "melakukan lebih dulu / membiarkan",
+    explanation: "Te-form + おく: prepare something ahead of time, or leave a state as it is: 資料を準備しておきます (I'll prepare the documents in advance).",
+    explanationIdn: "Bentuk -te + おく: menyiapkan sesuatu lebih dulu, atau membiarkan suatu keadaan: 資料を準備しておきます (Saya akan menyiapkan dokumen lebih dulu).",
+    examples: [
+      { jp: "会議の前に資料を読んでおきます。", kana: "かいぎのまえにしりょうをよんでおきます。", en: "I'll read the materials before the meeting." },
+      { jp: "ドアを開けておいてください。", kana: "どあをあけておいてください。", en: "Please leave the door open." },
+    ],
+    exercises: [
+      { kind: "fill", prompt: "Prepare in advance.", sentence: "明日の会議のために、資料を___。", options: ["準備しておきます", "準備してあります", "準備しすぎます"], answer: "準備しておきます", translation: "I'll prepare the documents in advance for tomorrow's meeting." },
+    ],
+  },
+
   // ═══ N3 ═══════════════════════════════════════════════════════════════
   {
     id: "g3-passive", level: "N3", title: "受身形 〜られる", meaning: "passive voice", meaningIdn: "bentuk pasif",
@@ -398,6 +528,68 @@ export const GRAMMAR: GrammarPoint[] = [
     exercises: [
       { kind: "order", prompt: "Let's practice while we're young.", tiles: ["若い", "うちに", "練習しましょう"], translation: "若いうちに練習しましょう。" },
       { kind: "fill", prompt: "Before it rains…", sentence: "雨が降らない___、帰りましょう。", options: ["うちに", "ながら", "ばかり"], answer: "うちに", translation: "Let's head home before it rains." },
+    ],
+  },
+  {
+    id: "g3-noni", level: "N3", title: "〜のに", meaning: "even though / despite", meaningIdn: "padahal / meskipun",
+    explanation: "Plain form + のに expresses an unexpected or regrettable contrast: 頑張ったのに、失敗しました (Even though I tried hard, I failed).",
+    explanationIdn: "Bentuk biasa + のに mengekspresikan kontras yang tak terduga atau disesalkan: 頑張ったのに、失敗しました (Padahal sudah berusaha keras, saya gagal).",
+    examples: [
+      { jp: "天気がいいのに、家にいます。", kana: "てんきがいいのに、いえにいます。", en: "Even though the weather is nice, I'm staying home." },
+      { jp: "説明したのに、分かってくれません。", kana: "せつめいしたのに、わかってくれません。", en: "Even though I explained, they don't understand." },
+    ],
+    exercises: [
+      { kind: "fill", prompt: "An unexpected contrast.", sentence: "毎日勉強した___、試験に落ちました。", options: ["のに", "ので", "から"], answer: "のに", translation: "Even though I studied every day, I failed the exam." },
+      { kind: "order", prompt: "Even though it's a holiday, I have to work.", tiles: ["休みなのに", "仕事を", "しなければ", "なりません"], translation: "休みなのに、仕事をしなければなりません。" },
+    ],
+  },
+  {
+    id: "g3-tokoro", level: "N3", title: "〜ところ", meaning: "just about to / in the middle of / just did", meaningIdn: "baru mau / sedang / baru saja",
+    explanation: "Dictionary form + ところ = about to do; ~ている + ところ = in the middle of doing; ~た + ところ = just did. 今から出かけるところです (I'm just about to leave now).",
+    explanationIdn: "Bentuk kamus + ところ = baru mau melakukan; ~ている + ところ = sedang melakukan; ~た + ところ = baru saja melakukan. 今から出かけるところです (Saya baru mau berangkat sekarang).",
+    examples: [
+      { jp: "ちょうど今、帰るところです。", kana: "ちょうどいま、かえるところです。", en: "I'm just about to go home right now." },
+      { jp: "今、資料を確認しているところです。", kana: "いま、しりょうをかくにんしているところです。", en: "I'm in the middle of checking the documents right now." },
+    ],
+    exercises: [
+      { kind: "fill", prompt: "Just finished, right now.", sentence: "今、仕事が終わった___です。", options: ["ところ", "ほう", "うちに"], answer: "ところ", translation: "I just finished work right now." },
+    ],
+  },
+  {
+    id: "g3-okagede-seide", level: "N3", title: "〜おかげで・〜せいで", meaning: "thanks to / because of (blame)", meaningIdn: "berkat / gara-gara",
+    explanation: "おかげで credits a positive cause: 先輩のおかげで、合格しました (Thanks to my senpai, I passed). せいで blames a negative cause: 電車が遅れたせいで、遅刻しました (Because of the train delay, I was late).",
+    explanationIdn: "おかげで memuji sebab yang positif: 先輩のおかげで、合格しました (Berkat senior saya, saya lulus). せいで menyalahkan sebab yang negatif: 電車が遅れたせいで、遅刻しました (Gara-gara kereta terlambat, saya jadi telat).",
+    examples: [
+      { jp: "先生のおかげで、日本語が上手になりました。", kana: "せんせいのおかげで、にほんごがじょうずになりました。", en: "Thanks to my teacher, my Japanese improved." },
+      { jp: "寝坊したせいで、会議に遅れました。", kana: "ねぼうしたせいで、かいぎにおくれました。", en: "Because I overslept, I was late to the meeting." },
+    ],
+    exercises: [
+      { kind: "fill", prompt: "Give credit for a good outcome.", sentence: "先輩の助けの___、バグが直りました。", options: ["おかげで", "せいで", "ために"], answer: "おかげで", translation: "Thanks to my senpai's help, the bug got fixed." },
+      { kind: "order", prompt: "Because of the rain, the festival was cancelled.", tiles: ["雨のせいで", "お祭りが", "中止に", "なりました"], translation: "雨のせいで、お祭りが中止になりました。" },
+    ],
+  },
+  {
+    id: "g3-toshite", level: "N3", title: "〜として", meaning: "as / in the capacity of", meaningIdn: "sebagai",
+    explanation: "Noun + として marks a role or capacity: エンジニアとして働いています (I work as an engineer).",
+    explanationIdn: "Kata benda + として menandai peran atau kapasitas: エンジニアとして働いています (Saya bekerja sebagai engineer).",
+    examples: [
+      { jp: "新人として、たくさん質問しました。", kana: "しんじんとして、たくさんしつもんしました。", en: "As a newcomer, I asked a lot of questions." },
+      { jp: "友達として、心配しています。", kana: "ともだちとして、しんぱいしています。", en: "As a friend, I'm worried." },
+    ],
+    exercises: [
+      { kind: "fill", prompt: "In a role.", sentence: "彼は先輩___、いつも助けてくれます。", options: ["として", "にとって", "について"], answer: "として", translation: "As a senior, he always helps me." },
+    ],
+  },
+  {
+    id: "g3-nichigainai", level: "N3", title: "〜に違いない", meaning: "must be / certainly (strong conjecture)", meaningIdn: "pasti / sudah pasti (dugaan kuat)",
+    explanation: "Plain form + に違いない expresses strong confidence in a conjecture: あの人は日本人に違いない (That person must be Japanese).",
+    explanationIdn: "Bentuk biasa + に違いない mengekspresikan keyakinan kuat pada suatu dugaan: あの人は日本人に違いない (Orang itu pasti orang Jepang).",
+    examples: [
+      { jp: "この味は本物に違いない。", kana: "このあじはほんものにちがいない。", en: "This taste must be the real thing." },
+      { jp: "最近連絡がないから、忙しいに違いない。", kana: "さいきんれんらくがないから、いそがしいにちがいない。", en: "There's been no contact lately, so he must be busy." },
+    ],
+    exercises: [
+      { kind: "fill", prompt: "Strong conjecture.", sentence: "彼の話し方を見ると、先生___。", options: ["に違いない", "かもしれない", "というより"], answer: "に違いない", translation: "Looking at how he talks, he must be a teacher." },
     ],
   },
 ];

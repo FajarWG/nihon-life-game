@@ -291,30 +291,38 @@ flowchart TD
 | 🟡 Exam tidak memberi XP saat lulus | ✅ **FIXED** — sekarang +20 grammar +10 reading saat lulus |
 | 🟡 Read activity tidak bisa di-mark daily | ✅ **FIXED** — `ReadScene.finishActivity({ activity: "reading", ... })` sekarang memanggil `markActivity()`, dibatasi 1×/hari |
 | 🟠 Tidak ada pembatas waktu tidur | ✅ **FIXED** — sleep hanya bisa dipakai mulai jam 20:00 |
-| 🟡 Ekonomi terlalu mudah (tidak ada pengeluaran rutin) | ⚠️ **BELUM** — masih belum ada sewa/tagihan berkala |
-| 🟠 Vending machine & Restaurant langsung consume item | ⚠️ **BELUM** — masih instant-buy only |
+| 🟡 Ekonomi terlalu mudah (tidak ada pengeluaran rutin) | ✅ **FIXED** — sewa apartemen ¥500 dipotong otomatis tiap 7 hari saat tidur (lihat §6.4) |
+| 🟠 Vending machine & Restaurant langsung consume item | ✅ **PARTIAL FIX** — restaurant sekarang punya toggle "Eat here / Take away"; vending sudah cart-based (goes to inventory) sejak sebelumnya |
 | 🟠 Story scene dependensi API eksternal | ✅ **FIXED** — kini ada 7 cerita bawaan (`src/data/stories.ts`) yang dimainkan tanpa API key; AI generation tetap tersedia sebagai tambahan opsional |
-| 🟡 Train selalu mengarah ke company | ⚠️ **BELUM** — masih 1 rute, 6 stasiun didefinisikan tapi tidak bisa dipilih |
+| 🟡 Train selalu mengarah ke company | ⚠️ **BELUM** — masih 1 rute, 6 stasiun didefinisikan tapi tidak bisa dipilih (lihat catatan di §5.3) |
 
 ### 5.3 Rekomendasi yang Masih Terbuka
 
-#### Balancing (belum dikerjakan)
+#### Balancing
 
-| # | Rekomendasi | Dampak |
+| # | Rekomendasi | Status |
 |---|-------------|--------|
-| 1 | **Tambahkan pengeluaran rutin** | Sewa apartemen ¥500/minggu, atau biaya makan otomatis ¥100/hari |
-| 2 | **Turunkan work pay atau tambah variasi** | Sistem performa 3 tingkat (perfect/good/bad), atau tambah tiket level N3+ |
-| 3 | **Vending & Restaurant: opsi "beli untuk nanti"** | Biarkan player memilih: langsung makan/minum atau simpan di inventory |
-| 4 | **Train multi-rute** | 6 stasiun sudah ada datanya — tinggal buka pilihan destinasi selain company |
+| 1 | **Tambahkan pengeluaran rutin** | ✅ **FIXED** (sesi ini) — rent ¥500/7 hari, lihat §6.4 |
+| 2 | **Turunkan work pay atau tambah variasi** | ⚠️ Belum — sistem performa masih biner (perfect ticket / setengah bayar) |
+| 3 | **Vending & Restaurant: opsi "beli untuk nanti"** | ✅ **FIXED** (sesi ini) — restaurant, lihat §6.4 |
+| 4 | **Train multi-rute** | ⚠️ Belum — dianalisis ulang sesi ini: 5 dari 6 stasiun bertujuan ke lokasi yang sudah bisa dicapai jalan kaki langsung di peta town, jadi multi-rute nyata cuma bernilai untuk company (satu-satunya lokasi yang memang butuh kereta). Kalau mau dikerjakan, nilainya ada di variasi konten pengumuman/kuis, bukan fast-travel baru. |
 
-#### Kedalaman Gameplay (belum dikerjakan)
+#### Kedalaman Gameplay
 
-| # | Rekomendasi | Dampak |
+| # | Rekomendasi | Status |
 |---|-------------|--------|
-| 5 | **Unlock N2 & N1 exam content** | Slot type system sudah siap; vocabulary/kanji/grammar/drills N3 sudah solid sebagai basis pola konten |
-| 6 | **Sistem mingguan: hari libur & event spesial** | Story pool sudah punya `kind: "festival"` — bisa diperluas jadi event kalender |
-| 7 | **Tambahkan random encounter di jalan** | Story `kind: "encounter"` sudah ada infrastrukturnya (2 dari 7 built-in story), tinggal dipicu dari world-walk bukan hanya dari menu Story |
-| 8 | **Kebutuhan kedua: Social/Mood** | Masih belum ada dimensi kedua selain Energy |
+| 5 | **Unlock N2 & N1 exam content** | ⚠️ Belum — perlu konten vocab/kanji/grammar/drill N2-N1 baru (di luar scope sesi ini) |
+| 6 | **Sistem mingguan: hari libur & event spesial** | ⚠️ Sebagian — `kind: "festival"` sudah dipicu tiap hari ke-14 dari siklus 28 hari (lihat SleepScene.prefetchStory) |
+| 7 | **Tambahkan random encounter di jalan** | ✅ **FIXED** (sesi ini) — lihat §6.4 |
+| 8 | **Kebutuhan kedua: Social/Mood** | ⚠️ Belum — masih belum ada dimensi kedua selain Energy |
+
+### 6.4 [BARU] Perubahan Sesi Ini (rent, take-away, random encounter)
+
+**Sewa mingguan.** `gameState.sleep()` sekarang memotong ¥500 (`RENT_AMOUNT`, `RENT_INTERVAL_DAYS` di `gameState.ts`) setiap 7 hari in-game (hari 8, 15, 22, …), diclamp supaya uang tidak bisa minus. `SleepScene` menampilkan baris "🏠 Rent due: -¥500" di ringkasan pagi saat itu terjadi.
+
+**Restaurant "Eat here / Take away".** `ShopScene` kini punya toggle di restaurant: mode default "🍽 Eat here" mempertahankan perilaku lama (energy langsung bertambah), mode "🥡 Take away" memindahkan makanan ke inventory (item bisa dimakan nanti lewat kulkas apartemen) tanpa energy instan. Vending machine sendiri sudah cart-based sejak sebelumnya (checkout → inventory), jadi tidak perlu perubahan.
+
+**Random encounter saat jalan-jalan.** `MapScene` sekarang punya heartbeat 5 detik (hanya di peta outdoor) yang mengecek apakah ada story `kind: "encounter"` yang sudah di-queue (biasanya muncul tiap hari kelipatan 7 lewat `SleepScene.prefetchStory`). Kalau ada dan roll 15% berhasil, game menampilkan toast lalu langsung membuka `StoryScene` — pemain tidak perlu lagi pulang ke meja apartemen untuk memicu encounter. Dibatasi 1× per hari via `flags.encounterOfferedDay`.
 
 ### 5.4 Arsitektur — Status Update
 
@@ -399,26 +407,28 @@ JLPT
 
 MONEY
   Start:             ¥3,000
+  Rent:              -¥500 every 7 days (charged on waking; clamped at 0)
   Max daily income:  ~¥2,200
   Main quest total:  ¥500+¥500+¥1,000+¥1,500+¥2,500 = ¥6,000
   Min daily food:    ¥110 (coffee) / ¥480 (bento)
   Min ingredients:   ¥60 (greenonion)
   Max ingredient:    ¥400 (meat)
 
-KONTEN (per 2026-07-17)
-  Vocabulary:  180 kata (N5:90 · N4:50 · N3:40)
-  Kanji:       306 entri (N5:112 · N4:105 · N3:89)
-  Grammar:     30 poin (10 per level N5/N4/N3)
-  Reading:     7 passage (N5:1 · N4:1 · N3:5)
-  Listening:   7 drill (N5:1 · N4:1 · N3:5)
-  Items:       38 item, 2 toko fisik (konbini 11 stok, supermarket 22 stok)
-  Recipes:     3 resep (N5:2 · N4:1 · N3:0)
-  Work tasks:  5 tiket (N5:2 · N4:3 · N3:0)
-  NPC:         4, masing-masing 5 dialogue tier + 1 quest
-  Main quest:  5 (N5→N4→N3 arc)
-  Side quest:  4 (1 per NPC)
-  Built-in stories: 7 (grammarFocus N5–N3, kind daily/encounter/festival)
-  Stations:    6 (1 jalur kereta, belum bisa multi-rute)
+KONTEN (per 2026-07-21, sesi content-pass kedua)
+  Vocabulary:  309 kata (N5:140 · N4:96 · N3:73) — naik dari 180
+  Kanji:       306 entri (N5:112 · N4:105 · N3:89) — belum disentuh sesi ini
+  Grammar:     45 poin (15 per level N5/N4/N3) — naik dari 30
+  Reading:     13 passage (N5:4 · N4:4 · N3:5) — dulu timpang (1/1/5), sekarang rata
+  Listening:   13 drill (N5:4 · N4:4 · N3:5) — dulu timpang (1/1/5), sekarang rata
+  Items:       38 item, 2 toko fisik (konbini 11 stok, supermarket 22 stok) — belum disentuh
+  Recipes:     5 resep (N5:2 · N4:2 · N3:1) — tambah yakisoba (N4) & nikujaga (N3), N3 dulu kosong
+  Work tasks:  9 tiket (N5:2 · N4:3 · N3:4) — tambah 4 tiket N3 (bug-js/code-review/docs/meeting), N3 dulu kosong
+  NPC:         6, masing-masing 5 dialogue tier + 1 quest — tambah Hana (pustakawan) & Suzuki-san (ibu kos)
+  Main quest:  5 (N5→N4→N3 arc) — belum disentuh
+  Side quest:  6 (1 per NPC) — tambah side-hana-1 & side-suzuki-1
+  Daily quest templates: 7 (dulu 3) — tambah reading/train/cooking/shopping
+  Built-in stories: 11 (dulu 7) — tambah 2 festival (N4/N3), 1 season (N4), 1 holiday (N5); kind season & holiday dulu 0
+  Stations:    6 (1 jalur kereta, belum bisa multi-rute) — dianalisis ulang, nilai rendah untuk dikerjakan (lihat §5.3)
 ```
 
 ---

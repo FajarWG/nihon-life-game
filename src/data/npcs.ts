@@ -186,6 +186,98 @@ export const NPCS: NpcDef[] = [
       },
     ],
   },
+  {
+    id: "hana", name: "Hana", nameJp: "花", age: 26, occupation: "Librarian",
+    sprite: "npc-hana", bio: "Runs the town library. Quiet, loves books, secretly writes novels after closing.",
+    favoriteItems: ["jlptbook", "omamori"],
+    questId: "side-hana-1",
+    schedule: [
+      { from: 9, to: 18, location: "library", x: 4, y: 4 },
+    ],
+    dialogues: [
+      {
+        id: "hana-0", minFriendship: 0,
+        lines: [
+          { speaker: "hana", jp: "静かにしてくださいね…あ、いらっしゃい。", kana: "しずかにしてくださいね…あ、いらっしゃい。", en: "Please keep it quiet... oh, welcome.", idn: "Tolong tenang ya... oh, selamat datang." },
+          { speaker: "hana", jp: "何かおすすめの本、探しましょうか。", kana: "なにかおすすめのほん、さがしましょうか。", en: "Shall I help you find a recommended book?", idn: "Mau kubantu cari buku rekomendasi?" },
+        ],
+      },
+      {
+        id: "hana-3", minFriendship: 3,
+        lines: [
+          { speaker: "hana", jp: "最近、よく図書館に来てくれますね。", kana: "さいきん、よくとしょかんにきてくれますね。", en: "You've been coming to the library a lot lately.", idn: "Akhir-akhir ini kamu sering ke perpustakaan ya." },
+          { speaker: "hana", jp: "本が好きな人、嫌いじゃないですよ。", kana: "ほんがすきなひと、きらいじゃないですよ。", en: "I don't dislike people who love books, you know.", idn: "Aku tidak benci orang yang suka buku, lho." },
+        ],
+      },
+      {
+        id: "hana-6", minFriendship: 6,
+        lines: [
+          { speaker: "hana", jp: "実は、昔ここで働く前は、小説家になりたかったんです。", kana: "じつは、むかしここではたらくまえは、しょうせつかになりたかったんです。", en: "Actually, before I worked here, I wanted to become a novelist.", idn: "Sebenarnya, sebelum bekerja di sini, aku ingin jadi novelis." },
+          { speaker: "hana", jp: "今も、閉館後にこっそり書いてるんですよ。", kana: "いまも、へいかんごにこっそりかいてるんですよ。", en: "Even now, I secretly write after closing time.", idn: "Sampai sekarang, aku diam-diam menulis setelah tutup." },
+        ],
+      },
+      {
+        id: "hana-8", minFriendship: 8,
+        lines: [
+          { speaker: "hana", jp: "君の漢字、本当に読めるようになりましたね。", kana: "きみのかんじ、ほんとうによめるようになりましたね。", en: "You've really become able to read kanji, haven't you.", idn: "Kanji-mu benar-benar sudah bisa dibaca ya." },
+          { speaker: "hana", jp: "いつか、私の小説も読んでくれますか。", kana: "いつか、わたしのしょうせつもよんでくれますか。", en: "Will you read my novel someday, too?", idn: "Suatu hari, maukah kamu baca novelku juga?" },
+        ],
+      },
+      {
+        id: "hana-10", minFriendship: 10,
+        lines: [
+          { speaker: "hana", jp: "君が来るこの図書館の時間、実は一番好きな時間なんです。", kana: "きみがくるこのとしょかんのじかん、じつはいちばんすきなじかんなんです。", en: "The time you spend here at the library is actually my favorite time.", idn: "Waktu kamu datang ke perpustakaan ini sebenarnya waktu favoritku." },
+          { speaker: "hana", jp: "これからも、静かな場所で待ってますね。", kana: "これからも、しずかなばしょでまってますね。", en: "I'll keep waiting for you here in this quiet place.", idn: "Aku akan terus menunggumu di tempat yang tenang ini." },
+        ],
+      },
+    ],
+  },
+  {
+    id: "suzuki", name: "Suzuki-san", nameJp: "鈴木さん", age: 58, occupation: "Apartment landlady",
+    sprite: "npc-suzuki", bio: "Manages the apartment building. Warm but keeps a close eye on the rent.",
+    favoriteItems: ["flowers", "greentea"],
+    questId: "side-suzuki-1",
+    schedule: [
+      { from: 7, to: 20, location: "town", x: 5, y: 5 },
+    ],
+    dialogues: [
+      {
+        id: "suzuki-0", minFriendship: 0,
+        lines: [
+          { speaker: "suzuki", jp: "あら、おはよう。今日も元気そうね。", kana: "あら、おはよう。きょうもげんきそうね。", en: "Oh, good morning. You look lively today too.", idn: "Oh, selamat pagi. Hari ini juga kamu kelihatan bersemangat." },
+          { speaker: "suzuki", jp: "何か困ったことがあったら、いつでも言ってね。", kana: "なにかこまったことがあったら、いつでもいってね。", en: "If anything troubles you, tell me anytime.", idn: "Kalau ada masalah, bilang saja kapan pun." },
+        ],
+      },
+      {
+        id: "suzuki-3", minFriendship: 3,
+        lines: [
+          { speaker: "suzuki", jp: "この町に来たばかりの頃を思い出すわ。", kana: "このまちにきたばかりのころをおもいだすわ。", en: "It reminds me of when you'd just arrived in this town.", idn: "Ini mengingatkanku waktu kamu baru datang ke kota ini." },
+          { speaker: "suzuki", jp: "家賃、いつもちゃんと払ってくれてありがとうね。", kana: "やちん、いつもちゃんとはらってくれてありがとうね。", en: "Thank you for always paying your rent properly.", idn: "Terima kasih selalu bayar sewa tepat waktu." },
+        ],
+      },
+      {
+        id: "suzuki-6", minFriendship: 6,
+        lines: [
+          { speaker: "suzuki", jp: "実はね、このアパート、もう三十年も管理してるのよ。", kana: "じつはね、このあぱーと、もうさんじゅうねんもかんりしてるのよ。", en: "Actually, I've been managing this apartment for 30 years now.", idn: "Sebenarnya, aku sudah mengurus apartemen ini selama 30 tahun." },
+          { speaker: "suzuki", jp: "いろんな人が住んで、出て行ったけど、君のことはよく覚えておくわね。", kana: "いろんなひとがすんで、でていったけど、きみのことはよくおぼえておくわね。", en: "Many people have lived here and moved on, but I'll remember you well.", idn: "Banyak orang sudah tinggal dan pergi, tapi aku akan selalu ingat kamu." },
+        ],
+      },
+      {
+        id: "suzuki-8", minFriendship: 8,
+        lines: [
+          { speaker: "suzuki", jp: "最近、部屋から勉強する声が聞こえてくるのよ。", kana: "さいきん、へやからべんきょうするこえがきこえてくるのよ。", en: "Lately, I can hear the sound of you studying from your room.", idn: "Akhir-akhir ini, aku dengar suara kamu belajar dari kamarmu." },
+          { speaker: "suzuki", jp: "頑張ってるのね。応援してるわよ。", kana: "がんばってるのね。おうえんしてるわよ。", en: "You're working hard, aren't you. I'm rooting for you.", idn: "Kamu sedang berusaha keras ya. Aku mendukungmu." },
+        ],
+      },
+      {
+        id: "suzuki-10", minFriendship: 10,
+        lines: [
+          { speaker: "suzuki", jp: "君みたいな店子は、なかなかいないわよ。", kana: "きみみたいなたなこは、なかなかいないわよ。", en: "Tenants like you are hard to come by.", idn: "Penyewa seperti kamu itu jarang ada lho." },
+          { speaker: "suzuki", jp: "このアパートを、これからも大事にしてね。", kana: "このあぱーとを、これからもだいじにしてね。", en: "Please keep taking good care of this apartment.", idn: "Tolong terus jaga apartemen ini baik-baik ya." },
+        ],
+      },
+    ],
+  },
 ];
 
 export const NPC_MAP: Record<string, NpcDef> = Object.fromEntries(NPCS.map(n => [n.id, n]));

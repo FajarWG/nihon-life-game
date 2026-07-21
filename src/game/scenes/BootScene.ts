@@ -12,6 +12,8 @@ const CHAR_COLORS: Record<string, { hair: string; shirt: string; pants: string }
   "npc-yuki": { hair: "#c87850", shirt: "#e88098", pants: "#5a6a8a" },
   "npc-yamada": { hair: "#3a3040", shirt: "#3a8a6a", pants: "#3a3a4a" },
   "npc-sato": { hair: "#6a6a74", shirt: "#4a90d9", pants: "#4a4a54" },
+  "npc-hana": { hair: "#3a2a24", shirt: "#8a4a6a", pants: "#4a3a4a" },
+  "npc-suzuki": { hair: "#8a8a90", shirt: "#c88a5a", pants: "#5a4a44" },
 };
 
 export class BootScene extends Phaser.Scene {

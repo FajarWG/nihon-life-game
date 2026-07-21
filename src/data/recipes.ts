@@ -37,6 +37,30 @@ export const RECIPES: Recipe[] = [
     ],
     result: "meal-tamagoyaki",
   },
+  {
+    id: "r-yakisoba", nameJp: "焼きそば", kana: "やきそば", nameEn: "Yakisoba", level: "N4",
+    ingredients: ["noodles", "cabbage", "meat", "sauce"],
+    steps: [
+      { jp: "肉とキャベツを切ります。", kana: "にくとキャベツをきります。", en: "Cut the meat and cabbage.", idn: "Potong daging dan kubis." },
+      { jp: "フライパンで肉を炒めます。", kana: "ふらいぱんでにくをいためます。", en: "Fry the meat in a pan.", idn: "Tumis daging di wajan." },
+      { jp: "キャベツを加えて、一緒に炒めます。", kana: "キャベツをくわえて、いっしょにいためます。", en: "Add the cabbage and fry together.", idn: "Tambahkan kubis, tumis bersama." },
+      { jp: "麺を入れて、混ぜます。", kana: "めんをいれて、まぜます。", en: "Add the noodles and mix.", idn: "Masukkan mi, aduk rata." },
+      { jp: "ソースをかけて、完成です。", kana: "そーすをかけて、かんせいです。", en: "Pour the sauce over it. Done!", idn: "Siram dengan saus. Selesai!" },
+    ],
+    result: "meal-yakisoba",
+  },
+  {
+    id: "r-nikujaga", nameJp: "肉じゃが", kana: "にくじゃが", nameEn: "Nikujaga", level: "N3",
+    ingredients: ["meat", "potato", "onion", "carrot", "soysauce", "sugar"],
+    steps: [
+      { jp: "じゃがいもと人参を切ります。", kana: "じゃがいもとにんじんをきります。", en: "Cut the potatoes and carrots.", idn: "Potong kentang dan wortel." },
+      { jp: "鍋で肉と玉ねぎを炒めます。", kana: "なべでにくとたまねぎをいためます。", en: "Fry the meat and onion in a pot.", idn: "Tumis daging dan bawang bombay di panci." },
+      { jp: "じゃがいもと人参を加えて、水を入れます。", kana: "じゃがいもとにんじんをくわえて、みずをいれます。", en: "Add the potatoes and carrots, then add water.", idn: "Tambahkan kentang dan wortel, lalu masukkan air." },
+      { jp: "醤油と砂糖で味付けします。", kana: "しょうゆとさとうであじつけします。", en: "Season with soy sauce and sugar.", idn: "Bumbui dengan kecap asin dan gula." },
+      { jp: "弱火でじっくり煮て、完成です。", kana: "よわびでじっくりにて、かんせいです。", en: "Simmer slowly on low heat. Done!", idn: "Rebus perlahan dengan api kecil. Selesai!" },
+    ],
+    result: "meal-nikujaga",
+  },
 ];
 
 export const RECIPE_MAP: Record<string, Recipe> = Object.fromEntries(RECIPES.map(r => [r.id, r]));
